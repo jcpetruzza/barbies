@@ -44,17 +44,7 @@ import Data.Functor.Compose (Compose(..))
 import Data.Functor.Product (Product(..))
 import Data.Functor.Prod
 
-
--- | Barbie-types that can be mapped over. Instances of 'FunctorB' should
---   satisfy the following laws:
---
--- @
---   'bmap' 'id' = 'id'
---   'bmap' f . 'bmap' g = 'bmap' (f . g)
--- @
---
-class FunctorB b where
-  bmap :: (forall a . f a -> g a) -> b f -> b g
+import Data.Barbie.Internal.Functor(FunctorB(..))
 
 
 -- | Barbie-types that can be traversed fro left to right. Instances should
