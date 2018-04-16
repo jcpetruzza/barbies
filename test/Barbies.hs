@@ -30,7 +30,7 @@ import Test.Tasty.QuickCheck
 ---------------------------------------------------
 
 data Void (f :: * -> *)
-  deriving(Generic, Typeable, FunctorB)
+  deriving(Generic, Typeable, FunctorB, TraversableB)
 
 instance Eq   (Void f) where (==) v = case v of
 instance Show (Void f) where showsPrec _ v = case v of
@@ -42,14 +42,14 @@ instance Show (Void f) where showsPrec _ v = case v of
 
 data Record0 (f :: * -> *)
   = Record0
-  deriving(Generic, Typeable, Eq, Show, FunctorB)
+  deriving(Generic, Typeable, Eq, Show, FunctorB, TraversableB)
 
 instance Arbitrary (Record0 f) where arbitrary = pure Record0
 
 
 data Record1 f
   = Record1 { rec1_f1 :: f Int }
-  deriving(Generic, Typeable, FunctorB)
+  deriving(Generic, Typeable, FunctorB, TraversableB)
 
 deriving instance Show (f Int) => Show (Record1 f)
 deriving instance Eq   (f Int) => Eq   (Record1 f)
@@ -63,7 +63,7 @@ data Record3 f
       , rec3_f2 :: f Bool
       , rec3_f3 :: f Char
       }
-  deriving(Generic, Typeable, FunctorB)
+  deriving(Generic, Typeable, FunctorB, TraversableB)
 
 deriving instance (Show (f Int), Show (f Bool), Show (f Char)) => Show (Record3 f)
 deriving instance (Eq   (f Int), Eq   (f Bool), Eq   (f Char)) => Eq   (Record3 f)
@@ -78,7 +78,7 @@ instance (Arbitrary (f Int), Arbitrary (f Bool), Arbitrary (f Char)) => Arbitrar
 
 data Ignore1 (f :: * -> *)
   = Ignore1 { ign1_f1 :: Int }
-  deriving(Generic, Typeable, Eq, Show, FunctorB)
+  deriving(Generic, Typeable, Eq, Show, FunctorB, TraversableB)
 
 instance Arbitrary (Ignore1 f) where arbitrary = Ignore1 <$> arbitrary
 
@@ -91,7 +91,7 @@ data Sum3 f
   = Sum3_0
   | Sum3_1 (f Int)
   | Sum3_2 (f Int) (f Bool)
-  deriving(Generic, Typeable, FunctorB)
+  deriving(Generic, Typeable, FunctorB, TraversableB)
 
 deriving instance (Show (f Int), Show (f Bool)) => Show (Sum3 f)
 deriving instance (Eq   (f Int), Eq   (f Bool)) => Eq   (Sum3 f)

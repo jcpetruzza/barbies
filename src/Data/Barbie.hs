@@ -40,31 +40,11 @@ module Data.Barbie
 
 where
 
-import Data.Functor.Compose (Compose(..))
 import Data.Functor.Product (Product(..))
 import Data.Functor.Prod
 
 import Data.Barbie.Internal.Functor(FunctorB(..))
-
-
--- | Barbie-types that can be traversed fro left to right. Instances should
---   satisfy the following laws:
---
--- @
---  t . 'btraverse' f = 'btraverse' (t . f)  -- naturality
--- 'btraverse' 'Data.Functor.Identity' = 'Data.Functor.Identity'         -- identity
--- 'btraverse' ('Compose' . 'fmap' g . f) = 'Compose' . 'fmap' ('btraverse' g) . 'btraverse' f -- composition
--- @
---
-class FunctorB b => TraversableB b where
-  btraverse :: Applicative t => (forall a . f a -> t (g a)) -> b f -> t (b g)
-
-
--- | Evaluate each action in the structure from left to right,
---   and collect the results.
-bsequence :: (Applicative f, TraversableB b) => b (Compose f g) -> f (b g)
-bsequence
-  = btraverse getCompose
+import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence)
 
 
 -- | Barbie-types that can form products, subject to the laws:

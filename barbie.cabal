@@ -30,6 +30,7 @@ library
       Data.Functor.Prod
 
       Data.Barbie.Internal.Functor
+      Data.Barbie.Internal.Traversable
 
   other-modules:
       Data.Barbie.Internal.Generics
@@ -55,6 +56,7 @@ test-suite barbie-test
       Barbies
       Clothes
       Spec.Functor
+      Spec.Traversable
 
   hs-source-dirs:
       test
