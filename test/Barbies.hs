@@ -30,7 +30,7 @@ import Test.Tasty.QuickCheck
 ---------------------------------------------------
 
 data Void (f :: * -> *)
-  deriving(Generic, Typeable, FunctorB, TraversableB)
+  deriving(Generic, Typeable, FunctorB, TraversableB, ProductB)
 
 instance Eq   (Void f) where (==) v = case v of
 instance Show (Void f) where showsPrec _ v = case v of
@@ -42,14 +42,14 @@ instance Show (Void f) where showsPrec _ v = case v of
 
 data Record0 (f :: * -> *)
   = Record0
-  deriving(Generic, Typeable, Eq, Show, FunctorB, TraversableB)
+  deriving(Generic, Typeable, Eq, Show, FunctorB, TraversableB, ProductB)
 
 instance Arbitrary (Record0 f) where arbitrary = pure Record0
 
 
 data Record1 f
   = Record1 { rec1_f1 :: f Int }
-  deriving(Generic, Typeable, FunctorB, TraversableB)
+  deriving(Generic, Typeable, FunctorB, TraversableB, ProductB)
 
 deriving instance Show (f Int) => Show (Record1 f)
 deriving instance Eq   (f Int) => Eq   (Record1 f)
@@ -63,7 +63,7 @@ data Record3 f
       , rec3_f2 :: f Bool
       , rec3_f3 :: f Char
       }
-  deriving(Generic, Typeable, FunctorB, TraversableB)
+  deriving(Generic, Typeable, FunctorB, TraversableB, ProductB)
 
 deriving instance (Show (f Int), Show (f Bool), Show (f Char)) => Show (Record3 f)
 deriving instance (Eq   (f Int), Eq   (f Bool), Eq   (f Char)) => Eq   (Record3 f)
