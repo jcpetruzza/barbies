@@ -1,56 +1,43 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
-module Spec.Traversable
-  (
-    properties
-  )
+module Spec.Traversable ( laws )
 
 where
 
-import Barbies
-import Clothes
+import Clothes (F, G, H, fg, gh)
 
-import Data.Barbie
+import Data.Barbie (TraversableB(..))
 
-import Data.Functor.Identity
-import Data.Functor.Compose
+import Data.Functor.Compose (Compose(..))
+import Data.Functor.Identity (Identity(..))
 import Data.Maybe (maybeToList)
-import Data.Typeable
+import Data.Typeable (Typeable, typeRep, Proxy(..))
 
-import Test.Tasty
-import Test.Tasty.QuickCheck
+import Test.Tasty(testGroup, TestTree)
+import Test.Tasty.QuickCheck(Arbitrary(..), testProperty, (===))
 
-properties :: TestTree
-properties
-  = testGroup "Traversable Laws"
-      [ traversableLaws @Record0
-      , traversableLaws @Record1
-      , traversableLaws @Record3
-
-      , traversableLaws @Ignore1
-
-      , traversableLaws @Sum3
-      ]
-
-traversableLaws
+laws
   :: forall b
-  . (TraversableB b, Eq (b F), Eq (b G), Eq (b H), Show (b F), Arbitrary (b F), Typeable b)
+  . ( TraversableB b
+    , Eq (b F), Eq (b G), Eq (b H)
+    , Show (b F), Show (b G), Show (b H)
+    , Arbitrary (b F)
+    , Typeable b
+    )
   => TestTree
-traversableLaws
+laws
   = testGroup (show (typeRep (Proxy :: Proxy b)))
       [testProperty "naturality" $ \b ->
          let f = Just . fg
              t = maybeToList
-         in (t . btraverse f) (b :: b F) == btraverse (t . f) (b :: b F)
+         in (t . btraverse f) (b :: b F) === btraverse (t . f) (b :: b F)
 
       , testProperty "identity" $ \b ->
-          btraverse Identity b == Identity (b :: b F)
+          btraverse Identity b === Identity (b :: b F)
 
       , testProperty "composition" $ \b ->
           let f x = Just (fg x)
               g x = [gh x]
-          in btraverse (Compose . fmap g . f) b ==
+          in btraverse (Compose . fmap g . f) b ===
                (Compose . fmap (btraverse g) . btraverse f) (b :: b F)
       ]
-

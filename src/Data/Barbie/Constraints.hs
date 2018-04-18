@@ -39,7 +39,9 @@ module Data.Barbie.Constraints
 
 where
 
-import Data.Barbie
+import Data.Barbie.Internal.Functor(FunctorB(..))
+import Data.Barbie.Internal.Product(ProductB(..))
+
 import Data.Constraint(Dict(..), withDict)
 import Data.Functor.Product(Product(..))
 import Data.Kind(Constraint)

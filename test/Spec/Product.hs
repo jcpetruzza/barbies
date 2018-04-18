@@ -1,41 +1,21 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
-module Spec.Product
-  (
-    properties
-  )
+module Spec.Product ( laws, uniqLaws )
 
 where
 
-import Barbies
-import Clothes
+import Clothes(F, G)
 
-import Data.Barbie
+import Data.Barbie(FunctorB(..), ProductB(..))
 
 import Data.Functor.Product(Product(Pair))
-import Data.Typeable
+import Data.Typeable(Typeable, Proxy(..), typeRep)
 
-import Test.Tasty
-import Test.Tasty.QuickCheck
+import Test.Tasty(TestTree)
+import Test.Tasty.QuickCheck(Arbitrary(..), testProperty, (===))
 
-properties :: TestTree
-properties
-  = testGroup "Product Laws"
-      [ testGroup "Product"
-          [ productLaws @Record0
-          , productLaws @Record1
-          , productLaws @Record3
-          ]
 
-      , testGroup "Unique"
-          [ uniqLaws @Record0
-          , uniqLaws @Record1
-          , uniqLaws @Record3
-          ]
-      ]
-
-productLaws
+laws
   :: forall b
   . ( ProductB b
     , Eq (b F), Eq (b G)
@@ -44,7 +24,7 @@ productLaws
     , Typeable b
     )
   => TestTree
-productLaws
+laws
   = testProperty (show (typeRep (Proxy :: Proxy b))) $ \l r ->
       bmap first  (bprod l r) == (l :: b F) &&
       bmap second (bprod l r) == (r :: b G)
@@ -55,11 +35,12 @@ productLaws
 uniqLaws
   :: forall b
   . ( ProductB b
-    , Eq (b Maybe), Show (b F)
+    , Eq (b Maybe)
+    , Show (b F), Show (b Maybe)
     , Arbitrary (b F)
     , Typeable b
     )
   => TestTree
 uniqLaws
   = testProperty (show (typeRep (Proxy :: Proxy b))) $ \b ->
-      bmap (const Nothing) (b :: b F) == buniq Nothing
+      bmap (const Nothing) (b :: b F) === buniq Nothing

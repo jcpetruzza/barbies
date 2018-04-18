@@ -1,44 +1,32 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications    #-}
-module Spec.Functor
-  (
-    properties
-  )
+module Spec.Functor ( laws )
 
 where
 
-import Barbies
-import Clothes
+import Clothes (F, H, fg, gh)
 
-import Data.Barbie
+import Data.Barbie (FunctorB(..))
 
-import Data.Typeable
+import Data.Typeable (Typeable, typeRep, Proxy(..))
 
-import Test.Tasty
-import Test.Tasty.QuickCheck
+import Test.Tasty(testGroup, TestTree)
+import Test.Tasty.QuickCheck(Arbitrary(..), testProperty, (===))
 
-properties :: TestTree
-properties
-  = testGroup "Functor Laws"
-      [ functorLaws @Record0
-      , functorLaws @Record1
-      , functorLaws @Record3
-
-      , functorLaws @Ignore1
-
-      , functorLaws @Sum3
-      ]
-
-functorLaws
+laws
   :: forall b
-  . (FunctorB b, Eq (b F), Eq (b H), Show (b F), Arbitrary (b F), Typeable b)
+  . ( FunctorB b
+    , Eq (b F), Eq (b H)
+    , Show (b F), Show (b H)
+    , Arbitrary (b F)
+    , Typeable b
+    )
   => TestTree
-functorLaws
+laws
   = testGroup (show (typeRep (Proxy :: Proxy b)))
       [ testProperty "bmap id = id" $ \b ->
-          bmap id b == (b :: b F)
+          bmap id b === (b :: b F)
 
       , testProperty "bmap (f . g) = bmap f . bmap g)" $ \b ->
-          bmap (gh . fg) b == (bmap gh . bmap fg) (b :: b F)
+          bmap (gh . fg) b === (bmap gh . bmap fg) (b :: b F)
       ]
