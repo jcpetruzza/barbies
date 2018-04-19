@@ -4,7 +4,7 @@ module Spec.Traversable ( laws )
 
 where
 
-import Clothes (F, G, H, fg, gh)
+import Clothes (F, G, H, FG(..), GH(..), NatTransf(..))
 
 import Data.Barbie (TraversableB(..))
 
@@ -27,17 +27,19 @@ laws
   => TestTree
 laws
   = testGroup (show (typeRep (Proxy :: Proxy b)))
-      [testProperty "naturality" $ \b ->
-         let f = Just . fg
-             t = maybeToList
-         in (t . btraverse f) (b :: b F) === btraverse (t . f) (b :: b F)
+      [testProperty "naturality" $
+        \b (FG (NatTransf fg)) ->
+          let f = Just . fg
+              t = maybeToList
+          in (t . btraverse f) (b :: b F) === btraverse (t . f) (b :: b F)
 
       , testProperty "identity" $ \b ->
           btraverse Identity b === Identity (b :: b F)
 
-      , testProperty "composition" $ \b ->
-          let f x = Just (fg x)
-              g x = [gh x]
-          in btraverse (Compose . fmap g . f) b ===
-               (Compose . fmap (btraverse g) . btraverse f) (b :: b F)
+      , testProperty "composition" $
+          \b (FG (NatTransf fg)) (GH (NatTransf gh)) ->
+            let f x = Just (fg x)
+                g x = [gh x]
+            in btraverse (Compose . fmap g . f) b ===
+                 (Compose . fmap (btraverse g) . btraverse f) (b :: b F)
       ]

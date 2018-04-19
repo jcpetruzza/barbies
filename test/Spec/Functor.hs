@@ -4,7 +4,7 @@ module Spec.Functor ( laws )
 
 where
 
-import Clothes (F, H, fg, gh)
+import Clothes (F, H, FG(..), GH(..), NatTransf(..))
 
 import Data.Barbie (FunctorB(..))
 
@@ -27,6 +27,7 @@ laws
       [ testProperty "bmap id = id" $ \b ->
           bmap id b === (b :: b F)
 
-      , testProperty "bmap (f . g) = bmap f . bmap g)" $ \b ->
-          bmap (gh . fg) b === (bmap gh . bmap fg) (b :: b F)
+      , testProperty "bmap (f . g) = bmap f . bmap g)" $
+          \b (GH (NatTransf f)) (FG (NatTransf g)) ->
+            bmap (f . g) b === (bmap f . bmap g) (b :: b F)
       ]

@@ -68,6 +68,7 @@ test-suite barbie-test
   build-depends:
       barbie
     , base >=4.7 && <5
+    , QuickCheck
     , tasty
     , tasty-quickcheck
 
