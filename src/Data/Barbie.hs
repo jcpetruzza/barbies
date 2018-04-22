@@ -52,8 +52,8 @@ module Data.Barbie
   , (/*/), (/*)
 
     -- * Constraints and proofs of instance
-  , ConstraintsB(..)
-  , ProofB(..)
+  , ConstraintsB(ConstraintsOf, adjProof)
+  , ProofB(bproof)
   )
 
 where

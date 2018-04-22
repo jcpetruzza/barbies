@@ -39,8 +39,11 @@ import GHC.Generics
 -- instances can derived automatically.
 class FunctorB b => TraversableB b where
   btraverse :: Applicative t => (forall a . f a -> t (g a)) -> b f -> t (b g)
+  btraverse = btraverseDefault
 
-  default btraverse
+  btraverseDefault :: Applicative t => (forall a . f a -> t (g a)) -> b f -> t (b g)
+
+  default btraverseDefault
     :: ( Applicative t
        , Generic (b (Target F))
        , Generic (b (Target G))
@@ -49,7 +52,7 @@ class FunctorB b => TraversableB b where
        )
     => (forall a . f a -> t (g a))
     -> b f -> t (b g)
-  btraverse = gbtraverseDefault
+  btraverseDefault = gbtraverseDefault
 
 
 

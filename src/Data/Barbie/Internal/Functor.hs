@@ -31,8 +31,12 @@ import GHC.Generics
 -- instances can derived automatically.
 class FunctorB b where
   bmap :: (forall a . f a -> g a) -> b f -> b g
+  bmap = bmapDefault
 
-  default bmap
+
+  bmapDefault :: (forall a . f a -> g a) -> b f -> b g
+
+  default bmapDefault
     :: ( Generic (b (Target F))
        , Generic (b (Target G))
        , GFunctorB (Rep (b (Target F)))
@@ -40,7 +44,7 @@ class FunctorB b where
        )
     => (forall a . f a -> g a)
     -> b f -> b g
-  bmap = gbmapDefault
+  bmapDefault = gbmapDefault
 
 -- | Default implementation of 'bmap' based on 'Generic'.
 gbmapDefault

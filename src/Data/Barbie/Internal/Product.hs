@@ -39,8 +39,12 @@ import GHC.Generics
 -- data Ok  f = Ok {o1 :: f 'String', o2 :: f 'Int'}        -- has an instance
 -- data Bad f = Bad{b1 :: f 'String', hiddenFromArg: 'Int'} -- no lawful instance
 -- @
+--
+-- There is a default implementation of 'bprod' and 'buniq' for 'Generic' types,
+-- so instances can derived automatically.
 class FunctorB b => ProductB b where
   bprod :: b f -> b g -> b (Product f g)
+  bprod = bprodDefault
 
   -- | Intuitively, the laws for this class require that `b` hides no structure
   --   from its argument @f@. Because of this, any @x :: forall a . f a@
@@ -51,8 +55,10 @@ class FunctorB b => ProductB b where
   -- @
   --
   buniq :: (forall a . f a) -> b f
+  buniq = buniqDefault
 
-  default bprod
+  bprodDefault :: b f -> b g -> b (Product f g)
+  default bprodDefault
     :: ( Generic (b (Target F))
        , Generic (b (Target G))
        , Generic (b (Target FxG))
@@ -61,15 +67,16 @@ class FunctorB b => ProductB b where
        , Rep (b (Target FxG)) ~ Repl (Target F) (Target FxG) (Rep (b (Target F)))
        )
     => b f -> b g -> b (Product f g)
-  bprod = gbprodDefault
+  bprodDefault = gbprodDefault
 
 
-  default buniq
+  buniqDefault :: (forall a . f a) -> b f
+  default buniqDefault
     :: ( Generic (b (Target F))
        , GProductB (Rep (b (Target F)))
        )
     => (forall a . f a) -> b f
-  buniq = gbuniqDefault
+  buniqDefault = gbuniqDefault
 
 
 -- | Like 'bprod', but returns a binary 'Prod', instead of 'Product', which

@@ -29,7 +29,7 @@ module Data.Barbie.Constraints
   , requiringProof
 
     -- * Retrieving proofs
-  , ConstraintsB(..)
+  , ConstraintsB(ConstraintsOf, adjProof)
   , ProofB(..)
   )
 

@@ -66,8 +66,16 @@ requiringProof f
   --   type 'ConstraintsOf' c f T = (c (f 'Int'), c (f 'String'), c (f 'Bool'))
   --
   --   adjProof t = case t of
-  --     A x y -> A ('Pair' ('Proof' 'Dict') x) ('Pair' ('Proof' 'Dict') y)
-  --     B x y -> B ('Pair' ('Proof' 'Dict') x) ('Pair' ('Proof' 'Dict') y)
+  --     A x y -> A ('Pair' 'proof' x) ('Pair' 'proof' y)
+  --     B x y -> B ('Pair' 'proof' x) ('Pair' 'proof' y)
+  -- @
+  --
+  -- There are default implementation of 'ConstraintsOf' and 'adjProof' for
+  -- 'Generic' types, so in practice one can simply do:
+  --
+  -- @
+  -- derive instance 'Generic' T
+  -- instance 'ConstraintsB' T
   -- @
 class FunctorB b => ConstraintsB b where
   -- | @'ConstraintsOf' c f b@ should contain a constraint @c (f x)@
@@ -76,14 +84,15 @@ class FunctorB b => ConstraintsB b where
   -- @
   -- 'ConstraintsOf' 'Show' f Barbie = ('Show' (f 'String'), 'Show' (f 'Int'))
   -- @
-  --
   type ConstraintsOf (c :: * -> Constraint) (f :: * -> *) b :: Constraint
   type ConstraintsOf c f b = GConstraintsOf c f (Rep (b (Target F)))
 
   -- | Adjoint a proof-of-instance to a barbie-type.
   adjProof :: ConstraintsOf c f b => b f -> b (Product (ProofOf c f) f)
+  adjProof = adjProofDefault
 
-  default adjProof
+  adjProofDefault :: ConstraintsOf c f b => b f -> b (Product (ProofOf c f) f)
+  default adjProofDefault
     :: ( Generic (b (Target F))
        , Generic (b (Target PxF))
        , GAdjProof (Rep (b (Target F)))
@@ -93,7 +102,7 @@ class FunctorB b => ConstraintsB b where
        )
     => b f
     -> b (Product (ProofOf c f) f)
-  adjProof = gadjProofDefault
+  adjProofDefault = gadjProofDefault
 
 
 -- | Barbie-types with products have a canonical proof of instance,
@@ -103,10 +112,15 @@ class FunctorB b => ConstraintsB b where
 --  'adjProof' = 'bprod' 'bproof'
 --  @
 --
+-- There is a default 'bproof' implementation for 'Generic' types, so
+-- instances can derived automatically.
 class (ConstraintsB b, ProductB b) => ProofB b where
   bproof :: ConstraintsOf c f b => b (ProofOf c f)
+  bproof = bproofDefault
 
-  default bproof
+
+  bproofDefault :: ConstraintsOf c f b => b (ProofOf c f)
+  default bproofDefault
     :: ( Generic (b (Target P))
        , GProof (Rep (b (Target F)))
        , ConstraintsOf c f b
@@ -114,7 +128,7 @@ class (ConstraintsB b, ProductB b) => ProofB b where
        , ConstraintsOf c f b ~ GConstraintsOf c f (Rep (b (Target F)))
        )
     => b (ProofOf c f)
-  bproof = gbproofDefault
+  bproofDefault = gbproofDefault
 
 
 -- ===============================================================
