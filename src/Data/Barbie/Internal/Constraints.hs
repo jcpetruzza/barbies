@@ -22,6 +22,8 @@ module Data.Barbie.Internal.Constraints
   , GConstraintsOf
   , GAdjProof
   , gadjProofDefault
+  , GProof
+  , gbproofDefault
   )
 
 where
@@ -100,6 +102,16 @@ class FunctorB b => ConstraintsB b where
 class (ConstraintsB b, ProductB b) => ProofB b where
   bproof :: ConstraintsOf c f b => b (ProofOf c f)
 
+  default bproof
+    :: ( Generic (b (Target P))
+       , GProof (Rep (b (Target F)))
+       , ConstraintsOf c f b
+       , Rep (b (Target P)) ~ Repl (Target F) (Target P) (Rep (b (Target F)))
+       , ConstraintsOf c f b ~ GConstraintsOf c f (Rep (b (Target F)))
+       )
+    => b (ProofOf c f)
+  bproof = gbproofDefault
+
 
 -- ===============================================================
 --  Generic derivations
@@ -113,6 +125,7 @@ type family GConstraintsOf (c :: * -> Constraint) (f :: * -> *) b  :: Constraint
   GConstraintsOf c f (l :+: r) = (GConstraintsOf c f l, GConstraintsOf c f r)
   GConstraintsOf c f (K1 R (Target F a)) = c (f a)
   GConstraintsOf c f (K1 _i _c) = ()
+
 
 -- | Default implementation of 'adjProof' based on 'Generic'.
 gadjProofDefault
@@ -132,7 +145,24 @@ gadjProofDefault b
     pf = Proxy :: Proxy f
 
 
+-- | Default implementation of 'proof' based on 'Generic'.
+gbproofDefault
+  :: forall b c f
+  .  ( Generic (b (Target P))
+     , GProof (Rep (b (Target F)))
+     , GConstraintsOf c f (Rep (b (Target F)))
+     , Rep (b (Target P)) ~ Repl (Target F) (Target P) (Rep (b (Target F)))
+     )
+  => b (ProofOf c f)
+gbproofDefault
+  = unsafeUntargetBarbie @P $ to $ gbproof pc pf pb
+  where
+    pc = Proxy :: Proxy c
+    pf = Proxy :: Proxy f
+    pb = Proxy :: Proxy (Rep (b (Target F)) x)
+
 data F a
+data P a
 data PxF a
 
 class GAdjProof b where
@@ -142,6 +172,11 @@ class GAdjProof b where
     -> Proxy f
     -> b x
     -> Repl (Target F) (Target PxF) b x
+
+class GProof b where
+  gbproof
+    :: GConstraintsOf c f b
+    => Proxy c -> Proxy f -> Proxy (b x) -> Repl (Target F) (Target P) b x
 
 
 -- ----------------------------------
@@ -172,6 +207,25 @@ instance (GAdjProof l, GAdjProof r) => GAdjProof (l :+: r) where
     R1 r -> R1 (gadjProof pc pf r)
 
 
+
+instance GProof x => GProof (M1 _i _c x) where
+  {-# INLINE gbproof #-}
+  gbproof pc pf pm1
+    = M1 (gbproof pc pf (unM1 <$> pm1))
+
+instance GProof U1 where
+  {-# INLINE gbproof #-}
+  gbproof _ _ _ = U1
+
+instance (GProof l, GProof r) => GProof (l :*: r) where
+  {-# INLINE gbproof #-}
+  gbproof pc pf pp
+    = gbproof pc pf (left <$> pp) :*: gbproof pc pf (right <$> pp)
+    where
+      left  (l :*: _) = l
+      right (_ :*: r) = r
+
+
 -- --------------------------------
 -- The interesting cases
 -- --------------------------------
@@ -187,3 +241,13 @@ instance {-# OVERLAPPING #-} GAdjProof (K1 R (Target F a)) where
 instance (K1 _i _c) ~ Repl (Target F) (Target PxF) (K1 _i _c) => GAdjProof (K1 _i _c) where
   {-# INLINE gadjProof #-}
   gadjProof _ _ k1 = k1
+
+
+
+instance {-# OVERLAPPING #-} GProof (K1 R (Target F a)) where
+  {-# INLINE gbproof #-}
+  gbproof pc pf _
+    = K1 $ unsafeTarget @P (mkProof pc pf)
+    where
+      mkProof :: c (f a) => Proxy c -> Proxy f -> ProofOf c f a
+      mkProof _ _ = proof

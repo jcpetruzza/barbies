@@ -51,7 +51,7 @@ data Record0 (f :: * -> *)
   deriving
     ( Generic, Typeable
     , Eq, Show
-    , FunctorB, TraversableB, ProductB, ConstraintsB
+    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
     )
 
 instance Arbitrary (Record0 f) where arbitrary = pure Record0
@@ -61,7 +61,7 @@ data Record1 f
   = Record1 { rec1_f1 :: f Int }
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB
+    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
     )
 
 deriving instance ConstraintsOf Show f Record1 => Show (Record1 f)
@@ -78,7 +78,7 @@ data Record3 f
       }
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB
+    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
     )
 
 deriving instance ConstraintsOf Show f Record3 => Show (Record3 f)
