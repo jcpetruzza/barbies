@@ -35,7 +35,7 @@ import Test.Tasty.QuickCheck
 data Void (f :: * -> *)
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB
+    , FunctorB, TraversableB, ConstraintsB
     )
 
 instance Eq   (Void f) where (==) v = case v of

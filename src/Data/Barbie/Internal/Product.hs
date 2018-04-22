@@ -21,10 +21,8 @@ import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Generics
 import Data.Functor.Product (Product(..))
 import Data.Functor.Prod
-import Data.Kind (Constraint)
 
 import GHC.Generics
-import GHC.TypeLits (TypeError, ErrorMessage(Text, ShowType, (:<>:)))
 
 
 -- | Barbie-types that can form products, subject to the laws:
@@ -167,39 +165,6 @@ instance(GProductB l, GProductB r) => GProductB (l :*: r) where
   {-# INLINE gbuniq #-}
   gbuniq x = (gbuniq x :*: gbuniq x)
 
--- ----------------------------------------------
--- Error cases
--- ----------------------------------------------
-
-data VoidType
-data SumType
-data HiddenStructure
-
-type family CantDeriveFor t :: Constraint where
-  CantDeriveFor VoidType
-    = TypeError
-        ('Text "Can't derive " ':<>: 'ShowType ProductB ':<>: 'Text ": void-types")
-
-  CantDeriveFor SumType
-    = TypeError
-        ('Text "Can't derive " ':<>: 'ShowType ProductB ':<>: 'Text ": sum-types.")
-
-  CantDeriveFor HiddenStructure
-    = TypeError
-        ('Text "Can't derive " ':<>: 'ShowType ProductB ':<>:
-         'Text ": hidden-structure.")
-
-instance CantDeriveFor VoidType => GProductB V1 where
-  gbprod   = error "GBProductB V1 -- Can't happen"
-  gbuniq _ = error "GBProductB V1 -- Can't happen"
-
-instance CantDeriveFor SumType => GProductB (l :+: r) where
-  gbprod   = error "GProductB :+: -- Can't happen"
-  gbuniq _ = error "GProductB :+: -- Can't happen"
-
-instance CantDeriveFor HiddenStructure => GProductB (K1 i c) where
-  gbprod   = error "GProductB K1  -- Can't happen"
-  gbuniq _ = error "GProductB K1  -- Can't happen"
 
 -- --------------------------------
 -- The interesting cases
