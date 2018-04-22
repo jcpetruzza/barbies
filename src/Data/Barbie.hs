@@ -3,8 +3,8 @@
 -- Module      :  Data.Barbie
 --
 -- A common Haskell idiom is to parameterise a datatype by a type @* -> *@,
--- typically a functor or a GADT. These behave like the clothings of a Barbie,
--- that transform them in a different doll. E.g.
+-- typically a functor or a GADT. These behave like the clothes of a Barbie,
+-- that make them a different doll. E.g.
 --
 -- @
 -- data Barbie f
@@ -19,7 +19,24 @@
 -- @
 --
 -- This module define the classes to work with these types and easily
--- transform them.
+-- transform them. They all come with default instances based on
+-- `GHC.Generics.Generic`, so using them is as easy as:
+--
+-- @
+-- data Barbie f
+--   = Barbie
+--       { name :: f 'String'
+--       , age  :: f 'Int'
+--       }
+--   deriving
+--     ( 'GHC.Generics.Generic'
+--     , 'FunctorB', 'TraversableB', 'ProductB', 'ConstraintsB', 'ProofB'
+--     )
+--
+-- deriving instance 'ConstraintsOf' 'Show' f Barbie => 'Show' Barbie
+-- deriving instance 'ConstraintsOf' 'Eq'   f Barbie => 'Eq'   Barbie
+--
+-- @
 ----------------------------------------------------------------------------
 module Data.Barbie
   (
@@ -33,10 +50,15 @@ module Data.Barbie
     -- * Product
   , ProductB(buniq, bprod)
   , (/*/), (/*)
+
+    -- * Constraints and proofs of instance
+  , ConstraintsB(..)
+  , ProofB(..)
   )
 
 where
 
+import Data.Barbie.Internal.Constraints(ConstraintsB(..), ProofB(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Product(ProductB(..), (/*/), (/*))
 import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence)

@@ -73,6 +73,10 @@ class FunctorB b => ConstraintsB b where
   -- | @'ConstraintsOf' c f b@ should contain a constraint @c (f x)@
   --  for each @f x@ occurring in @b@. E.g.:
   --
+  -- @
+  -- 'ConstraintsOf' 'Show' f Barbie = ('Show' (f 'String'), 'Show' (f 'Int'))
+  -- @
+  --
   type ConstraintsOf (c :: * -> Constraint) (f :: * -> *) b :: Constraint
   type ConstraintsOf c f b = GConstraintsOf c f (Rep (b (Target F)))
 
