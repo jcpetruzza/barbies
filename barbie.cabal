@@ -29,6 +29,7 @@ library
       Data.Barbie.Container
       Data.Functor.Prod
 
+      Data.Barbie.Internal.Constraints
       Data.Barbie.Internal.Functor
       Data.Barbie.Internal.Product
       Data.Barbie.Internal.Traversable

@@ -5,6 +5,7 @@
 {-# LANGUAGE KindSignatures      #-}
 {-# LANGUAGE StandaloneDeriving  #-}
 
+{-# LANGUAGE TypeFamilies  #-}
 {-# LANGUAGE UndecidableInstances  #-}
 module Barbies
   ( Void
@@ -21,6 +22,8 @@ module Barbies
 where
 
 import Data.Barbie
+import Data.Barbie.Constraints
+
 import Data.Typeable
 import GHC.Generics
 import Test.Tasty.QuickCheck
@@ -30,7 +33,10 @@ import Test.Tasty.QuickCheck
 ---------------------------------------------------
 
 data Void (f :: * -> *)
-  deriving(Generic, Typeable, FunctorB, TraversableB, ProductB)
+  deriving
+    ( Generic, Typeable
+    , FunctorB, TraversableB, ProductB, ConstraintsB
+    )
 
 instance Eq   (Void f) where (==) v = case v of
 instance Show (Void f) where showsPrec _ v = case v of
@@ -42,19 +48,26 @@ instance Show (Void f) where showsPrec _ v = case v of
 
 data Record0 (f :: * -> *)
   = Record0
-  deriving(Generic, Typeable, Eq, Show, FunctorB, TraversableB, ProductB)
+  deriving
+    ( Generic, Typeable
+    , Eq, Show
+    , FunctorB, TraversableB, ProductB, ConstraintsB
+    )
 
 instance Arbitrary (Record0 f) where arbitrary = pure Record0
 
 
 data Record1 f
   = Record1 { rec1_f1 :: f Int }
-  deriving(Generic, Typeable, FunctorB, TraversableB, ProductB)
+  deriving
+    ( Generic, Typeable
+    , FunctorB, TraversableB, ProductB, ConstraintsB
+    )
 
-deriving instance Show (f Int) => Show (Record1 f)
-deriving instance Eq   (f Int) => Eq   (Record1 f)
+deriving instance ConstraintsOf Show f Record1 => Show (Record1 f)
+deriving instance ConstraintsOf Eq   f Record1 => Eq   (Record1 f)
 
-instance Arbitrary (f Int) => Arbitrary (Record1 f) where
+instance ConstraintsOf Arbitrary f Record1 => Arbitrary (Record1 f) where
   arbitrary = Record1 <$> arbitrary
 
 data Record3 f
@@ -63,12 +76,15 @@ data Record3 f
       , rec3_f2 :: f Bool
       , rec3_f3 :: f Char
       }
-  deriving(Generic, Typeable, FunctorB, TraversableB, ProductB)
+  deriving
+    ( Generic, Typeable
+    , FunctorB, TraversableB, ProductB, ConstraintsB
+    )
 
-deriving instance (Show (f Int), Show (f Bool), Show (f Char)) => Show (Record3 f)
-deriving instance (Eq   (f Int), Eq   (f Bool), Eq   (f Char)) => Eq   (Record3 f)
+deriving instance ConstraintsOf Show f Record3 => Show (Record3 f)
+deriving instance ConstraintsOf Eq   f Record3 => Eq   (Record3 f)
 
-instance (Arbitrary (f Int), Arbitrary (f Bool), Arbitrary (f Char)) => Arbitrary (Record3 f) where
+instance ConstraintsOf Arbitrary f Record3 => Arbitrary (Record3 f) where
   arbitrary = Record3 <$> arbitrary <*> arbitrary <*> arbitrary
 
 
@@ -78,7 +94,11 @@ instance (Arbitrary (f Int), Arbitrary (f Bool), Arbitrary (f Char)) => Arbitrar
 
 data Ignore1 (f :: * -> *)
   = Ignore1 { ign1_f1 :: Int }
-  deriving(Generic, Typeable, Eq, Show, FunctorB, TraversableB)
+  deriving
+    ( Generic, Typeable
+    , Eq, Show
+    , FunctorB, TraversableB, ConstraintsB
+    )
 
 instance Arbitrary (Ignore1 f) where arbitrary = Ignore1 <$> arbitrary
 
@@ -91,12 +111,15 @@ data Sum3 f
   = Sum3_0
   | Sum3_1 (f Int)
   | Sum3_2 (f Int) (f Bool)
-  deriving(Generic, Typeable, FunctorB, TraversableB)
+  deriving
+    ( Generic, Typeable
+    , FunctorB, TraversableB, ConstraintsB
+    )
 
-deriving instance (Show (f Int), Show (f Bool)) => Show (Sum3 f)
-deriving instance (Eq   (f Int), Eq   (f Bool)) => Eq   (Sum3 f)
+deriving instance ConstraintsOf Show f Sum3 => Show (Sum3 f)
+deriving instance ConstraintsOf Eq   f Sum3 => Eq   (Sum3 f)
 
-instance (Arbitrary (f Int), Arbitrary (f Bool)) => Arbitrary (Sum3 f) where
+instance ConstraintsOf Arbitrary f Sum3 => Arbitrary (Sum3 f) where
   arbitrary
     = oneof
         [ pure Sum3_0
