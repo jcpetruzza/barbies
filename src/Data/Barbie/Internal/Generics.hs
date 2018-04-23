@@ -47,10 +47,12 @@ unsafeUntargetBarbie :: forall t b f . b (Target t) -> b f
 unsafeUntargetBarbie = unsafeCoerce
 
 type family Repl f g rep where
-    Repl f g (M1 i c x)   = M1 i c (Repl f g x)
-    Repl f g V1           = V1
-    Repl f g U1           = U1
-    Repl f g (K1 i (f a)) = K1 i (g a)
-    Repl f g (K1 i c)     = K1 i c
-    Repl f g (l :+: r)    = (Repl f g l) :+: (Repl f g r)
-    Repl f g (l :*: r)    = (Repl f g l) :*: (Repl f g r)
+    Repl f g (M1 i c x)       = M1 i c (Repl f g x)
+    Repl f g V1               = V1
+    Repl f g U1               = U1
+    Repl f g (K1 i (f a))     = K1 i (g a)
+    Repl f g (K1 i (b f))     = K1 i (b g)
+    Repl f g (K1 i (h (b f))) = K1 i (h (b g))
+    Repl f g (K1 i c)         = K1 i c
+    Repl f g (l :+: r)        = (Repl f g l) :+: (Repl f g r)
+    Repl f g (l :*: r)        = (Repl f g l) :*: (Repl f g r)

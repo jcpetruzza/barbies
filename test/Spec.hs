@@ -20,6 +20,10 @@ main
             , Functor.laws @Ignore1
 
             , Functor.laws @Sum3
+            , Functor.laws @SumRec
+
+            , Functor.laws @CompositeRecord
+            , Functor.laws @NestedF
             ]
 
         , testGroup "Traversable Laws"
@@ -30,18 +34,24 @@ main
             , Traversable.laws @Ignore1
 
             , Traversable.laws @Sum3
+            , Traversable.laws @SumRec
+
+            , Traversable.laws @CompositeRecord
+            , Traversable.laws @NestedF
             ]
 
         , testGroup "Product Laws"
             [ Product.laws @Record0
             , Product.laws @Record1
             , Product.laws @Record3
+            , Product.laws @CompositeRecord
             ]
 
         , testGroup "Uniq Laws"
             [ Product.uniqLaws @Record0
             , Product.uniqLaws @Record1
             , Product.uniqLaws @Record3
+            , Product.uniqLaws @CompositeRecord
             ]
         ]
 

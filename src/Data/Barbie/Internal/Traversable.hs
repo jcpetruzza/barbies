@@ -124,6 +124,23 @@ instance {-# OVERLAPPING #-} GTraversableB (K1 R (Target F a)) where
   gbtraverse f (K1 fa)
     = K1 . unsafeTarget @G <$> f (unsafeUntarget @F fa)
 
+instance {-# OVERLAPPING #-} TraversableB b => GTraversableB (K1 R (b (Target F))) where
+  {-# INLINE gbtraverse #-}
+  gbtraverse f (K1 bf)
+    = K1 <$> btraverse (fmap (unsafeTarget @G) . f . unsafeUntarget @F) bf
+
+instance {-# OVERLAPPING #-}
+  ( Traversable h
+  , TraversableB b
+  , Repl (Target F) (Target G) (K1 R (h (b (Target F)))) -- shouldn't be
+      ~ (K1 R (h (b (Target G))))  -- necessary but ghc chokes otherwise
+  )
+  => GTraversableB (K1 R (h (b (Target F)))) where
+  {-# INLINE gbtraverse #-}
+  gbtraverse f (K1 hbf)
+    = K1 <$> traverse (fmap (unsafeTargetBarbie @G) . btraverse f . unsafeUntargetBarbie @F) hbf
+
+
 instance (K1 i c) ~ Repl (Target F) (Target G) (K1 i c) => GTraversableB (K1 i c) where
   {-# INLINE gbtraverse #-}
   gbtraverse _ k1 = pure k1

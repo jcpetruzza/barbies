@@ -102,6 +102,22 @@ instance {-# OVERLAPPING #-} GFunctorB (K1 R (Target F a)) where
   gbmap f (K1 fa)
     = K1 $ unsafeTarget @G (f $ unsafeUntarget @F fa)
 
+instance {-# OVERLAPPING #-} FunctorB b => GFunctorB (K1 R (b (Target F))) where
+  {-# INLINE gbmap #-}
+  gbmap f (K1 bf)
+    = K1 $ bmap (unsafeTarget @G . f . unsafeUntarget @F) bf
+
+instance {-# OVERLAPPING #-}
+  ( Functor h
+  , FunctorB b
+  , Repl (Target F) (Target G) (K1 R (h (b (Target F)))) -- shouldn't be
+      ~ (K1 R (h (b (Target G))))  -- necessary but ghc chokes otherwise
+  )
+  => GFunctorB (K1 R (h (b (Target F)))) where
+  {-# INLINE gbmap #-}
+  gbmap f (K1 hbf)
+    = K1 (fmap (unsafeTargetBarbie @G . bmap f . unsafeUntargetBarbie @F) hbf)
+
 instance (K1 i c) ~ Repl (Target F) (Target G) (K1 i c) => GFunctorB (K1 i c) where
   {-# INLINE gbmap #-}
   gbmap _ k1 = k1

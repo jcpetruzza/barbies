@@ -185,3 +185,13 @@ instance {-# OVERLAPPING #-} GProductB (K1 R (Target F a)) where
 
   {-# INLINE gbuniq #-}
   gbuniq x = K1 (unsafeTarget @F x)
+
+
+instance {-# OVERLAPPING #-} ProductB b => GProductB (K1 R (b (Target F))) where
+  {-# INLINE gbprod #-}
+  gbprod (K1 bf) (K1 bg)
+    = let bfxg = unsafeUntargetBarbie @F bf `bprod` unsafeUntargetBarbie @G bg
+      in K1 (unsafeTargetBarbie @FxG bfxg)
+
+  {-# INLINE gbuniq #-}
+  gbuniq x = K1 (unsafeTargetBarbie @F (buniq x))

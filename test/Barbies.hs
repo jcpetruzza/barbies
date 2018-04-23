@@ -1,12 +1,10 @@
-{-# LANGUAGE DeriveAnyClass      #-}
-{-# LANGUAGE DeriveGeneric       #-}
-{-# LANGUAGE DeriveDataTypeable  #-}
-{-# LANGUAGE EmptyCase           #-}
-{-# LANGUAGE KindSignatures      #-}
-{-# LANGUAGE StandaloneDeriving  #-}
-
-{-# LANGUAGE TypeFamilies  #-}
-{-# LANGUAGE UndecidableInstances  #-}
+{-# LANGUAGE DeriveAnyClass       #-}
+{-# LANGUAGE DeriveGeneric        #-}
+{-# LANGUAGE DeriveDataTypeable   #-}
+{-# LANGUAGE EmptyCase            #-}
+{-# LANGUAGE KindSignatures       #-}
+{-# LANGUAGE StandaloneDeriving   #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Barbies
   ( Void
 
@@ -17,12 +15,16 @@ module Barbies
   , Ignore1(..)
 
   , Sum3(..)
+
+  , CompositeRecord(..)
+  , SumRec(..)
+
+  , NestedF(..)
   )
 
 where
 
 import Data.Barbie
-import Data.Barbie.Constraints
 
 import Data.Typeable
 import GHC.Generics
@@ -126,3 +128,70 @@ instance ConstraintsOf Arbitrary f Sum3 => Arbitrary (Sum3 f) where
         , Sum3_1 <$> arbitrary
         , Sum3_2 <$> arbitrary <*> arbitrary
         ]
+
+-----------------------------------------------------
+-- Composite and recursive
+-----------------------------------------------------
+
+data CompositeRecord f
+  = CompositeRecord
+      { crec_f1 :: f Int
+      , crec_F2 :: f Bool
+      , crec_f3 :: Record3 f
+      , crec_f4 :: Record1 f
+      }
+  deriving
+    ( Generic, Typeable
+    , FunctorB, TraversableB, ProductB -- , ConstraintsB
+    )
+
+deriving instance (Show (f Int), Show (f Bool), Show (f Char)) => Show (CompositeRecord f)
+deriving instance (Eq   (f Int), Eq   (f Bool), Eq   (f Char)) => Eq   (CompositeRecord f)
+
+instance (Arbitrary (f Int), Arbitrary (f Bool), Arbitrary (f Char)) => Arbitrary (CompositeRecord f) where
+  arbitrary
+    = CompositeRecord <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
+
+data SumRec f
+  = SumRec_0
+  | SumRec_1 (f Int)
+  | SumRec_2 (f Int) (SumRec f)
+  deriving
+    ( Generic, Typeable
+    , FunctorB, TraversableB
+    )
+
+deriving instance  Show (f Int) => Show (SumRec f)
+deriving instance  Eq   (f Int) => Eq   (SumRec f)
+
+instance Arbitrary (f Int) => Arbitrary (SumRec f) where
+  arbitrary
+    = oneof
+        [ pure SumRec_0
+        , SumRec_1 <$> arbitrary
+        , SumRec_2 <$> arbitrary <*> arbitrary
+        ]
+
+
+-----------------------------------------------------
+-- Nested under functors
+-----------------------------------------------------
+
+data NestedF f
+  = NestedF
+      { npf_1 :: f Int
+      , npf_2 :: [Record3 f]
+      , npf_3 :: Maybe (Sum3 f)
+      , npf_4 :: Maybe (NestedF f)
+      }
+  deriving
+    ( Generic, Typeable
+    , FunctorB, TraversableB
+    )
+
+deriving instance (Show (f Int), Show (Record3 f), Show (Sum3 f)) => Show (NestedF f)
+deriving instance (Eq   (f Int), Eq   (Record3 f), Eq   (Sum3 f)) => Eq   (NestedF f)
+
+instance (Arbitrary (f Int), ConstraintsOf Arbitrary f Record3, ConstraintsOf Arbitrary f Sum3) => Arbitrary (NestedF f) where
+  arbitrary = NestedF <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
