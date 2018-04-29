@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds      #-}
 {-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE DefaultSignatures    #-}
 {-# LANGUAGE FlexibleContexts     #-}
@@ -11,6 +12,7 @@ module Data.Barbie.Internal.Product
   ( ProductB(buniq, bprod)
   , (/*/), (/*)
 
+  , CanDeriveGenericInstance, CanDeriveGenericInstance'
   , GProductB
   , gbprodDefault, gbuniqDefault
   )
@@ -44,7 +46,6 @@ import GHC.Generics
 -- so instances can derived automatically.
 class FunctorB b => ProductB b where
   bprod :: b f -> b g -> b (Product f g)
-  bprod = bprodDefault
 
   -- | Intuitively, the laws for this class require that `b` hides no structure
   --   from its argument @f@. Because of this, any @x :: forall a . f a@
@@ -55,29 +56,36 @@ class FunctorB b => ProductB b where
   -- @
   --
   buniq :: (forall a . f a) -> b f
-  buniq = buniqDefault
 
-  bprodDefault :: b f -> b g -> b (Product f g)
-  default bprodDefault
-    :: ( Generic (b (Target F))
-       , Generic (b (Target G))
-       , Generic (b (Target FxG))
-       , GProductB (Rep (b (Target F)))
-       , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
-       , Rep (b (Target FxG)) ~ Repl (Target F) (Target FxG) (Rep (b (Target F)))
-       )
-    => b f -> b g -> b (Product f g)
-  bprodDefault = gbprodDefault
+  default bprod :: CanDeriveGenericInstance b => b f -> b g -> b (Product f g)
+  bprod = gbprodDefault
+
+  default buniq :: CanDeriveGenericInstance' b => (forall a . f a) -> b f
+  buniq = gbuniqDefault
 
 
-  buniqDefault :: (forall a . f a) -> b f
-  default buniqDefault
-    :: ( Generic (b (Target F))
-       , GProductB (Rep (b (Target F)))
-       )
-    => (forall a . f a) -> b f
-  buniqDefault = gbuniqDefault
+-- | The requirements to to derive @'ProductB' (B f)@ are more strict than those for
+--   'FunctorB' or 'TraversableB'. Intuitively, we need:
+--
+--     * There is an instance of @'Generic' (B f)@ for every @f@
+--
+--     * @B@ has only one constructor.
+--
+--     * Every field of @B@' constructor is of the form 'f t'. That is, @B@ has no
+--       hidden structure.
+type CanDeriveGenericInstance b
+  = ( Generic (b (Target F))
+    , Generic (b (Target G))
+    , Generic (b (Target FxG))
+    , GProductB (Rep (b (Target F)))
+    , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
+    , Rep (b (Target FxG)) ~ Repl (Target F) (Target FxG) (Rep (b (Target F)))
+    )
 
+type CanDeriveGenericInstance' b
+  = ( Generic (b (Target F))
+    , GProductB (Rep (b (Target F)))
+    )
 
 -- | Like 'bprod', but returns a binary 'Prod', instead of 'Product', which
 --   composes better.
@@ -111,13 +119,7 @@ infixr 4 /*
 
 -- | Default implementation of 'bprod' based on 'Generic'.
 gbprodDefault
-  :: ( Generic (b (Target F))
-     , Generic (b (Target G))
-     , Generic (b (Target FxG))
-     , GProductB (Rep (b (Target F)))
-     , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
-     , Rep (b (Target FxG)) ~ Repl (Target F) (Target FxG) (Rep (b (Target F)))
-     )
+  :: CanDeriveGenericInstance b
   => b f -> b g -> b (Product f g)
 gbprodDefault l r
   = let l' = from (unsafeTargetBarbie @F l)
@@ -125,9 +127,7 @@ gbprodDefault l r
      in unsafeUntargetBarbie @FxG $ to (gbprod l' r')
 
 gbuniqDefault
-  :: ( Generic (b (Target F))
-     , GProductB (Rep (b (Target F)))
-     )
+  :: CanDeriveGenericInstance' b
   => (forall a . f a) -> b f
 gbuniqDefault x
   = unsafeUntargetBarbie @F $ to (gbuniq x)

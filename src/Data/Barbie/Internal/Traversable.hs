@@ -2,6 +2,7 @@
 -- |
 -- Module      :  Data.Barbie.Internal.Functor
 ----------------------------------------------------------------------------
+{-# LANGUAGE ConstraintKinds    #-}
 {-# LANGUAGE DefaultSignatures  #-}
 {-# LANGUAGE FlexibleContexts   #-}
 {-# LANGUAGE FlexibleInstances  #-}
@@ -14,6 +15,7 @@ module Data.Barbie.Internal.Traversable
   ( TraversableB(..)
   , bsequence
 
+  , CanDeriveGenericInstance
   , GTraversableB
   , gbtraverseDefault
   )
@@ -39,20 +41,11 @@ import GHC.Generics
 -- instances can derived automatically.
 class FunctorB b => TraversableB b where
   btraverse :: Applicative t => (forall a . f a -> t (g a)) -> b f -> t (b g)
-  btraverse = btraverseDefault
 
-  btraverseDefault :: Applicative t => (forall a . f a -> t (g a)) -> b f -> t (b g)
-
-  default btraverseDefault
-    :: ( Applicative t
-       , Generic (b (Target F))
-       , Generic (b (Target G))
-       , GTraversableB (Rep (b (Target F)))
-       , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
-       )
-    => (forall a . f a -> t (g a))
-    -> b f -> t (b g)
-  btraverseDefault = gbtraverseDefault
+  default btraverse
+    :: ( Applicative t, CanDeriveGenericInstance b)
+    => (forall a . f a -> t (g a)) -> b f -> t (b g)
+  btraverse = gbtraverseDefault
 
 
 
@@ -63,14 +56,25 @@ bsequence
   = btraverse getCompose
 
 
+-- | Intuivively, the requirements to have @'TraversableB' B@ derived are:
+--
+--     * There is an instance of @'Generic' (B f)@ for every @f@
+--
+--     * If @f@ is used as argument to some type in the definition of @B@, it
+--       is only on a Barbie-type with a 'TraversableB' instance.
+--
+--     * Recursive usages of @B f@ are allowed to appear as argument to a
+--       'Traversable' (e.g. @'Maybe' (B f)')
+type CanDeriveGenericInstance b
+  = ( Generic (b (Target F))
+    , Generic (b (Target G))
+    , GTraversableB (Rep (b (Target F)))
+    , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
+    )
+
 -- | Default implementation of 'btraverse' based on 'Generic'.
 gbtraverseDefault
-  :: ( Applicative t
-     , Generic (b (Target F))
-     , Generic (b (Target G))
-     , GTraversableB (Rep (b (Target F)))
-     , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
-     )
+  :: ( Applicative t, CanDeriveGenericInstance b)
   => (forall a . f a -> t (g a))
   -> b f -> t (b g)
 gbtraverseDefault f b

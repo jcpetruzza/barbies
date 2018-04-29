@@ -33,6 +33,7 @@ library
       Data.Barbie.Internal.Functor
       Data.Barbie.Internal.Product
       Data.Barbie.Internal.Traversable
+      Data.Barbie.Internal.ProofB
       Data.Barbie.Internal.Generics
 
   hs-source-dirs:

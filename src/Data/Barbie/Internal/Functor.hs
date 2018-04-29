@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds     #-}
 {-# LANGUAGE DefaultSignatures   #-}
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE FlexibleContexts    #-}
@@ -12,6 +13,7 @@ module Data.Barbie.Internal.Functor
 
   , GFunctorB
   , gbmapDefault
+  , CanDeriveGenericInstance
   )
 
 where
@@ -31,30 +33,33 @@ import GHC.Generics
 -- instances can derived automatically.
 class FunctorB b where
   bmap :: (forall a . f a -> g a) -> b f -> b g
-  bmap = bmapDefault
 
+  default bmap
+    :: CanDeriveGenericInstance b
+    => (forall a . f a -> g a) -> b f -> b g
+  bmap = gbmapDefault
 
-  bmapDefault :: (forall a . f a -> g a) -> b f -> b g
+-- | Intuivively, the requirements to have @'FunctorB' B@ derived are:
+--
+--     * There is an instance of @'Generic' (B f)@ for every @f@
+--
+--     * If @f@ is used as argument to some type in the definition of @B@, it
+--       is only on a Barbie-type with a 'FunctorB' instance.
+--
+--     * Recursive usages of @B f@ are allowed to appear as argument to a
+--       'Functor' (e.g. @'Maybe' (B f)')
+type CanDeriveGenericInstance b
+  = ( Generic (b (Target F))
+    , Generic (b (Target G))
+    , GFunctorB (Rep (b (Target F)))
+    , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
+    )
 
-  default bmapDefault
-    :: ( Generic (b (Target F))
-       , Generic (b (Target G))
-       , GFunctorB (Rep (b (Target F)))
-       , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
-       )
-    => (forall a . f a -> g a)
-    -> b f -> b g
-  bmapDefault = gbmapDefault
 
 -- | Default implementation of 'bmap' based on 'Generic'.
 gbmapDefault
-  :: ( Generic (b (Target F))
-     , Generic (b (Target G))
-     , GFunctorB (Rep (b (Target F)))
-     , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
-     )
-  => (forall a . f a -> g a)
-  -> b f -> b g
+  :: CanDeriveGenericInstance b
+  => (forall a . f a -> g a) -> b f -> b g
 gbmapDefault f b
   = unsafeUntargetBarbie @G $ to $ gbmap f $ from (unsafeTargetBarbie @F b)
 

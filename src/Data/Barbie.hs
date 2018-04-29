@@ -58,7 +58,8 @@ module Data.Barbie
 
 where
 
-import Data.Barbie.Internal.Constraints(ConstraintsB(..), ProofB(..))
+import Data.Barbie.Internal.Constraints(ConstraintsB(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Product(ProductB(..), (/*/), (/*))
 import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence)
+import Data.Barbie.Internal.ProofB(ProofB(..))

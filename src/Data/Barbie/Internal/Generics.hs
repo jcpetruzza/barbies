@@ -18,7 +18,7 @@ module Data.Barbie.Internal.Generics
   , unsafeTarget
   , unsafeUntargetBarbie
 
-  , Repl
+  , Repl, Repl'
 
   , RecRep
   , RecUsage(..), NonRec(..)
@@ -98,3 +98,6 @@ toWithRecAnn :: Generic a => RecRep a x -> a
 toWithRecAnn = to . unsafeCoerce
 
 type RecRep a = AnnRec a (Rep a)
+
+type Repl' f g rep
+  = Repl f g (DeannRec rep)

@@ -36,3 +36,4 @@ module Data.Barbie.Constraints
 where
 
 import Data.Barbie.Internal.Constraints
+import Data.Barbie.Internal.ProofB
