@@ -18,6 +18,7 @@ module Barbies
 
   , CompositeRecord(..)
   , SumRec(..)
+  , InfRec(..)
 
   , NestedF(..)
   )
@@ -142,7 +143,7 @@ data CompositeRecord f
       }
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB -- , ConstraintsB
+    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
     )
 
 deriving instance (Show (f Int), Show (f Bool), Show (f Char)) => Show (CompositeRecord f)
@@ -159,19 +160,30 @@ data SumRec f
   | SumRec_2 (f Int) (SumRec f)
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB
+    , FunctorB, TraversableB, ConstraintsB
     )
 
-deriving instance  Show (f Int) => Show (SumRec f)
-deriving instance  Eq   (f Int) => Eq   (SumRec f)
+deriving instance  ConstraintsOf Show f SumRec => Show (SumRec f)
+deriving instance  ConstraintsOf Eq   f SumRec => Eq   (SumRec f)
 
-instance Arbitrary (f Int) => Arbitrary (SumRec f) where
+instance ConstraintsOf Arbitrary f SumRec => Arbitrary (SumRec f) where
   arbitrary
     = oneof
         [ pure SumRec_0
         , SumRec_1 <$> arbitrary
         , SumRec_2 <$> arbitrary <*> arbitrary
         ]
+
+
+data InfRec f
+  = InfRec { ir_1 :: f Int, ir_2 :: InfRec f }
+  deriving
+    ( Generic, Typeable
+    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
+    )
+
+deriving instance  ConstraintsOf Show f InfRec => Show (InfRec f)
+deriving instance  ConstraintsOf Eq   f InfRec => Eq   (InfRec f)
 
 
 -----------------------------------------------------

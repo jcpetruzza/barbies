@@ -19,6 +19,12 @@ module Data.Barbie.Internal.Generics
   , unsafeUntargetBarbie
 
   , Repl
+
+  , RecRep
+  , RecUsage(..), NonRec(..)
+  , AnnRec, DeannRec
+  , toWithRecAnn
+  , fromWithRecAnn
   )
 
 where
@@ -56,3 +62,39 @@ type family Repl f g rep where
     Repl f g (K1 i c)         = K1 i c
     Repl f g (l :+: r)        = (Repl f g l) :+: (Repl f g r)
     Repl f g (l :*: r)        = (Repl f g l) :*: (Repl f g r)
+
+
+-- | We use 'RecUsage' to identify the position in the
+--   generic representation where the barbie type is used
+--   recursively.
+newtype RecUsage a
+  = RecUsage a
+
+newtype NonRec a
+  = NonRec a
+
+type family AnnRec a rep where
+  AnnRec a (M1 i c x)  = M1  i c (AnnRec a x)
+  AnnRec a V1          = V1
+  AnnRec a U1          = U1
+  AnnRec a (K1 i a)    = K1 i (RecUsage a)
+  AnnRec a (K1 i a')   = K1 i (NonRec a')
+  AnnRec a (l :*: r)   = AnnRec a l :*: AnnRec a r
+  AnnRec a (l :+: r)   = AnnRec a l :+: AnnRec a r
+
+type family DeannRec rep where
+  DeannRec (M1 i c x)          = M1  i c (DeannRec x)
+  DeannRec V1                  = V1
+  DeannRec U1                  = U1
+  DeannRec (K1 i (RecUsage a)) = K1 i a
+  DeannRec (K1 i (NonRec a))   = K1 i a
+  DeannRec (l :*: r)           = DeannRec l :*: DeannRec r
+  DeannRec (l :+: r)           = DeannRec l :+: DeannRec r
+
+fromWithRecAnn :: Generic a => a -> RecRep a x
+fromWithRecAnn = unsafeCoerce . from
+
+toWithRecAnn :: Generic a => RecRep a x -> a
+toWithRecAnn = to . unsafeCoerce
+
+type RecRep a = AnnRec a (Rep a)

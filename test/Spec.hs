@@ -4,6 +4,7 @@ import Test.Tasty (defaultMain, testGroup)
 import qualified Spec.Functor as Functor
 import qualified Spec.Product as Product
 import qualified Spec.Traversable as Traversable
+import qualified Spec.Constraints as Constraints
 
 
 import Barbies
@@ -52,6 +53,25 @@ main
             , Product.uniqLaws @Record1
             , Product.uniqLaws @Record3
             , Product.uniqLaws @CompositeRecord
+            ]
+
+        , testGroup "adjProof projection"
+            [ Constraints.lawAdjProofPrj @Record0
+            , Constraints.lawAdjProofPrj @Record1
+            , Constraints.lawAdjProofPrj @Record3
+            , Constraints.lawAdjProofPrj @Ignore1
+
+            , Constraints.lawAdjProofPrj @Sum3
+
+            , Constraints.lawAdjProofPrj @CompositeRecord
+            , Constraints.lawAdjProofPrj @SumRec
+            ]
+
+        , testGroup "bproof projection"
+            [ Constraints.lawProofEquivPrj @Record0
+            , Constraints.lawProofEquivPrj @Record1
+            , Constraints.lawProofEquivPrj @Record3
+            , Constraints.lawProofEquivPrj @CompositeRecord
             ]
         ]
 
