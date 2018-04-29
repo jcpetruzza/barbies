@@ -33,6 +33,7 @@ import Data.Barbie.Internal.Product(ProductB(..))
 import Data.Barbie.Internal.Generics
 
 import Data.Constraint(Dict(..), withDict)
+import Data.Functor.Classes(Show1(..))
 import Data.Functor.Product(Product(..))
 import Data.Kind(Constraint)
 import Data.Proxy
@@ -44,6 +45,10 @@ import GHC.Generics
 --   of @c (f a)@.
 newtype ProofOf c f a
   = Proof { proofDict :: Dict (c (f a)) }
+  deriving(Eq, Show)
+
+instance Show1 (ProofOf c f) where
+  liftShowsPrec _ _ = showsPrec
 
 -- | Build proof of instance.
 proof :: c (f a) => ProofOf c f a
