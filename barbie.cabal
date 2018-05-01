@@ -29,6 +29,7 @@ library
       Data.Barbie.Container
       Data.Functor.Prod
 
+      Data.Barbie.Internal.Bare
       Data.Barbie.Internal.Constraints
       Data.Barbie.Internal.Functor
       Data.Barbie.Internal.Product
@@ -56,6 +57,7 @@ test-suite barbie-test
   other-modules:
       Barbies
       Clothes
+      Spec.Bare
       Spec.Functor
       Spec.Traversable
       Spec.Product

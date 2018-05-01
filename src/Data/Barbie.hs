@@ -51,6 +51,13 @@ module Data.Barbie
   , ProductB(buniq, bprod)
   , (/*/), (/*)
 
+    -- * Bare values
+  , Wear
+  , Bare
+  , BareB(bstrip, bcover)
+  , bstripFrom
+  , bcoverWith
+
     -- * Constraints and proofs of instance
   , ConstraintsB(ConstraintsOf, adjProof)
   , ProofB(bproof)
@@ -58,6 +65,7 @@ module Data.Barbie
 
 where
 
+import Data.Barbie.Internal.Bare(Bare, BareB(..), bstripFrom, bcoverWith, Wear)
 import Data.Barbie.Internal.Constraints(ConstraintsB(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Product(ProductB(..), (/*/), (/*))
