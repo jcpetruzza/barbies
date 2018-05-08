@@ -85,6 +85,8 @@ main
             , Constraints.lawAdjProofPrj @Record1
             , Constraints.lawAdjProofPrj @Record3
 
+            , Constraints.lawAdjProofPrj @Record1W
+            , Constraints.lawAdjProofPrj @Record3W
 
 
             , Constraints.lawAdjProofPrj @Ignore1
@@ -92,8 +94,11 @@ main
             , Constraints.lawAdjProofPrj @Sum3
             , Constraints.lawAdjProofPrj @SumRec
 
+            , Constraints.lawAdjProofPrj @Sum3W
+            , Constraints.lawAdjProofPrj @SumRecW
 
             , Constraints.lawAdjProofPrj @CompositeRecord
+            , Constraints.lawAdjProofPrj @CompositeRecordW
             ]
 
         , testGroup "bproof projection"
@@ -102,6 +107,9 @@ main
             , Constraints.lawProofEquivPrj @Record3
             , Constraints.lawProofEquivPrj @CompositeRecord
 
+            , Constraints.lawProofEquivPrj @Record1W
+            , Constraints.lawProofEquivPrj @Record3W
+            , Constraints.lawProofEquivPrj @CompositeRecordW
             ]
 
         , testGroup "Bare laws"

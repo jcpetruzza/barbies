@@ -24,6 +24,7 @@ where
 
 import Data.Barbie.Internal.Functor (FunctorB(..))
 import Data.Barbie.Internal.Generics
+import Data.Barbie.Internal.Tags (F,G)
 import Data.Functor.Compose (Compose(..))
 import GHC.Generics
 
@@ -88,9 +89,6 @@ class GTraversableB b where
     => (forall a . f a -> t (g a))
     -> b x -> t (Repl (Target F) (Target G) b x)
 
-data F a
-data G a
-
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
@@ -122,6 +120,11 @@ instance (GTraversableB l, GTraversableB r) => GTraversableB (l :+: r) where
 -- --------------------------------
 -- The interesting cases
 -- --------------------------------
+
+instance {-# OVERLAPPING #-} GTraversableB (K1 R (Target (W F) a)) where
+  {-# INLINE gbtraverse #-}
+  gbtraverse f (K1 fa)
+    = K1 . unsafeTarget @(W G) <$> f (unsafeUntarget @(W F) fa)
 
 instance {-# OVERLAPPING #-} GTraversableB (K1 R (Target F a)) where
   {-# INLINE gbtraverse #-}

@@ -28,8 +28,10 @@ module Data.Barbie.Internal.Constraints
 
 where
 
+import Data.Barbie.Internal.Wear(Wear)
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Generics
+import Data.Barbie.Internal.Tags(F, PxF)
 
 import Data.Constraint(Dict(..), withDict)
 import Data.Functor.Classes(Show1(..))
@@ -42,21 +44,24 @@ import GHC.Generics
 
 -- | @'ProofOf' c f a@ is evidence that there exists an instance
 --   of @c (f a)@.
+--
+--  Note that, in particular, @'ProofOf' c 'Bare' a@ is proof for
+--  @c a@.
 newtype ProofOf c f a
-  = Proof { proofDict :: Dict (c (f a)) }
+  = Proof { proofDict :: Dict (c (Wear f a)) }
   deriving(Eq, Show)
 
 instance Show1 (ProofOf c f) where
   liftShowsPrec _ _ = showsPrec
 
 -- | Build proof of instance.
-proof :: c (f a) => ProofOf c f a
+proof :: c (Wear f a) => ProofOf c f a
 proof
   = Proof Dict
 
 -- | Turn a constrained-function into an unconstrained one
 --   that demands proof-of-instance instead.
-requiringProof :: (c (f a) => r) -> (ProofOf c f a -> r)
+requiringProof :: (c (Wear f a) => r) -> (ProofOf c f a -> r)
 requiringProof f
   = \p -> withDict (proofDict p) f
 
@@ -131,7 +136,8 @@ type family GConstraintsOf (c :: * -> Constraint) (f :: * -> *) r :: Constraint 
   GConstraintsOf c f U1 = ()
   GConstraintsOf c f (l :*: r) = (GConstraintsOf c f l, GConstraintsOf c f r)
   GConstraintsOf c f (l :+: r) = (GConstraintsOf c f l, GConstraintsOf c f r)
-  GConstraintsOf c f (K1 R (NonRec (Target F a))) = c (f a)
+  GConstraintsOf c f (K1 R (NonRec (Target (W F) a))) = c (Wear f a)
+  GConstraintsOf c f (K1 R (NonRec (Target F a))) = (c (f a), Wear f a ~ f a)
   GConstraintsOf c f (K1 R (NonRec (b (Target F)))) = ConstraintsOf c f b
   GConstraintsOf c f (K1 R (RecUsage (b (Target F)))) = () -- break recursion
   GConstraintsOf c f (K1 _i _c) = ()
@@ -151,9 +157,6 @@ gadjProofDefault b
   where
     pcbf = Proxy :: Proxy (c (b f))
 
-
-data F a
-data PxF a
 
 class GAdjProof b rep where
   gadjProof
@@ -195,12 +198,21 @@ instance (GAdjProof b l, GAdjProof b r) => GAdjProof b (l :+: r) where
 -- The interesting cases
 -- --------------------------------
 
+instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target (W F) a))) where
+  {-# INLINE gadjProof #-}
+  gadjProof pcbf (K1 (NonRec fa))
+    = K1 $ unsafeTarget @(W PxF) (Pair (mkProof pcbf) $ unsafeUntarget @(W F) fa)
+    where
+      mkProof :: c (Wear f a) => Proxy (c (b f)) -> ProofOf c f a
+      mkProof _ = proof
+
+
 instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target F a))) where
   {-# INLINE gadjProof #-}
   gadjProof pcbf (K1 (NonRec fa))
     = K1 $ unsafeTarget @PxF (Pair (mkProof pcbf) $ unsafeUntarget @F fa)
     where
-      mkProof :: c (f a) => Proxy (c (b f)) -> ProofOf c f a
+      mkProof :: c (Wear f a) => Proxy (c (b f)) -> ProofOf c f a
       mkProof _ = proof
 
 instance {-# OVERLAPPING #-} CanDeriveGenericInstance b => GAdjProof b (K1 R (RecUsage (b (Target F)))) where

@@ -21,32 +21,13 @@ where
 
 import Data.Barbie.Internal.Functor (FunctorB(..))
 import Data.Barbie.Internal.Generics
+import Data.Barbie.Internal.Tags (I, B)
+import Data.Barbie.Internal.Wear
 import Data.Functor.Identity (Identity(..))
 
 import GHC.Generics
 import Unsafe.Coerce (unsafeCoerce)
 
--- | The 'Wear' type-function allows one to define a type as
---
--- @
--- data B f
---   = B { f1 :: Wear f Int
---       , f2 :: Wear f Bool
---       }
--- @
---
--- The advantage being that on can then retrieve a "naked"
--- value by doing:
---
--- @
--- B { f1 :: 5, f2 = True } :: B Bare
--- #
-type family Wear f a where
-  Wear Bare a = a
-  Wear f    a = f a
-
--- | 'Bare' is the only type such that 'Wear Bare a ~ a'.
-data Bare a
 
 -- | Class of Barbie-types defined using 'Wear' and can therefore
 --   have 'Bare' versions. Must satisfy:
@@ -80,23 +61,23 @@ bcoverWith f
 --   instance.
 type CanDeriveGenericInstance b
   = ( Generic (b (Target I))
-    , Generic (b Bare)
+    , Generic (b (Target B))
     , Gbstrip (Rep (b (Target I)))
-    , Rep (b Bare) ~ ReplWear (Target I) (Target B) (Rep (b (Target I)))
+    , Rep (b (Target B)) ~ Repl (Target I) (Target B) (Rep (b (Target I)))
     )
 
 type CanDeriveGenericInstance' b
   = ( Generic (b (Target I))
     , Generic (b (Target B))
     , Gbcover (Rep (b (Target B)))
-    , Rep (b (Target I)) ~ ReplWear (Target B) (Target I) (Rep (b (Target B)))
+    , Rep (b (Target I)) ~ Repl (Target B) (Target I) (Rep (b (Target B)))
     )
 
 
 -- | Default implementatio of 'bstrip' based on 'Generic'.
 gbstripDefault :: CanDeriveGenericInstance b => b Identity -> b Bare
 gbstripDefault b
-  = to $ gbstrip $ from (unsafeTargetBarbie @I b)
+  = unsafeUntargetBarbie @B $ to $ gbstrip $ from (unsafeTargetBarbie @I b)
 
 -- | Default implementatio of 'bstrip' based on 'Generic'.
 gbcoverDefault :: CanDeriveGenericInstance' b => b Bare -> b Identity
@@ -104,34 +85,18 @@ gbcoverDefault b
   = unsafeUntargetBarbie @I $ to $ gbcover $ from (unsafeTargetBarbie @B b)
 
 
-data I a
-data B a
+unsafeTargetBare :: a -> Target (W B) a
+unsafeTargetBare = unsafeCoerce
 
-unsafeUntargetBare :: Target B a -> a
+unsafeUntargetBare :: Target (W B) a -> a
 unsafeUntargetBare = unsafeCoerce
 
 
-type family ReplWear f g rep where
-  ReplWear f g (M1 i c x) = M1 i c (ReplWear f g x)
-  ReplWear f g V1         = V1
-  ReplWear f g U1         = U1
-  ReplWear f g (l :+: r)  = ReplWear f g l :+: ReplWear f g r
-  ReplWear f g (l :*: r)  = ReplWear f g l :*: ReplWear f g r
-
-  ReplWear (Target B) g (K1 i (Target B a)) = K1 i (g a)
-  ReplWear (Target B) g (K1 i (b (Target B))) = K1 i (b g)
-  ReplWear (Target B) g (K1 i (h (b (Target B)))) = K1 i (h (b g))
-
-  ReplWear f (Target B) (K1 i (f a)) = K1 i a
-  ReplWear f (Target B) (K1 i (b f)) = K1 i (b Bare)
-  ReplWear f (Target B) (K1 i (h (b f))) = K1 i (h (b Bare))
-
-
 class Gbstrip rep where
-  gbstrip :: rep x -> ReplWear (Target I) (Target B) rep x
+  gbstrip :: rep x -> Repl (Target I) (Target B) rep x
 
 class Gbcover rep where
-  gbcover :: rep x -> ReplWear (Target B) (Target I) rep x
+  gbcover :: rep x -> Repl (Target B) (Target I) rep x
 
 -- ----------------------------------
 -- Trivial cases
@@ -187,29 +152,29 @@ instance (Gbcover l, Gbcover r) => Gbcover (l :+: r) where
 -- --------------------------------
 
 
-instance {-# OVERLAPPING #-} Gbstrip (K1 R (Target I a)) where
+instance {-# OVERLAPPING #-} Gbstrip (K1 R (Target (W I) a)) where
   {-# INLINE gbstrip #-}
   gbstrip (K1 ia)
-    = K1 $ runIdentity $ unsafeUntarget @I ia
+    = K1 $ unsafeTargetBare $ runIdentity $ unsafeUntarget @(W I) ia
 
 instance {-# OVERLAPPING #-} BareB b => Gbstrip (K1 R (b (Target I))) where
   {-# INLINE gbstrip #-}
   gbstrip (K1 bf)
-    = K1 $ bstrip $ unsafeUntargetBarbie @I bf
+    = K1 $ unsafeTargetBarbie @B $ bstrip $ unsafeUntargetBarbie @I bf
 
 instance {-# OVERLAPPING #-}
   ( Functor h
   , BareB b
-  , ReplWear (Target I) (Target B) (K1 R (h (b (Target I))))  -- shouldn't be
-      ~ (K1 R (h (b Bare)))  -- necessary but ghc chokes otherwise
+  , Repl (Target I) (Target B) (K1 R (h (b (Target I))))  -- shouldn't be
+      ~ (K1 R (h (b (Target B))))  -- necessary but ghc chokes otherwise
   )
    => Gbstrip (K1 R (h (b (Target I)))) where
   {-# INLINE gbstrip #-}
   gbstrip (K1 hbf)
-    = K1 (fmap (bstrip . unsafeUntargetBarbie @I) hbf)
+    = K1 (fmap (unsafeTargetBarbie @B . bstrip . unsafeUntargetBarbie @I) hbf)
 
 
-instance (K1 i c) ~ ReplWear (Target I) (Target B) (K1 i c) => Gbstrip (K1 i c) where
+instance (K1 i c) ~ Repl (Target I) (Target B) (K1 i c) => Gbstrip (K1 i c) where
   {-# INLINE gbstrip #-}
   gbstrip k1 = k1
 
@@ -219,10 +184,10 @@ instance (K1 i c) ~ ReplWear (Target I) (Target B) (K1 i c) => Gbstrip (K1 i c) 
 -- --------------------------------
 
 
-instance {-# OVERLAPPING #-} Gbcover (K1 R (Target B a)) where
+instance {-# OVERLAPPING #-} Gbcover (K1 R (Target (W B) a)) where
   {-# INLINE gbcover #-}
   gbcover (K1 a)
-    = K1 $ unsafeTarget @I $ Identity $ unsafeUntargetBare a
+    = K1 $ unsafeTarget @(W I) $ Identity $ unsafeUntargetBare a
 
 instance {-# OVERLAPPING #-} BareB b => Gbcover (K1 R (b (Target B))) where
   {-# INLINE gbcover #-}
@@ -232,7 +197,7 @@ instance {-# OVERLAPPING #-} BareB b => Gbcover (K1 R (b (Target B))) where
 instance {-# OVERLAPPING #-}
   ( Functor h
   , BareB b
-  , ReplWear (Target B) (Target I) (K1 R (h (b (Target B))))  -- shouldn't be
+  , Repl (Target B) (Target I) (K1 R (h (b (Target B))))  -- shouldn't be
       ~ (K1 R (h (b (Target I))))  -- necessary but ghc chokes otherwise
   )
    => Gbcover (K1 R (h (b (Target B)))) where
@@ -240,6 +205,6 @@ instance {-# OVERLAPPING #-}
   gbcover (K1 hbb)
     = K1 (fmap (unsafeTargetBarbie @I . bcover . unsafeUntargetBarbie @B) hbb)
 
-instance (K1 i c) ~ ReplWear (Target B) (Target I) (K1 i c) => Gbcover (K1 i c) where
+instance (K1 i c) ~ Repl (Target B) (Target I) (K1 i c) => Gbcover (K1 i c) where
   {-# INLINE gbcover #-}
   gbcover k1 = k1

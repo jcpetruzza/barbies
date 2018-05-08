@@ -19,6 +19,7 @@ module Data.Barbie.Internal.Functor
 where
 
 import Data.Barbie.Internal.Generics
+import Data.Barbie.Internal.Tags (F,G)
 import GHC.Generics
 
 -- | Barbie-types that can be mapped over. Instances of 'FunctorB' should
@@ -68,9 +69,6 @@ class GFunctorB b where
   gbmap :: (forall a . f a -> g a) -> b x -> Repl (Target F) (Target G) b x
 
 
-data F a
-data G a
-
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
@@ -101,6 +99,11 @@ instance (GFunctorB l, GFunctorB r) => GFunctorB (l :+: r) where
 -- --------------------------------
 -- The interesting cases
 -- --------------------------------
+
+instance {-# OVERLAPPING #-} GFunctorB (K1 R (Target (W F) a)) where
+  {-# INLINE gbmap #-}
+  gbmap f (K1 fa)
+    = K1 $ unsafeTarget @(W G) (f $ unsafeUntarget @(W F) fa)
 
 instance {-# OVERLAPPING #-} GFunctorB (K1 R (Target F a)) where
   {-# INLINE gbmap #-}

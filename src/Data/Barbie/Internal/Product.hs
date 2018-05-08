@@ -21,6 +21,7 @@ where
 
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Generics
+import Data.Barbie.Internal.Tags(F, G, FxG)
 import Data.Functor.Product (Product(..))
 import Data.Functor.Prod
 
@@ -141,11 +142,6 @@ class GProductB b where
   gbuniq
     :: (forall a . f a) -> b x
 
-data F a
-data G a
-data FxG a
-
-
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
@@ -176,6 +172,15 @@ instance(GProductB l, GProductB r) => GProductB (l :*: r) where
 -- --------------------------------
 -- The interesting cases
 -- --------------------------------
+
+instance {-# OVERLAPPING #-} GProductB (K1 R (Target (W F) a)) where
+  {-# INLINE gbprod #-}
+  gbprod (K1 fa) (K1 ga)
+    = let fxga = Pair (unsafeUntarget @(W F) fa) (unsafeUntarget @(W G) ga)
+      in K1 (unsafeTarget @(W FxG) fxga)
+
+  {-# INLINE gbuniq #-}
+  gbuniq x = K1 (unsafeTarget @(W F) x)
 
 instance {-# OVERLAPPING #-} GProductB (K1 R (Target F a)) where
   {-# INLINE gbprod #-}

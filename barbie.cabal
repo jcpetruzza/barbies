@@ -32,10 +32,14 @@ library
       Data.Barbie.Internal.Bare
       Data.Barbie.Internal.Constraints
       Data.Barbie.Internal.Functor
-      Data.Barbie.Internal.Product
-      Data.Barbie.Internal.Traversable
-      Data.Barbie.Internal.ProofB
       Data.Barbie.Internal.Generics
+      Data.Barbie.Internal.Product
+      Data.Barbie.Internal.ProofB
+      Data.Barbie.Internal.Traversable
+      Data.Barbie.Internal.Wear
+
+  other-modules:
+      Data.Barbie.Internal.Tags
 
   hs-source-dirs:
       src

@@ -22,10 +22,11 @@ where
 
 import Data.Barbie.Internal.Generics
 import Data.Barbie.Internal.Constraints hiding
-  (CanDeriveGenericInstance, ConstraintsOfMatchesGenericDeriv, GConstraintsOf)
+  (CanDeriveGenericInstance, ConstraintsOfMatchesGenericDeriv)
 import Data.Barbie.Internal.Product(ProductB(..))
+import Data.Barbie.Internal.Tags(P, F)
+import Data.Barbie.Internal.Wear(Wear)
 
-import Data.Kind(Constraint)
 import Data.Proxy
 
 import GHC.Generics
@@ -65,19 +66,6 @@ type ConstraintsOfMatchesGenericDeriv c f b
 --  Generic derivations
 -- ===============================================================
 
--- NB. Duplicated wrt the definition in 'Constraints' since we don't
--- want to export the 'F' constructor for type-safety.
-type family GConstraintsOf (c :: * -> Constraint) (f :: * -> *) r :: Constraint where
-  GConstraintsOf c f (M1 _i _c x) = GConstraintsOf c f x
-  GConstraintsOf c f V1 = ()
-  GConstraintsOf c f U1 = ()
-  GConstraintsOf c f (l :*: r) = (GConstraintsOf c f l, GConstraintsOf c f r)
-  GConstraintsOf c f (l :+: r) = (GConstraintsOf c f l, GConstraintsOf c f r)
-  GConstraintsOf c f (K1 R (NonRec (Target F a))) = c (f a)
-  GConstraintsOf c f (K1 R (NonRec (b (Target F)))) = ConstraintsOf c f b
-  GConstraintsOf c f (K1 R (RecUsage (b (Target F)))) = () -- break recursion
-  GConstraintsOf c f (K1 _i _c) = ()
-
 -- | Default implementation of 'proof' based on 'Generic'.
 gbproofDefault
   :: forall b c f
@@ -92,9 +80,6 @@ gbproofDefault
     pcbf = Proxy :: Proxy (c (b f))
     pb = Proxy :: Proxy (RecRep (b (Target F)) x)
 
-
-data F a
-data P a
 
 
 class GProof b rep where
@@ -131,13 +116,23 @@ instance (GProof b l, GProof b r) => GProof b (l :*: r) where
 -- -- The interesting cases
 -- -- --------------------------------
 
+instance {-# OVERLAPPING #-} GProof b (K1 R (NonRec (Target (W F) a))) where
+  {-# INLINE gbproof #-}
+  gbproof pcbf _
+    = K1 $ unsafeTarget @(W P) (mkProof pcbf)
+    where
+      mkProof ::
+       c (Wear f a) => Proxy (c (b f)) -> ProofOf c f a
+      mkProof _ = proof
+
 instance {-# OVERLAPPING #-} GProof b (K1 R (NonRec (Target F a))) where
   {-# INLINE gbproof #-}
   gbproof pcbf _
     = K1 $ unsafeTarget @P (mkProof pcbf)
     where
-      mkProof :: c (f a) => Proxy (c (b f)) -> ProofOf c f a
+      mkProof :: c (Wear f a) => Proxy (c (b f)) -> ProofOf c f a
       mkProof _ = proof
+
 
 instance {-# OVERLAPPING #-}
   CanDeriveGenericInstance b => GProof b (K1 R (RecUsage (b (Target F)))) where

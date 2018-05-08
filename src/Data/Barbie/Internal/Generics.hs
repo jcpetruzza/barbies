@@ -18,6 +18,8 @@ module Data.Barbie.Internal.Generics
   , unsafeTarget
   , unsafeUntargetBarbie
 
+  , W
+
   , Repl, Repl'
 
   , RecRep
@@ -25,6 +27,7 @@ module Data.Barbie.Internal.Generics
   , AnnRec, DeannRec
   , toWithRecAnn
   , fromWithRecAnn
+
   )
 
 where
@@ -56,6 +59,7 @@ type family Repl f g rep where
     Repl f g (M1 i c x)       = M1 i c (Repl f g x)
     Repl f g V1               = V1
     Repl f g U1               = U1
+    Repl (Target f) (Target g) (K1 i (Target (W f) a)) = K1 i (Target (W g) a)
     Repl f g (K1 i (f a))     = K1 i (g a)
     Repl f g (K1 i (b f))     = K1 i (b g)
     Repl f g (K1 i (h (b f))) = K1 i (h (b g))
@@ -101,3 +105,8 @@ type RecRep a = AnnRec a (Rep a)
 
 type Repl' f g rep
   = Repl f g (DeannRec rep)
+
+
+-- | We use 'W' to identify usagaes of 'Wear' in the generic
+--   representation of a barbie-type.
+data W (f :: * -> *) a
