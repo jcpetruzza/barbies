@@ -1,10 +1,10 @@
-name:           barbie
+name:           barbies
 version:        0.1.0.0
 synopsis:       Classes for working with types that can change clothes.
 description:    Types that are parametric on unary type-constructors that control their shapes are like Barbies that can wear different clothes to become a different doll. This package provides basic classes and abstractions to work with these types and easily transform them.
 category:       Data-structures
-homepage:       https://github.com/jcpetruzza/barbie#readme
-bug-reports:    https://github.com/jcpetruzza/barbie/issues
+homepage:       https://github.com/jcpetruzza/barbies#readme
+bug-reports:    https://github.com/jcpetruzza/barbies/issues
 author:         Daniel Gorin
 maintainer:     jcpetruzza@gmail.com
 copyright:      2018 Daniel Gorin
@@ -53,7 +53,7 @@ library
   default-language: Haskell2010
 
 
-test-suite barbie-test
+test-suite barbies-test
   type: exitcode-stdio-1.0
 
   main-is: Spec.hs
@@ -72,7 +72,7 @@ test-suite barbie-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Werror
 
   build-depends:
-      barbie
+      barbies
     , base >=4.7 && <5
     , QuickCheck
     , tasty

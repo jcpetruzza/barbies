@@ -1,3 +1,3 @@
-# Changelog for barbie
+# Changelog for barbies
 
 ## Unreleased changes
