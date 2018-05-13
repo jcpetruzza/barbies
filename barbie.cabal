@@ -62,7 +62,6 @@ test-suite barbie-test
       Barbies
       Clothes
       Spec.Bare
-      Spec.Constraints
       Spec.Functor
       Spec.Traversable
       Spec.Product

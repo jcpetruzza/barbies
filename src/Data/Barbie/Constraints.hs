@@ -29,7 +29,7 @@ module Data.Barbie.Constraints
   , requiringDict
 
     -- * Retrieving proofs
-  , ConstraintsB(ConstraintsOf, adjProof)
+  , ConstraintsB(ConstraintsOf)
   , ProofB(..)
   )
 

@@ -21,8 +21,7 @@ module Data.Barbie.Internal.ProofB
 where
 
 import Data.Barbie.Internal.Generics
-import Data.Barbie.Internal.Constraints hiding
-  (CanDeriveGenericInstance, ConstraintsOfMatchesGenericDeriv)
+import Data.Barbie.Internal.Constraints
 import Data.Barbie.Internal.Product(ProductB(..))
 import Data.Barbie.Internal.Tags(P, F)
 import Data.Barbie.Internal.Wear(Wear)
@@ -31,12 +30,7 @@ import Data.Proxy
 
 import GHC.Generics
 
--- | Barbie-types with products have a canonical proof of instance,
---   which can make them more convenient to use:
---
---  @
---  'adjProof' = 'bprod' 'bproof'
---  @
+-- | Barbie-types with products have a canonical proof of instance.
 --
 -- There is a default 'bproof' implementation for 'Generic' types, so
 -- instances can derived automatically.

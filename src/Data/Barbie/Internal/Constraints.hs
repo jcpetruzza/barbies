@@ -19,11 +19,11 @@ module Data.Barbie.Internal.Constraints
 
   , ConstraintsB(..)
 
-  , CanDeriveGenericInstance
-  , ConstraintsOfMatchesGenericDeriv
+  -- , CanDeriveGenericInstance
+  -- , ConstraintsOfMatchesGenericDeriv
   , GConstraintsOf
-  , GAdjProof
-  , gadjProofDefault
+  -- , GAdjProof
+  -- , gadjProofDefault
   )
 
 where
@@ -31,13 +31,11 @@ where
 import Data.Barbie.Internal.Wear(Wear)
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Generics
-import Data.Barbie.Internal.Tags(F, PxF)
+import Data.Barbie.Internal.Tags(F)
 
 import Data.Constraint(Dict(..), withDict)
 import Data.Functor.Classes(Show1(..))
-import Data.Functor.Product(Product(..))
 import Data.Kind(Constraint)
-import Data.Proxy
 
 import GHC.Generics
 
@@ -73,13 +71,9 @@ requiringDict f
   --
   -- instance 'ConstraintsB' T where
   --   type 'ConstraintsOf' c f T = (c (f 'Int'), c (f 'String'), c (f 'Bool'))
-  --
-  --   adjProof t = case t of
-  --     A x y -> A ('Pair' 'mkDictOf' x) ('Pair' 'mkDictOf' y)
-  --     B x y -> B ('Pair' 'mkDictOf' x) ('Pair' 'mkDictOf' y)
   -- @
   --
-  -- There are default implementation of 'ConstraintsOf' and 'adjProof' for
+  -- There is a default implementation of 'ConstraintsOf' for
   -- 'Generic' types, so in practice one can simply do:
   --
   -- @
@@ -96,16 +90,16 @@ class FunctorB b => ConstraintsB b where
   type ConstraintsOf (c :: * -> Constraint) (f :: * -> *) b :: Constraint
   type ConstraintsOf c f b = GConstraintsOf c f (RecRep (b (Target F)))
 
-  -- | Adjoint a proof-of-instance to a barbie-type.
-  adjProof :: ConstraintsOf c f b => b f -> b (Product (DictOf c f) f)
+  -- -- | Adjoint a proof-of-instance to a barbie-type.
+  -- adjProof :: ConstraintsOf c f b => b f -> b (Product (DictOf c f) f)
 
-  default adjProof
-    :: ( CanDeriveGenericInstance b
-       , ConstraintsOfMatchesGenericDeriv c f b
-       , ConstraintsOf c f b
-       )
-     => b f -> b (Product (DictOf c f) f)
-  adjProof = gadjProofDefault
+  -- default adjProof
+  --   :: ( CanDeriveGenericInstance b
+  --      , ConstraintsOfMatchesGenericDeriv c f b
+  --      , ConstraintsOf c f b
+  --      )
+  --    => b f -> b (Product (DictOf c f) f)
+  -- adjProof = gadjProofDefault
 
 -- | Intuivively, the requirements to have @'ConstraintsB' B@ derived are:
 --
@@ -113,15 +107,15 @@ class FunctorB b => ConstraintsB b where
 --
 --     * If @f@ is used as argument to some type in the definition of @B@, it
 --       is only on a Barbie-type with a 'ConstraintsB' instance.
-type CanDeriveGenericInstance b
-  = ( Generic (b (Target F))
-    , Generic (b (Target PxF))
-    , GAdjProof b (RecRep (b (Target F)))
-    , Rep (b (Target PxF)) ~ Repl' (Target F) (Target PxF) (RecRep (b (Target F)))
-    )
+-- type CanDeriveGenericInstance b
+--   = ( Generic (b (Target F))
+--     , Generic (b (Target PxF))
+--     , GAdjProof b (RecRep (b (Target F)))
+--     , Rep (b (Target PxF)) ~ Repl' (Target F) (Target PxF) (RecRep (b (Target F)))
+--     )
 
-type ConstraintsOfMatchesGenericDeriv c f b
-  = ConstraintsOf c f b ~ GConstraintsOf c f (RecRep (b (Target F)))
+-- type ConstraintsOfMatchesGenericDeriv c f b
+--   = ConstraintsOf c f b ~ GConstraintsOf c f (RecRep (b (Target F)))
 
 
 -- ===============================================================
@@ -144,92 +138,92 @@ type family GConstraintsOf (c :: * -> Constraint) (f :: * -> *) r :: Constraint 
 
 
 -- | Default implementation of 'adjProof' based on 'Generic'.
-gadjProofDefault
-  :: forall b c f
-  . ( CanDeriveGenericInstance b
-    , ConstraintsOfMatchesGenericDeriv c f b
-    , ConstraintsOf c f b
-    )
-  => b f -> b (Product (DictOf c f) f)
-gadjProofDefault b
-  = unsafeUntargetBarbie @PxF $ to $
-      gadjProof pcbf $ fromWithRecAnn (unsafeTargetBarbie @F b)
-  where
-    pcbf = Proxy :: Proxy (c (b f))
+-- gadjProofDefault
+--   :: forall b c f
+--   . ( CanDeriveGenericInstance b
+--     , ConstraintsOfMatchesGenericDeriv c f b
+--     , ConstraintsOf c f b
+--     )
+--   => b f -> b (Product (DictOf c f) f)
+-- gadjProofDefault b
+--   = unsafeUntargetBarbie @PxF $ to $
+--       gadjProof pcbf $ fromWithRecAnn (unsafeTargetBarbie @F b)
+--   where
+--     pcbf = Proxy :: Proxy (c (b f))
 
 
-class GAdjProof b rep where
-  gadjProof
-    :: ( GConstraintsOf c f rep
-       , GConstraintsOf c f (RecRep (b (Target F))) -- for the recursive case!
-       )
-    => Proxy (c (b f)) -> rep x -> Repl' (Target F) (Target PxF) rep x
+-- class GAdjProof b rep where
+--   gadjProof
+--     :: ( GConstraintsOf c f rep
+--        , GConstraintsOf c f (RecRep (b (Target F))) -- for the recursive case!
+--        )
+--     => Proxy (c (b f)) -> rep x -> Repl' (Target F) (Target PxF) rep x
 
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-instance GAdjProof b x => GAdjProof b (M1 _i _c x) where
-  {-# INLINE gadjProof #-}
-  gadjProof pcbf (M1 x)
-    = M1 (gadjProof pcbf x)
+-- instance GAdjProof b x => GAdjProof b (M1 _i _c x) where
+--   {-# INLINE gadjProof #-}
+--   gadjProof pcbf (M1 x)
+--     = M1 (gadjProof pcbf x)
 
-instance GAdjProof b V1 where
-  gadjProof _ _ = undefined
+-- instance GAdjProof b V1 where
+--   gadjProof _ _ = undefined
 
-instance GAdjProof b U1 where
-  {-# INLINE gadjProof #-}
-  gadjProof _ u1 = u1
+-- instance GAdjProof b U1 where
+--   {-# INLINE gadjProof #-}
+--   gadjProof _ u1 = u1
 
-instance (GAdjProof b l, GAdjProof b r) => GAdjProof b (l :*: r) where
-  {-# INLINE gadjProof #-}
-  gadjProof pcbf (l :*: r)
-    = (gadjProof pcbf l) :*: (gadjProof pcbf r)
+-- instance (GAdjProof b l, GAdjProof b r) => GAdjProof b (l :*: r) where
+--   {-# INLINE gadjProof #-}
+--   gadjProof pcbf (l :*: r)
+--     = (gadjProof pcbf l) :*: (gadjProof pcbf r)
 
-instance (GAdjProof b l, GAdjProof b r) => GAdjProof b (l :+: r) where
-  {-# INLINE gadjProof #-}
-  gadjProof pcbf = \case
-    L1 l -> L1 (gadjProof pcbf l)
-    R1 r -> R1 (gadjProof pcbf r)
-
-
--- --------------------------------
--- The interesting cases
--- --------------------------------
-
-instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target (W F) a))) where
-  {-# INLINE gadjProof #-}
-  gadjProof pcbf (K1 (NonRec fa))
-    = K1 $ unsafeTarget @(W PxF) (Pair (mkProof pcbf) $ unsafeUntarget @(W F) fa)
-    where
-      mkProof :: c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
-      mkProof _ = mkDictOf
+-- instance (GAdjProof b l, GAdjProof b r) => GAdjProof b (l :+: r) where
+--   {-# INLINE gadjProof #-}
+--   gadjProof pcbf = \case
+--     L1 l -> L1 (gadjProof pcbf l)
+--     R1 r -> R1 (gadjProof pcbf r)
 
 
-instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target F a))) where
-  {-# INLINE gadjProof #-}
-  gadjProof pcbf (K1 (NonRec fa))
-    = K1 $ unsafeTarget @PxF (Pair (mkProof pcbf) $ unsafeUntarget @F fa)
-    where
-      mkProof :: c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
-      mkProof _ = mkDictOf
+-- -- --------------------------------
+-- -- The interesting cases
+-- -- --------------------------------
 
-instance {-# OVERLAPPING #-} CanDeriveGenericInstance b => GAdjProof b (K1 R (RecUsage (b (Target F)))) where
-  {-# INLINE gadjProof #-}
-  gadjProof pcbf (K1 (RecUsage bf))
-    = K1 $ to $ gadjProof pcbf $ fromWithRecAnn bf
+-- instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target (W F) a))) where
+--   {-# INLINE gadjProof #-}
+--   gadjProof pcbf (K1 (NonRec fa))
+--     = K1 $ unsafeTarget @(W PxF) (Pair (mkProof pcbf) $ unsafeUntarget @(W F) fa)
+--     where
+--       mkProof :: c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
+--       mkProof _ = mkDictOf
 
-instance {-# OVERLAPPING #-} ConstraintsB b' => GAdjProof b (K1 R (NonRec (b' (Target F)))) where
-  {-# INLINE gadjProof #-}
-  gadjProof pcbf (K1 (NonRec bf))
-    = K1 $ unsafeTargetBarbie @PxF $ adjProof' pcbf $ unsafeUntargetBarbie @F bf
-    where
-      adjProof'
-        :: ConstraintsOf c f b'
-        => Proxy (c (b f)) -> b' f -> b' (Product (DictOf c f) f)
-      adjProof' _ = adjProof
 
-instance (K1 i a) ~ Repl' (Target F) (Target PxF) (K1 i (NonRec a)) => GAdjProof b (K1 i (NonRec a)) where
-  {-# INLINE gadjProof #-}
-  gadjProof _ (K1 (NonRec a)) = K1 a
+-- instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target F a))) where
+--   {-# INLINE gadjProof #-}
+--   gadjProof pcbf (K1 (NonRec fa))
+--     = K1 $ unsafeTarget @PxF (Pair (mkProof pcbf) $ unsafeUntarget @F fa)
+--     where
+--       mkProof :: c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
+--       mkProof _ = mkDictOf
+
+-- instance {-# OVERLAPPING #-} CanDeriveGenericInstance b => GAdjProof b (K1 R (RecUsage (b (Target F)))) where
+--   {-# INLINE gadjProof #-}
+--   gadjProof pcbf (K1 (RecUsage bf))
+--     = K1 $ to $ gadjProof pcbf $ fromWithRecAnn bf
+
+-- instance {-# OVERLAPPING #-} ConstraintsB b' => GAdjProof b (K1 R (NonRec (b' (Target F)))) where
+--   {-# INLINE gadjProof #-}
+--   gadjProof pcbf (K1 (NonRec bf))
+--     = K1 $ unsafeTargetBarbie @PxF $ adjProof' pcbf $ unsafeUntargetBarbie @F bf
+--     where
+--       adjProof'
+--         :: ConstraintsOf c f b'
+--         => Proxy (c (b f)) -> b' f -> b' (Product (DictOf c f) f)
+--       adjProof' _ = adjProof
+
+-- instance (K1 i a) ~ Repl' (Target F) (Target PxF) (K1 i (NonRec a)) => GAdjProof b (K1 i (NonRec a)) where
+--   {-# INLINE gadjProof #-}
+--   gadjProof _ (K1 (NonRec a)) = K1 a

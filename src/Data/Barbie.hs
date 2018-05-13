@@ -59,7 +59,7 @@ module Data.Barbie
   , bcoverWith
 
     -- * Constraints and proofs of instance
-  , ConstraintsB(ConstraintsOf, adjProof)
+  , ConstraintsB(ConstraintsOf)
   , ProofB(bproof)
   )
 
