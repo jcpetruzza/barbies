@@ -31,8 +31,8 @@ import GHC.Generics
 -- | Barbie-types that can form products, subject to the laws:
 --
 -- @
--- 'bmap' 'Data.Bifunctor.first'  . 'uncurry' . 'bprod' = 'Data.Bifunctor.first'
--- 'bmap' 'Data.Bifunctor.second' . 'uncurry' . 'bprod' = 'Data.Bifunctor.second'
+-- 'bmap' \('Pair' a _) . 'uncurry' . 'bprod' = 'fst'
+-- 'bmap' \('Pair' _ b) . 'uncurry' . 'bprod' = 'snd
 -- @
 --
 -- Notice that because of the laws, having an internal product structure is not

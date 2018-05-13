@@ -29,7 +29,7 @@ import Data.Functor.Compose (Compose(..))
 import GHC.Generics
 
 
--- | Barbie-types that can be traversed fro left to right. Instances should
+-- | Barbie-types that can be traversed from left to right. Instances should
 --   satisfy the following laws:
 --
 -- @
