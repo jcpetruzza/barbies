@@ -42,24 +42,21 @@ import GHC.Generics
 
 -- | @'DictOf' c f a@ is evidence that there exists an instance
 --   of @c (f a)@.
---
---  Note that, in particular, @'DictOf' c 'Bare' a@ is proof for
---  @c a@.
 newtype DictOf c f a
-  = DictOf { getDict :: Dict (c (Wear f a)) }
+  = DictOf { getDict :: Dict (c (f a)) }
   deriving(Eq, Show)
 
 instance Show1 (DictOf c f) where
   liftShowsPrec _ _ = showsPrec
 
 -- | Build proof of instance.
-mkDictOf :: c (Wear f a) => DictOf c f a
+mkDictOf :: c (f a) => DictOf c f a
 mkDictOf
   = DictOf Dict
 
 -- | Turn a constrained-function into an unconstrained one
 --   that demands proof-of-instance instead.
-requiringDict :: (c (Wear f a) => r) -> (DictOf c f a -> r)
+requiringDict :: (c (f a) => r) -> (DictOf c f a -> r)
 requiringDict f
   = \p -> withDict (getDict p) f
 
