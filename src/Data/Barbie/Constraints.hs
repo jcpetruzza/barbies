@@ -24,9 +24,9 @@
 ----------------------------------------------------------------------------
 module Data.Barbie.Constraints
   ( -- * Proof of instance
-    ProofOf(..)
-  , proof
-  , requiringProof
+    DictOf(..)
+  , mkDictOf
+  , requiringDict
 
     -- * Retrieving proofs
   , ConstraintsB(ConstraintsOf, adjProof)

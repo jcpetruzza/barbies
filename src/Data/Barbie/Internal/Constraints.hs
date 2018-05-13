@@ -13,9 +13,9 @@
 {-# LANGUAGE TypeOperators         #-}
 {-# LANGUAGE UndecidableInstances  #-}
 module Data.Barbie.Internal.Constraints
-  ( ProofOf(..)
-  , proof
-  , requiringProof
+  ( DictOf(..)
+  , mkDictOf
+  , requiringDict
 
   , ConstraintsB(..)
 
@@ -42,28 +42,28 @@ import Data.Proxy
 import GHC.Generics
 
 
--- | @'ProofOf' c f a@ is evidence that there exists an instance
+-- | @'DictOf' c f a@ is evidence that there exists an instance
 --   of @c (f a)@.
 --
---  Note that, in particular, @'ProofOf' c 'Bare' a@ is proof for
+--  Note that, in particular, @'DictOf' c 'Bare' a@ is proof for
 --  @c a@.
-newtype ProofOf c f a
-  = Proof { proofDict :: Dict (c (Wear f a)) }
+newtype DictOf c f a
+  = DictOf { getDict :: Dict (c (Wear f a)) }
   deriving(Eq, Show)
 
-instance Show1 (ProofOf c f) where
+instance Show1 (DictOf c f) where
   liftShowsPrec _ _ = showsPrec
 
 -- | Build proof of instance.
-proof :: c (Wear f a) => ProofOf c f a
-proof
-  = Proof Dict
+mkDictOf :: c (Wear f a) => DictOf c f a
+mkDictOf
+  = DictOf Dict
 
 -- | Turn a constrained-function into an unconstrained one
 --   that demands proof-of-instance instead.
-requiringProof :: (c (Wear f a) => r) -> (ProofOf c f a -> r)
-requiringProof f
-  = \p -> withDict (proofDict p) f
+requiringDict :: (c (Wear f a) => r) -> (DictOf c f a -> r)
+requiringDict f
+  = \p -> withDict (getDict p) f
 
 
 -- | Example definition:
@@ -75,8 +75,8 @@ requiringProof f
   --   type 'ConstraintsOf' c f T = (c (f 'Int'), c (f 'String'), c (f 'Bool'))
   --
   --   adjProof t = case t of
-  --     A x y -> A ('Pair' 'proof' x) ('Pair' 'proof' y)
-  --     B x y -> B ('Pair' 'proof' x) ('Pair' 'proof' y)
+  --     A x y -> A ('Pair' 'mkDictOf' x) ('Pair' 'mkDictOf' y)
+  --     B x y -> B ('Pair' 'mkDictOf' x) ('Pair' 'mkDictOf' y)
   -- @
   --
   -- There are default implementation of 'ConstraintsOf' and 'adjProof' for
@@ -97,14 +97,14 @@ class FunctorB b => ConstraintsB b where
   type ConstraintsOf c f b = GConstraintsOf c f (RecRep (b (Target F)))
 
   -- | Adjoint a proof-of-instance to a barbie-type.
-  adjProof :: ConstraintsOf c f b => b f -> b (Product (ProofOf c f) f)
+  adjProof :: ConstraintsOf c f b => b f -> b (Product (DictOf c f) f)
 
   default adjProof
     :: ( CanDeriveGenericInstance b
        , ConstraintsOfMatchesGenericDeriv c f b
        , ConstraintsOf c f b
        )
-     => b f -> b (Product (ProofOf c f) f)
+     => b f -> b (Product (DictOf c f) f)
   adjProof = gadjProofDefault
 
 -- | Intuivively, the requirements to have @'ConstraintsB' B@ derived are:
@@ -150,7 +150,7 @@ gadjProofDefault
     , ConstraintsOfMatchesGenericDeriv c f b
     , ConstraintsOf c f b
     )
-  => b f -> b (Product (ProofOf c f) f)
+  => b f -> b (Product (DictOf c f) f)
 gadjProofDefault b
   = unsafeUntargetBarbie @PxF $ to $
       gadjProof pcbf $ fromWithRecAnn (unsafeTargetBarbie @F b)
@@ -203,8 +203,8 @@ instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target (W F) a))) where
   gadjProof pcbf (K1 (NonRec fa))
     = K1 $ unsafeTarget @(W PxF) (Pair (mkProof pcbf) $ unsafeUntarget @(W F) fa)
     where
-      mkProof :: c (Wear f a) => Proxy (c (b f)) -> ProofOf c f a
-      mkProof _ = proof
+      mkProof :: c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
+      mkProof _ = mkDictOf
 
 
 instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target F a))) where
@@ -212,8 +212,8 @@ instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target F a))) where
   gadjProof pcbf (K1 (NonRec fa))
     = K1 $ unsafeTarget @PxF (Pair (mkProof pcbf) $ unsafeUntarget @F fa)
     where
-      mkProof :: c (Wear f a) => Proxy (c (b f)) -> ProofOf c f a
-      mkProof _ = proof
+      mkProof :: c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
+      mkProof _ = mkDictOf
 
 instance {-# OVERLAPPING #-} CanDeriveGenericInstance b => GAdjProof b (K1 R (RecUsage (b (Target F)))) where
   {-# INLINE gadjProof #-}
@@ -227,7 +227,7 @@ instance {-# OVERLAPPING #-} ConstraintsB b' => GAdjProof b (K1 R (NonRec (b' (T
     where
       adjProof'
         :: ConstraintsOf c f b'
-        => Proxy (c (b f)) -> b' f -> b' (Product (ProofOf c f) f)
+        => Proxy (c (b f)) -> b' f -> b' (Product (DictOf c f) f)
       adjProof' _ = adjProof
 
 instance (K1 i a) ~ Repl' (Target F) (Target PxF) (K1 i (NonRec a)) => GAdjProof b (K1 i (NonRec a)) where

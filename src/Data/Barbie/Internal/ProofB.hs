@@ -41,14 +41,14 @@ import GHC.Generics
 -- There is a default 'bproof' implementation for 'Generic' types, so
 -- instances can derived automatically.
 class (ConstraintsB b, ProductB b) => ProofB b where
-  bproof :: ConstraintsOf c f b => b (ProofOf c f)
+  bproof :: ConstraintsOf c f b => b (DictOf c f)
 
   default bproof
     :: ( CanDeriveGenericInstance b
        , ConstraintsOfMatchesGenericDeriv c f b
        , ConstraintsOf c f b
        )
-    => b (ProofOf c f)
+    => b (DictOf c f)
   bproof = gbproofDefault
 
 -- | Every type that admits a generic instance of 'ProductB' and
@@ -66,14 +66,14 @@ type ConstraintsOfMatchesGenericDeriv c f b
 --  Generic derivations
 -- ===============================================================
 
--- | Default implementation of 'proof' based on 'Generic'.
+-- | Default implementation of 'bproof' based on 'Generic'.
 gbproofDefault
   :: forall b c f
   .  ( CanDeriveGenericInstance b
      , ConstraintsOfMatchesGenericDeriv c f b
      , ConstraintsOf c f b
      )
-  => b (ProofOf c f)
+  => b (DictOf c f)
 gbproofDefault
   = unsafeUntargetBarbie @P $ to $ gbproof pcbf pb
   where
@@ -122,16 +122,16 @@ instance {-# OVERLAPPING #-} GProof b (K1 R (NonRec (Target (W F) a))) where
     = K1 $ unsafeTarget @(W P) (mkProof pcbf)
     where
       mkProof ::
-       c (Wear f a) => Proxy (c (b f)) -> ProofOf c f a
-      mkProof _ = proof
+       c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
+      mkProof _ = mkDictOf
 
 instance {-# OVERLAPPING #-} GProof b (K1 R (NonRec (Target F a))) where
   {-# INLINE gbproof #-}
   gbproof pcbf _
     = K1 $ unsafeTarget @P (mkProof pcbf)
     where
-      mkProof :: c (Wear f a) => Proxy (c (b f)) -> ProofOf c f a
-      mkProof _ = proof
+      mkProof :: c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
+      mkProof _ = mkDictOf
 
 
 instance {-# OVERLAPPING #-}
@@ -149,5 +149,5 @@ instance {-# OVERLAPPING #-}
   gbproof pcbf _
     = K1 $ unsafeTargetBarbie @P (proof' pcbf)
     where
-      proof' :: ConstraintsOf c f b' => Proxy (c (b f)) -> b' (ProofOf c f)
+      proof' :: ConstraintsOf c f b' => Proxy (c (b f)) -> b' (DictOf c f)
       proof' _ = bproof

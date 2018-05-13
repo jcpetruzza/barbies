@@ -6,7 +6,7 @@ where
 
 import Clothes(F)
 import Data.Barbie(bmap, ConstraintsB(..), ProofB(..))
-import Data.Barbie.Constraints(ProofOf)
+import Data.Barbie.Constraints(DictOf)
 
 import Data.Functor.Product (Product(Pair))
 import Data.Typeable(Typeable, Proxy(..), typeRep)
@@ -26,7 +26,7 @@ lawAdjProofPrj
   => TestTree
 lawAdjProofPrj
   = testProperty (show (typeRep (Proxy :: Proxy b))) $ \b ->
-      bmap second (adjProof b :: b (Product (ProofOf Show F) F)) === b
+      bmap second (adjProof b :: b (Product (DictOf Show F) F)) === b
   where
     second (Pair _ b) = b
 
@@ -34,14 +34,14 @@ lawAdjProofPrj
 lawProofEquivPrj
   :: forall b
   . ( ProofB b, ConstraintsOf Show F b
-    , Eq (b (ProofOf Show F))
-    , Show (b F), Show (b (ProofOf Show F))
+    , Eq (b (DictOf Show F))
+    , Show (b F), Show (b (DictOf Show F))
     , Arbitrary (b F)
     , Typeable b
     )
   => TestTree
 lawProofEquivPrj
   = testProperty (show (typeRep (Proxy :: Proxy b))) $ \b ->
-      bmap first (adjProof b :: b (Product (ProofOf Show F) F)) === bproof
+      bmap first (adjProof b :: b (Product (DictOf Show F) F)) === bproof
   where
     first (Pair a _) = a
