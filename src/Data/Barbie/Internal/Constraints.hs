@@ -3,6 +3,7 @@
 {-# LANGUAGE DefaultSignatures     #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE KindSignatures        #-}
 {-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -14,7 +15,6 @@
 {-# LANGUAGE UndecidableInstances  #-}
 module Data.Barbie.Internal.Constraints
   ( DictOf(..)
-  , mkDictOf
   , requiringDict
 
   , ConstraintsB(..)
@@ -33,7 +33,6 @@ import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Generics
 import Data.Barbie.Internal.Tags(F)
 
-import Data.Constraint(Dict(..), withDict)
 import Data.Functor.Classes(Show1(..))
 import Data.Kind(Constraint)
 
@@ -42,23 +41,25 @@ import GHC.Generics
 
 -- | @'DictOf' c f a@ is evidence that there exists an instance
 --   of @c (f a)@.
-newtype DictOf c f a
-  = DictOf { getDict :: Dict (c (f a)) }
-  deriving(Eq, Show)
+data DictOf c f a where
+  PackedDict :: c (f a) => DictOf c f a
+
+
+
+instance Eq (DictOf c f a) where
+  _ == _ = True
+
+instance Show (DictOf c f a) where
+  showsPrec _ PackedDict = showString "PackedDict"
 
 instance Show1 (DictOf c f) where
   liftShowsPrec _ _ = showsPrec
 
--- | Build proof of instance.
-mkDictOf :: c (f a) => DictOf c f a
-mkDictOf
-  = DictOf Dict
-
 -- | Turn a constrained-function into an unconstrained one
 --   that demands proof-of-instance instead.
 requiringDict :: (c (f a) => r) -> (DictOf c f a -> r)
-requiringDict f
-  = \p -> withDict (getDict p) f
+requiringDict r
+  = \PackedDict -> r
 
 
 -- | Example definition:
@@ -195,7 +196,7 @@ type family GConstraintsOf (c :: * -> Constraint) (f :: * -> *) r :: Constraint 
 --     = K1 $ unsafeTarget @(W PxF) (Pair (mkProof pcbf) $ unsafeUntarget @(W F) fa)
 --     where
 --       mkProof :: c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
---       mkProof _ = mkDictOf
+--       mkProof _ = PackedDict
 
 
 -- instance {-# OVERLAPPING #-} GAdjProof b (K1 R (NonRec (Target F a))) where
@@ -204,7 +205,7 @@ type family GConstraintsOf (c :: * -> Constraint) (f :: * -> *) r :: Constraint 
 --     = K1 $ unsafeTarget @PxF (Pair (mkProof pcbf) $ unsafeUntarget @F fa)
 --     where
 --       mkProof :: c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
---       mkProof _ = mkDictOf
+--       mkProof _ = PackedDict
 
 -- instance {-# OVERLAPPING #-} CanDeriveGenericInstance b => GAdjProof b (K1 R (RecUsage (b (Target F)))) where
 --   {-# INLINE gadjProof #-}

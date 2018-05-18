@@ -116,7 +116,7 @@ instance (GProof b l, GProof b r) => GProof b (l :*: r) where
 --     where
 --       mkProof ::
 --        c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
---       mkProof _ = mkDictOf
+--       mkProof _ = PackedDict
 
 instance {-# OVERLAPPING #-} GProof b (K1 R (NonRec (Target F a))) where
   {-# INLINE gbproof #-}
@@ -124,7 +124,7 @@ instance {-# OVERLAPPING #-} GProof b (K1 R (NonRec (Target F a))) where
     = K1 $ unsafeTarget @P (mkProof pcbf)
     where
       mkProof :: c (f a) => Proxy (c (b f)) -> DictOf c f a
-      mkProof _ = mkDictOf
+      mkProof _ = PackedDict
 
 
 instance {-# OVERLAPPING #-}

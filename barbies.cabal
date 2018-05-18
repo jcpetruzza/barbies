@@ -47,7 +47,6 @@ library
 
   build-depends:
       base >=4.7 && <5
-    , constraints
 
   ghc-options: -Wall -Werror
 

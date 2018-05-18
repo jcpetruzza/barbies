@@ -25,7 +25,6 @@
 module Data.Barbie.Constraints
   ( -- * Proof of instance
     DictOf(..)
-  , mkDictOf
   , requiringDict
 
     -- * Retrieving proofs
