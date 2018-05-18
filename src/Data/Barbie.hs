@@ -62,6 +62,9 @@ module Data.Barbie
     -- * Constraints and proofs of instance
   , ConstraintsB(ConstraintsOf)
   , ProofB(bproof)
+
+    -- * Wrapper
+  , Barbie(..)
   )
 
 where
@@ -69,10 +72,11 @@ where
 import Data.Barbie.Internal.Bare(Bare, BareB(..), bstripFrom, bcoverWith, Wear)
 import Data.Barbie.Internal.Constraints(ConstraintsB(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
+import Data.Barbie.Internal.Instances(Barbie(..))
+import Data.Barbie.Internal.ProofB(ProofB(..))
 import Data.Barbie.Internal.Product
   ( ProductB(..)
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
   , (/*/), (/*)
   )
 import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence)
-import Data.Barbie.Internal.ProofB(ProofB(..))
