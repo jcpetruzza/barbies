@@ -50,6 +50,7 @@ module Data.Barbie
     -- * Product
   , ProductB(buniq, bprod)
   , (/*/), (/*)
+  , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
 
     -- * Bare values
   , Wear
@@ -68,6 +69,10 @@ where
 import Data.Barbie.Internal.Bare(Bare, BareB(..), bstripFrom, bcoverWith, Wear)
 import Data.Barbie.Internal.Constraints(ConstraintsB(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
-import Data.Barbie.Internal.Product(ProductB(..), (/*/), (/*))
+import Data.Barbie.Internal.Product
+  ( ProductB(..)
+  , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
+  , (/*/), (/*)
+  )
 import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence)
 import Data.Barbie.Internal.ProofB(ProofB(..))

@@ -10,6 +10,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.Product
   ( ProductB(buniq, bprod)
+  , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
   , (/*/), (/*)
 
   , CanDeriveGenericInstance, CanDeriveGenericInstance'
@@ -64,6 +65,38 @@ class FunctorB b => ProductB b where
   default buniq :: CanDeriveGenericInstance' b => (forall a . f a) -> b f
   buniq = gbuniqDefault
 
+
+-- | An alias of 'bprod', since this is like a 'zip' for Barbie-types.
+bzip :: ProductB b => b f -> b g -> b (Product f g)
+bzip = bprod
+
+-- | An equivalent of 'unzip' for Barbie-types.
+bunzip :: ProductB b => b (Product f g) -> (b f, b g)
+bunzip bfg = (bmap (\(Pair a _) -> a) bfg, bmap (\(Pair _ b) -> b) bfg)
+
+-- | An equivalent of 'Data.List.zipWith' for Barbie-types.
+bzipWith :: ProductB b => (forall a. f a -> g a -> h a) -> b f -> b g -> b h
+bzipWith f bf bg
+  = bmap (\(Pair fa ga) -> f fa ga) (bf `bprod` bg)
+
+-- | An equivalent of 'Data.List.zipWith3' for Barbie-types.
+bzipWith3
+  :: ProductB b
+  => (forall a. f a -> g a -> h a -> i a)
+  -> b f -> b g -> b h -> b i
+bzipWith3 f bf bg bh
+  = bmap (\(Pair (Pair fa ga) ha) -> f fa ga ha)
+         (bf `bprod` bg `bprod` bh)
+
+
+-- | An equivalent of 'Data.List.zipWith4' for Barbie-types.
+bzipWith4
+  :: ProductB b
+  => (forall a. f a -> g a -> h a -> i a -> j a)
+  -> b f -> b g -> b h -> b i -> b j
+bzipWith4 f bf bg bh bi
+  = bmap (\(Pair (Pair (Pair fa ga) ha) ia) -> f fa ga ha ia)
+         (bf `bprod` bg `bprod` bh `bprod` bi)
 
 -- | The requirements to to derive @'ProductB' (B f)@ are more strict than those for
 --   'FunctorB' or 'TraversableB'. Intuitively, we need:
