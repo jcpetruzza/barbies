@@ -21,7 +21,7 @@ module Data.Barbie.Internal.ProofB
 where
 
 import Data.Barbie.Internal.Generics
-import Data.Barbie.Internal.Constraints
+import Data.Barbie.Internal.Constraints hiding (CanDeriveGenericInstance, ConstraintsOfMatchesGenericDeriv)
 import Data.Barbie.Internal.Product(ProductB(..))
 import Data.Barbie.Internal.Tags(P, F)
 
@@ -109,22 +109,18 @@ instance (GProof b l, GProof b r) => GProof b (l :*: r) where
 -- -- The interesting cases
 -- -- --------------------------------
 
--- instance {-# OVERLAPPING #-} GProof b (K1 R (NonRec (Target (W F) a))) where
---   {-# INLINE gbproof #-}
---   gbproof pcbf _
---     = K1 $ unsafeTarget @(W P) (mkProof pcbf)
---     where
---       mkProof ::
---        c (Wear f a) => Proxy (c (b f)) -> DictOf c f a
---       mkProof _ = PackedDict
+instance {-# OVERLAPPING #-} GProof b (K1 R (NonRec (Target (W F) a))) where
+  {-# INLINE gbproof #-}
+  gbproof pcbf _
+    = K1 $ unsafeTarget @(W P) (mkProof pcbf)
 
 instance {-# OVERLAPPING #-} GProof b (K1 R (NonRec (Target F a))) where
   {-# INLINE gbproof #-}
   gbproof pcbf _
     = K1 $ unsafeTarget @P (mkProof pcbf)
-    where
-      mkProof :: c (f a) => Proxy (c (b f)) -> DictOf c f a
-      mkProof _ = PackedDict
+
+mkProof :: c (f a) => Proxy (c (b f)) -> DictOf c f a
+mkProof _ = PackedDict
 
 
 instance {-# OVERLAPPING #-}

@@ -4,6 +4,7 @@
 {-# LANGUAGE EmptyCase            #-}
 {-# LANGUAGE KindSignatures       #-}
 {-# LANGUAGE StandaloneDeriving   #-}
+{-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Barbies
   ( Void
@@ -86,7 +87,7 @@ data Record1W f
   = Record1W { rec1w_f1 :: Wear f Int }
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB , ConstraintsB -- , ProofB
+    , FunctorB, TraversableB, ProductB , ConstraintsB, ProofB
     , BareB
     )
 
@@ -124,7 +125,7 @@ data Record3W f
       }
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB -- , ProofB
+    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
     , BareB
     )
 
@@ -228,7 +229,7 @@ data CompositeRecordW f
       }
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB -- , ProofB
+    , FunctorB, TraversableB, ProductB, ConstraintsB , ProofB
     , BareB
     )
 
@@ -296,7 +297,7 @@ data InfRecW f
   = InfRecW { irw_1 :: Wear f Int, irw_2 :: InfRecW f }
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB -- , ProofB
+    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
     , BareB
     )
 
@@ -341,8 +342,8 @@ data NestedFW f
     -- , ConstraintsB
     )
 
-deriving instance (Show (Wear f Int), Show (Record3W f), Show (Sum3W f)) => Show (NestedFW f)
-deriving instance (Eq   (Wear f Int), Eq   (Record3W f), Eq   (Sum3W f)) => Eq   (NestedFW f)
+deriving instance (Wear f Int ~ f Int, Show (f Int), Show (Record3W f), Show (Sum3W f)) => Show (NestedFW f)
+deriving instance (Wear f Int ~ f Int, Eq   (f Int), Eq   (Record3W f), Eq   (Sum3W f)) => Eq   (NestedFW f)
 
-instance (Arbitrary (Wear f Int), Arbitrary (Wear f Bool), Arbitrary (Wear f Char)) => Arbitrary (NestedFW f) where
+instance (Wear f Int ~ f Int, Wear f Bool ~ f Bool, Wear f Char ~ f Char, Arbitrary (f Int), Arbitrary (f Bool), Arbitrary (f Char)) => Arbitrary (NestedFW f) where
   arbitrary = NestedFW <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary

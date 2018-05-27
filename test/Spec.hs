@@ -2,6 +2,7 @@
 import Test.Tasty (defaultMain, testGroup)
 
 import qualified Spec.Bare as Bare
+import qualified Spec.Constraints as Constraints
 import qualified Spec.Functor as Functor
 import qualified Spec.Product as Product
 import qualified Spec.Traversable as Traversable
@@ -79,37 +80,37 @@ main
             , Product.uniqLaws @CompositeRecordW
             ]
 
-        -- , testGroup "adjProof projection"
-        --     [ Constraints.lawAdjProofPrj @Record0
-        --     , Constraints.lawAdjProofPrj @Record1
-        --     , Constraints.lawAdjProofPrj @Record3
+        , testGroup "adjProof projection"
+            [ Constraints.lawAdjProofPrj @Record0
+            , Constraints.lawAdjProofPrj @Record1
+            , Constraints.lawAdjProofPrj @Record3
 
-        --     , Constraints.lawAdjProofPrj @Record1W
-        --     , Constraints.lawAdjProofPrj @Record3W
+            , Constraints.lawAdjProofPrj @Record1W
+            , Constraints.lawAdjProofPrj @Record3W
 
 
-        --     , Constraints.lawAdjProofPrj @Ignore1
+            , Constraints.lawAdjProofPrj @Ignore1
 
-        --     , Constraints.lawAdjProofPrj @Sum3
-        --     , Constraints.lawAdjProofPrj @SumRec
+            , Constraints.lawAdjProofPrj @Sum3
+            , Constraints.lawAdjProofPrj @SumRec
 
-        --     , Constraints.lawAdjProofPrj @Sum3W
-        --     , Constraints.lawAdjProofPrj @SumRecW
+            , Constraints.lawAdjProofPrj @Sum3W
+            , Constraints.lawAdjProofPrj @SumRecW
 
-        --     , Constraints.lawAdjProofPrj @CompositeRecord
-        --     , Constraints.lawAdjProofPrj @CompositeRecordW
-        --     ]
+            , Constraints.lawAdjProofPrj @CompositeRecord
+            , Constraints.lawAdjProofPrj @CompositeRecordW
+            ]
 
-        -- , testGroup "bproof projection"
-        --     [ Constraints.lawProofEquivPrj @Record0
-        --     , Constraints.lawProofEquivPrj @Record1
-        --     , Constraints.lawProofEquivPrj @Record3
-        --     , Constraints.lawProofEquivPrj @CompositeRecord
+        , testGroup "bproof projection"
+            [ Constraints.lawProofEquivPrj @Record0
+            , Constraints.lawProofEquivPrj @Record1
+            , Constraints.lawProofEquivPrj @Record3
+            , Constraints.lawProofEquivPrj @CompositeRecord
 
-        --     , Constraints.lawProofEquivPrj @Record1W
-        --     , Constraints.lawProofEquivPrj @Record3W
-        --     , Constraints.lawProofEquivPrj @CompositeRecordW
-        --     ]
+            , Constraints.lawProofEquivPrj @Record1W
+            , Constraints.lawProofEquivPrj @Record3W
+            , Constraints.lawProofEquivPrj @CompositeRecordW
+            ]
 
         , testGroup "Bare laws"
             [ Bare.laws @Record1W
