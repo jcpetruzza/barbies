@@ -31,6 +31,7 @@ library
 
       Data.Barbie.Internal.Bare
       Data.Barbie.Internal.Constraints
+      Data.Barbie.Internal.Dicts
       Data.Barbie.Internal.Functor
       Data.Barbie.Internal.Generics
       Data.Barbie.Internal.Product
@@ -38,6 +39,7 @@ library
       Data.Barbie.Internal.Traversable
 
   other-modules:
+      Data.Barbie.Internal.Classification
       Data.Barbie.Internal.Instances
       Data.Barbie.Internal.Tags
       Data.Barbie.Internal.Wear

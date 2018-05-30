@@ -25,7 +25,8 @@
 module Data.Barbie.Constraints
   ( -- * Proof of instance
     DictOf(..)
-  , requiringDict
+  , DictOfWear(..)
+  , ClassInstanceDictF(..)
 
     -- * Retrieving proofs
   , ConstraintsB(ConstraintsOf)
@@ -35,4 +36,5 @@ module Data.Barbie.Constraints
 where
 
 import Data.Barbie.Internal.Constraints
+import Data.Barbie.Internal.Dicts
 import Data.Barbie.Internal.ProofB

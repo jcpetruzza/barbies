@@ -7,6 +7,7 @@ where
 
 import Data.Barbie.Internal.Bare
 import Data.Barbie.Internal.Constraints
+import Data.Barbie.Internal.Dicts
 import Data.Barbie.Internal.Functor
 import Data.Barbie.Internal.Traversable
 import Data.Barbie.Internal.Product

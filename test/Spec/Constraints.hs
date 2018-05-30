@@ -1,6 +1,9 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-module Spec.Constraints ( lawAdjProofPrj, lawProofEquivPrj )
+module Spec.Constraints
+  ( lawAdjProofPrj
+  , lawProofEquivPrj
+  )
 
 where
 

@@ -87,7 +87,7 @@ data Record1W f
   = Record1W { rec1w_f1 :: Wear f Int }
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB , ConstraintsB, ProofB
+    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
     , BareB
     )
 
@@ -229,7 +229,7 @@ data CompositeRecordW f
       }
   deriving
     ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB , ProofB
+    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
     , BareB
     )
 
