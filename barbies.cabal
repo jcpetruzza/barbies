@@ -68,6 +68,7 @@ test-suite barbies-test
       Spec.Functor
       Spec.Traversable
       Spec.Product
+      Spec.Wrapper
 
   hs-source-dirs:
       test

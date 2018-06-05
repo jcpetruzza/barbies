@@ -6,6 +6,7 @@ import qualified Spec.Constraints as Constraints
 import qualified Spec.Functor as Functor
 import qualified Spec.Product as Product
 import qualified Spec.Traversable as Traversable
+import qualified Spec.Wrapper as Wrapper
 
 
 import Barbies
@@ -118,5 +119,10 @@ main
             , Bare.laws @Sum3W
             , Bare.laws @SumRecW
             , Bare.laws @NestedFW
+            ]
+
+        , testGroup "Generic wrapper"
+            [ Wrapper.lawsMonoid @Record3
+            , Wrapper.lawsMonoid @Record3W
             ]
         ]
