@@ -1,7 +1,7 @@
 name:           barbies
 version:        0.1.0.0
 synopsis:       Classes for working with types that can change clothes.
-description:    Types that are parametric on unary type-constructors that control their shapes are like Barbies that can wear different clothes to become a different doll. This package provides basic classes and abstractions to work with these types and easily transform them.
+description:    Types that are parametric on a functor are like Barbies that have an outfit for each role. This package provides the basic abstractions to work with them comfortably.
 category:       Data-structures
 homepage:       https://github.com/jcpetruzza/barbies#readme
 bug-reports:    https://github.com/jcpetruzza/barbies/issues
@@ -33,13 +33,13 @@ library
       Data.Barbie.Internal.Constraints
       Data.Barbie.Internal.Dicts
       Data.Barbie.Internal.Functor
-      Data.Barbie.Internal.Generics
       Data.Barbie.Internal.Product
       Data.Barbie.Internal.ProofB
       Data.Barbie.Internal.Traversable
 
   other-modules:
       Data.Barbie.Internal.Classification
+      Data.Barbie.Internal.Generics
       Data.Barbie.Internal.Instances
       Data.Barbie.Internal.Tags
       Data.Barbie.Internal.Wear

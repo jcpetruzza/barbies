@@ -2,8 +2,8 @@
 -- |
 -- Module      :  Data.Barbie.Container
 --
--- We get an @a@-container for any Barbie-type by dressing it with
--- @('Const' a)@ . The 'Container' wrapper gives us all the expected
+-- We get a container of @a@'s for any Barbie-type when we make it wear a
+-- @('Const' a)@ . The 'Container' wrapper gives us the expected
 -- instances for a container type.
 ----------------------------------------------------------------------------
 {-# LANGUAGE DeriveGeneric #-}

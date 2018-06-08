@@ -39,22 +39,31 @@ import Data.Proxy
 import GHC.Generics
 
 
--- | Example definition:
-  --
-  -- @
-  -- data T f = A (f 'Int') (f 'String') | B (f 'Bool') (f 'Int')
-  --
-  -- instance 'ConstraintsB' T where
-  --   type 'ConstraintsOf' c f T = (c (f 'Int'), c (f 'String'), c (f 'Bool'))
-  -- @
-  --
-  -- There is a default implementation of 'ConstraintsOf' for
-  -- 'Generic' types, so in practice one can simply do:
-  --
-  -- @
-  -- derive instance 'Generic' T
-  -- instance 'ConstraintsB' T
-  -- @
+-- | Instances of this class provide means to talk about constraints,
+--   both at compile-time, using 'ConstraintsOf' and at run-time,
+--   in the form of class instance dictionaries, via 'adjProof'.
+--
+--   A manual definition would look like this:
+--
+-- @
+-- data T f = A (f 'Int') (f 'String') | B (f 'Bool') (f 'Int')
+--
+-- instance 'ConstraintsB' T where
+--   type 'ConstraintsOf' c f T
+--     = (c (f 'Int'), c (f 'String'), c (f 'Bool'))
+--
+--   adjProof t = case t of
+--     A x y -> A ('Pair' ('packDict' x) ('packDict' y))
+--     B z w -> B ('Pair' ('packDict' z) ('packDict' w))
+-- @
+--
+-- There is a default implementation of 'ConstraintsOf' for
+-- 'Generic' types, so in practice one will simply do:
+--
+-- @
+-- derive instance 'Generic' T
+-- instance 'ConstraintsB' T
+-- @
 class FunctorB b => ConstraintsB b where
   -- | @'ConstraintsOf' c f b@ should contain a constraint @c (f x)@
   --  for each @f x@ occurring in @b@. E.g.:

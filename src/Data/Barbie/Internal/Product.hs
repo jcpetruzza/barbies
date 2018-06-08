@@ -33,7 +33,7 @@ import GHC.Generics
 --
 -- @
 -- 'bmap' \('Pair' a _) . 'uncurry' . 'bprod' = 'fst'
--- 'bmap' \('Pair' _ b) . 'uncurry' . 'bprod' = 'snd
+-- 'bmap' \('Pair' _ b) . 'uncurry' . 'bprod' = 'snd'
 -- @
 --
 -- Notice that because of the laws, having an internal product structure is not
@@ -44,19 +44,20 @@ import GHC.Generics
 -- data Bad f = Bad{b1 :: f 'String', hiddenFromArg: 'Int'} -- no lawful instance
 -- @
 --
+-- Intuitively, the laws for this class require that `b` hides no structure
+-- from its argument @f@. Because of this, any @x :: forall a . f a@
+-- determines a unique value of @b f@, witnessed by the 'buniq' method.
+-- Formally:
+--
+-- @
+-- 'const' ('buniq' x) = 'bmap' ('const' x)
+-- @
+--
 -- There is a default implementation of 'bprod' and 'buniq' for 'Generic' types,
 -- so instances can derived automatically.
 class FunctorB b => ProductB b where
   bprod :: b f -> b g -> b (Product f g)
 
-  -- | Intuitively, the laws for this class require that `b` hides no structure
-  --   from its argument @f@. Because of this, any @x :: forall a . f a@
-  --   determines a unique value of @b f@. Formally:
-  --
-  -- @
-  -- 'const' ('buniq' x) = 'bmap' ('const' x)
-  -- @
-  --
   buniq :: (forall a . f a) -> b f
 
   default bprod :: CanDeriveGenericInstance b => b f -> b g -> b (Product f g)

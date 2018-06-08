@@ -15,6 +15,9 @@ module Data.Barbie.Internal.Bare
   , Gbstrip(..)
   , gbstripDefault
   , gbcoverDefault
+
+  , CanDeriveGenericInstance
+  , CanDeriveGenericInstance'
   )
 
 where

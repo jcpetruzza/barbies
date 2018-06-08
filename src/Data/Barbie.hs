@@ -3,8 +3,8 @@
 -- Module      :  Data.Barbie
 --
 -- A common Haskell idiom is to parameterise a datatype by a type @* -> *@,
--- typically a functor or a GADT. These behave like the clothes of a Barbie,
--- that make them a different doll. E.g.
+-- typically a functor or a GADT. These are like outfits of a Barbie,
+-- that turn her into a different doll. E.g.
 --
 -- @
 -- data Barbie f
@@ -14,7 +14,7 @@
 --       }
 --
 -- b1 :: Barbie 'Data.Monoid.Last'       -- Barbie with a monoid structure
--- b2 :: Barbie ('Data.Functor.Const.Const' a)  -- container Barbie
+-- b2 :: Barbie ('Data.Functor.Const.Const' a)  -- 'Data.Barbie.Container.Container' Barbie
 -- b3 :: Barbie 'Data.Functor.Identity.Identity'   -- Barbie's new clothes
 -- @
 --
@@ -35,8 +35,35 @@
 --
 -- deriving instance 'ConstraintsOf' 'Show' f Barbie => 'Show' Barbie
 -- deriving instance 'ConstraintsOf' 'Eq'   f Barbie => 'Eq'   Barbie
+-- @
+--
+-- Sometimes one wants to use @Barbie 'Data.Functor.Identity.Identity'@
+-- and it may feels lik a second-class record type, where one needs to
+-- unpack values in each field. For those cases, we can leverage on
+-- closed type-families ang get the best of both worlds:
 --
 -- @
+-- data 'Bare'
+--
+-- type family 'Wear' f a where
+--   'Wear' 'Bare' a = a
+--   'Wear' f      a = f a
+--
+-- data SignUpForm f
+--   = SignUpForm'
+--       { username  :: 'Wear' f 'String',
+--       , password  :: 'Wear' f 'String'
+--       , mailingOk :: 'Wear' f 'Boolean'
+--       }
+--   deriving ( ..., 'BareB')
+--
+-- type SignUpRaw  = SignUpForm 'Maybe'
+-- type SignUpData = SignUpForm 'Bare'
+--
+-- formData = SignUpForm "jbond" "shaken007" False :: SignUpData
+-- @
+
+
 ----------------------------------------------------------------------------
 module Data.Barbie
   (

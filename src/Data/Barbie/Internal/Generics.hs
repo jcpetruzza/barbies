@@ -2,7 +2,7 @@
 -- |
 -- Module      :  Data.Barbie.Internal.Functor
 --
--- GHC is at the moemt unable to derive @'Generic1' b@ for a Barbie-type
+-- GHC is at the momemt unable to derive @'Generic1' b@ for a Barbie-type
 -- @b@. Instead, we use a trick by which we use the uninhabited type
 -- 'Target' to identify the point where an 'f' occurs. That is, we coerce
 -- a @b f@ into a @b 'Target'@, operate on the representation of this type,
