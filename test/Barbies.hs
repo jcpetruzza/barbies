@@ -45,14 +45,15 @@ import Test.Tasty.QuickCheck
 ---------------------------------------------------
 
 data Void (f :: * -> *)
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ConstraintsB, BareB
-    )
+  deriving (Generic, Typeable)
 
 instance Eq   (Void f) where (==) v = case v of
 instance Show (Void f) where showsPrec _ v = case v of
 
+instance FunctorB Void
+instance TraversableB Void
+instance ConstraintsB Void
+instance BareB Void
 
 ----------------------------------------------------
 -- Product Barbies
@@ -63,18 +64,28 @@ data Record0 (f :: * -> *)
   deriving
     ( Generic, Typeable
     , Eq, Show
-    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB, BareB
     )
+
+instance FunctorB Record0
+instance TraversableB Record0
+instance ProductB Record0
+instance ConstraintsB Record0
+instance ProofB Record0
+instance BareB Record0
 
 instance Arbitrary (Record0 f) where arbitrary = pure Record0
 
 
 data Record1 f
   = Record1 { rec1_f1 :: f Int }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
-    )
+  deriving (Generic, Typeable)
+
+
+instance FunctorB Record1
+instance TraversableB Record1
+instance ProductB Record1
+instance ConstraintsB Record1
+instance ProofB Record1
 
 deriving instance ConstraintsOf Show f Record1 => Show (Record1 f)
 deriving instance ConstraintsOf Eq   f Record1 => Eq   (Record1 f)
@@ -85,11 +96,16 @@ instance ConstraintsOf Arbitrary f Record1 => Arbitrary (Record1 f) where
 
 data Record1W f
   = Record1W { rec1w_f1 :: Wear f Int }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
-    , BareB
-    )
+  deriving (Generic, Typeable)
+
+
+instance FunctorB Record1W
+instance TraversableB Record1W
+instance ProductB Record1W
+instance ConstraintsB Record1W
+instance ProofB Record1W
+instance BareB Record1W
+
 
 deriving instance ConstraintsOf Show f Record1W => Show (Record1W f)
 deriving instance ConstraintsOf Eq   f Record1W => Eq   (Record1W f)
@@ -105,10 +121,14 @@ data Record3 f
       , rec3_f2 :: f Bool
       , rec3_f3 :: f Char
       }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
-    )
+  deriving (Generic, Typeable)
+
+
+instance FunctorB Record3
+instance TraversableB Record3
+instance ProductB Record3
+instance ConstraintsB Record3
+instance ProofB Record3
 
 deriving instance ConstraintsOf Show f Record3 => Show (Record3 f)
 deriving instance ConstraintsOf Eq   f Record3 => Eq   (Record3 f)
@@ -123,11 +143,16 @@ data Record3W f
       , rec3w_f2 :: Wear f Bool
       , rec3w_f3 :: Wear f Char
       }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
-    , BareB
-    )
+  deriving (Generic, Typeable)
+
+
+instance FunctorB Record3W
+instance TraversableB Record3W
+instance ProductB Record3W
+instance ConstraintsB Record3W
+instance ProofB Record3W
+
+instance BareB Record3W
 
 deriving instance ConstraintsOf Show f Record3W => Show (Record3W f)
 deriving instance ConstraintsOf Eq   f Record3W => Eq   (Record3W f)
@@ -142,11 +167,11 @@ instance ConstraintsOf Arbitrary f Record3W => Arbitrary (Record3W f) where
 
 data Ignore1 (f :: * -> *)
   = Ignore1 { ign1_f1 :: Int }
-  deriving
-    ( Generic, Typeable
-    , Eq, Show
-    , FunctorB, TraversableB, ConstraintsB
-    )
+  deriving (Generic, Typeable, Eq, Show)
+
+instance FunctorB Ignore1
+instance TraversableB Ignore1
+instance ConstraintsB Ignore1
 
 instance Arbitrary (Ignore1 f) where arbitrary = Ignore1 <$> arbitrary
 
@@ -159,10 +184,11 @@ data Sum3 f
   = Sum3_0
   | Sum3_1 (f Int)
   | Sum3_2 (f Int) (f Bool)
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ConstraintsB
-    )
+  deriving (Generic, Typeable)
+
+instance FunctorB Sum3
+instance TraversableB Sum3
+instance ConstraintsB Sum3
 
 deriving instance ConstraintsOf Show f Sum3 => Show (Sum3 f)
 deriving instance ConstraintsOf Eq   f Sum3 => Eq   (Sum3 f)
@@ -179,11 +205,12 @@ data Sum3W f
   = Sum3W_0
   | Sum3W_1 (Wear f Int)
   | Sum3W_2 (Wear f Int) (Wear f Bool)
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ConstraintsB
-    , BareB
-    )
+  deriving (Generic, Typeable)
+
+instance FunctorB Sum3W
+instance TraversableB Sum3W
+instance ConstraintsB Sum3W
+instance BareB Sum3W
 
 deriving instance ConstraintsOf Show f Sum3W => Show (Sum3W f)
 deriving instance ConstraintsOf Eq   f Sum3W => Eq   (Sum3W f)
@@ -208,10 +235,13 @@ data CompositeRecord f
       , crec_f3 :: Record3 f
       , crec_f4 :: Record1 f
       }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
-    )
+  deriving (Generic, Typeable)
+
+instance FunctorB CompositeRecord
+instance TraversableB CompositeRecord
+instance ProductB CompositeRecord
+instance ConstraintsB CompositeRecord
+instance ProofB CompositeRecord
 
 deriving instance ConstraintsOf Show f CompositeRecord => Show (CompositeRecord f)
 deriving instance ConstraintsOf Eq   f CompositeRecord => Eq   (CompositeRecord f)
@@ -227,11 +257,14 @@ data CompositeRecordW f
       , crecw_f3 :: Record3W f
       , crecw_f4 :: Record1W f
       }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
-    , BareB
-    )
+  deriving (Generic, Typeable)
+
+instance FunctorB CompositeRecordW
+instance TraversableB CompositeRecordW
+instance ProductB CompositeRecordW
+instance ConstraintsB CompositeRecordW
+instance ProofB CompositeRecordW
+instance BareB CompositeRecordW
 
 deriving instance ConstraintsOf Show f CompositeRecordW => Show (CompositeRecordW f)
 deriving instance ConstraintsOf Eq   f CompositeRecordW => Eq   (CompositeRecordW f)
@@ -245,10 +278,11 @@ data SumRec f
   = SumRec_0
   | SumRec_1 (f Int)
   | SumRec_2 (f Int) (SumRec f)
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ConstraintsB
-    )
+  deriving (Generic, Typeable)
+
+instance FunctorB SumRec
+instance TraversableB SumRec
+instance ConstraintsB SumRec
 
 deriving instance ConstraintsOf Show f SumRec => Show (SumRec f)
 deriving instance ConstraintsOf Eq   f SumRec => Eq   (SumRec f)
@@ -265,11 +299,12 @@ data SumRecW f
   = SumRecW_0
   | SumRecW_1 (Wear f Int)
   | SumRecW_2 (Wear f Int) (SumRecW f)
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ConstraintsB
-    , BareB
-    )
+  deriving (Generic, Typeable)
+
+instance FunctorB SumRecW
+instance TraversableB SumRecW
+instance ConstraintsB SumRecW
+instance BareB SumRecW
 
 deriving instance ConstraintsOf Show f SumRecW => Show (SumRecW f)
 deriving instance ConstraintsOf Eq   f SumRecW => Eq   (SumRecW f)
@@ -285,21 +320,28 @@ instance ConstraintsOf Arbitrary f SumRecW => Arbitrary (SumRecW f) where
 
 data InfRec f
   = InfRec { ir_1 :: f Int, ir_2 :: InfRec f }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
-    )
+  deriving (Generic, Typeable)
+
+instance FunctorB InfRec
+instance TraversableB InfRec
+instance ProductB InfRec
+instance ConstraintsB InfRec
+instance ProofB InfRec
 
 deriving instance ConstraintsOf Show f InfRec => Show (InfRec f)
 deriving instance ConstraintsOf Eq   f InfRec => Eq   (InfRec f)
 
 data InfRecW f
   = InfRecW { irw_1 :: Wear f Int, irw_2 :: InfRecW f }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB, ProductB, ConstraintsB, ProofB
-    , BareB
-    )
+  deriving (Generic, Typeable)
+
+
+instance FunctorB InfRecW
+instance TraversableB InfRecW
+instance ProductB InfRecW
+instance ConstraintsB InfRecW
+instance ProofB InfRecW
+instance BareB InfRecW
 
 deriving instance ConstraintsOf Show f InfRecW => Show (InfRecW f)
 deriving instance ConstraintsOf Eq   f InfRecW => Eq   (InfRecW f)
@@ -316,10 +358,10 @@ data NestedF f
       , npf_3 :: Maybe (Sum3 f)
       , npf_4 :: Maybe (NestedF f)
       }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB
-    )
+  deriving (Generic, Typeable)
+
+instance FunctorB NestedF
+instance TraversableB NestedF
 
 deriving instance (Show (f Int), Show (Record3 f), Show (Sum3 f)) => Show (NestedF f)
 deriving instance (Eq   (f Int), Eq   (Record3 f), Eq   (Sum3 f)) => Eq   (NestedF f)
@@ -335,12 +377,14 @@ data NestedFW f
       , npfw_3 :: Maybe (Sum3W f)
       , npfw_4 :: Maybe (NestedFW f)
       }
-  deriving
-    ( Generic, Typeable
-    , FunctorB, TraversableB
-    , BareB
-    -- , ConstraintsB
-    )
+  deriving (Generic, Typeable)
+
+
+
+instance FunctorB NestedFW
+instance TraversableB NestedFW
+instance BareB NestedFW
+-- instance  ConstraintsB NetedFW
 
 deriving instance (Wear f Int ~ f Int, Show (f Int), Show (Record3W f), Show (Sum3W f)) => Show (NestedFW f)
 deriving instance (Wear f Int ~ f Int, Eq   (f Int), Eq   (Record3W f), Eq   (Sum3W f)) => Eq   (NestedFW f)

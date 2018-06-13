@@ -1,5 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures             #-}
+{-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE UndecidableInstances       #-}
 module Data.Barbie.Internal.Instances ( Barbie(..) )
 
@@ -16,7 +17,12 @@ import Data.Barbie.Internal.ProofB
 -- | A wrapper for Barbie-types, providing useful instances.
 newtype Barbie b (f :: * -> *)
   = Barbie { getBarbie :: b f }
-  deriving (FunctorB, ProductB, BareB, ConstraintsB, ProofB)
+  deriving (FunctorB, ProductB, BareB, ProofB)
+
+-- Need to derive it manually to make GHC 8.0.2 happy
+instance ConstraintsB b => ConstraintsB (Barbie b) where
+  type ConstraintsOf c f (Barbie b) = ConstraintsOf c f b
+  adjProof = Barbie . adjProof . getBarbie
 
 instance TraversableB b => TraversableB (Barbie b) where
   btraverse f = fmap Barbie . btraverse f . getBarbie
