@@ -14,6 +14,8 @@ import Data.Barbie.Internal.Traversable
 import Data.Barbie.Internal.Product
 import Data.Barbie.Internal.ProofB
 
+import Data.Semigroup
+
 -- | A wrapper for Barbie-types, providing useful instances.
 newtype Barbie b (f :: * -> *)
   = Barbie { getBarbie :: b f }
@@ -28,13 +30,22 @@ instance TraversableB b => TraversableB (Barbie b) where
   btraverse f = fmap Barbie . btraverse f . getBarbie
 
 
-instance (ProofB b, ConstraintsOf Monoid f b) => Monoid (Barbie b f) where
+instance (ProofB b, ConstraintsOf Semigroup f b) => Semigroup (Barbie b f) where
+  (<>) = bzipWith3 mk bproof
+    where
+      mk :: DictOf Semigroup f a -> f a -> f a -> f a
+      mk = requiringDict (<>)
+
+instance
+  (
+    Semigroup (Barbie b f)
+  , ConstraintsOf Monoid f b
+  ,  ProofB b
+  )
+  => Monoid (Barbie b f) where
   mempty = bmap mk bproof
     where
       mk :: DictOf Monoid f a -> f a
       mk = requiringDict mempty
 
-  mappend = bzipWith3 mk bproof
-    where
-      mk :: DictOf Monoid f a -> f a -> f a -> f a
-      mk = requiringDict mappend
+  mappend = (<>)

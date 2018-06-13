@@ -9,7 +9,7 @@ where
 
 import Data.Barbie (Barbie(..), ConstraintsOf, ProofB)
 
-import Data.Monoid
+import Data.Semigroup
 
 import Test.Tasty(testGroup, TestTree)
 import Test.Tasty.QuickCheck(Arbitrary(..), testProperty)
@@ -18,6 +18,7 @@ lawsMonoid
   :: forall b
   .  ( Arbitrary (b []), Eq (b []), Show (b [])
      , ProofB b
+     , ConstraintsOf Semigroup [] b
      , ConstraintsOf Monoid [] b
      )
   => TestTree
