@@ -36,16 +36,13 @@ instance (ProofB b, ConstraintsOf Semigroup f b) => Semigroup (Barbie b f) where
       mk :: DictOf Semigroup f a -> f a -> f a -> f a
       mk = requiringDict (<>)
 
-instance
-  (
-    Semigroup (Barbie b f)
-  , ConstraintsOf Monoid f b
-  ,  ProofB b
-  )
-  => Monoid (Barbie b f) where
+instance (ProofB b, ConstraintsOf Monoid f b) => Monoid (Barbie b f) where
   mempty = bmap mk bproof
     where
       mk :: DictOf Monoid f a -> f a
       mk = requiringDict mempty
 
-  mappend = (<>)
+  mappend = bzipWith3 mk bproof
+    where
+      mk :: DictOf Monoid f a -> f a -> f a -> f a
+      mk = requiringDict mappend
