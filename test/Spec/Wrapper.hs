@@ -9,7 +9,7 @@ where
 
 import Data.Barbie (Barbie(..), ConstraintsOf, ProofB)
 
-import Data.Semigroup
+import Data.Semigroup (Semigroup, (<>))
 
 import Test.Tasty(testGroup, TestTree)
 import Test.Tasty.QuickCheck(Arbitrary(..), testProperty)
