@@ -51,7 +51,7 @@ library
       base >=4.7 && <5
      ,bifunctors
 
-  ghc-options: -Wall
+  ghc-options: -Wall -Wnoncanonical-monoid-instances
 
   default-language: Haskell2010
 
