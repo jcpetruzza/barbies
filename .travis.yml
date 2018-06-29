@@ -1,0 +1,23 @@
+sudo: false
+
+language: generic
+
+# Caching so the next build will be fast too.
+cache:
+  directories:
+  - $HOME/.stack
+
+before_install:
+  # Download and unpack the stack executable
+  - mkdir -p ~/.local/bin
+  - export PATH=$HOME/.local/bin:$PATH
+  - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+
+matrix:
+  include:
+    - env: STACK_YAML=stack-lts-9.21.yaml
+    - env: STACK_YAML=stack-nightly.yaml
+    - env: STACK_YAML=stack.yaml
+
+script:
+  - travis_wait 240 stack --no-terminal --install-ghc --skip-ghc-check test
