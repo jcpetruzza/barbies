@@ -1,4 +1,4 @@
-# barbie
+# barbies [![Build Status](https://travis-ci.org/jcpetruzza/barbies.svg?branch=master)](https://travis-ci.org/jcpetruzza/barbies)
 
 Types that are parametric on unary type-constructors that control
 their shapes are like Barbies that can wear different clothes
