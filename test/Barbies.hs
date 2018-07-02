@@ -13,8 +13,14 @@ module Barbies
   , Record1(..)
   , Record3(..)
 
+  , Record1S(..)
+  , Record3S(..)
+
   , Record1W(..)
   , Record3W(..)
+
+  , Record1WS(..)
+  , Record3WS(..)
 
   , Ignore1(..)
 
@@ -94,6 +100,24 @@ instance ConstraintsOf Arbitrary f Record1 => Arbitrary (Record1 f) where
   arbitrary = Record1 <$> arbitrary
 
 
+data Record1S f
+  = Record1S { rec1s_f1 :: !(f Int) }
+  deriving (Generic, Typeable)
+
+
+instance FunctorB Record1S
+instance TraversableB Record1S
+instance ProductB Record1S
+instance ConstraintsB Record1S
+instance ProofB Record1S
+
+deriving instance ConstraintsOf Show f Record1S => Show (Record1S f)
+deriving instance ConstraintsOf Eq   f Record1S => Eq   (Record1S f)
+
+instance ConstraintsOf Arbitrary f Record1S => Arbitrary (Record1S f) where
+  arbitrary = Record1S <$> arbitrary
+
+
 data Record1W f
   = Record1W { rec1w_f1 :: Wear f Int }
   deriving (Generic, Typeable)
@@ -113,6 +137,25 @@ deriving instance ConstraintsOf Eq   f Record1W => Eq   (Record1W f)
 instance ConstraintsOf Arbitrary f Record1W => Arbitrary (Record1W f) where
   arbitrary = Record1W <$> arbitrary
 
+
+data Record1WS f
+  = Record1WS { rec1ws_f1 :: !(Wear f Int) }
+  deriving (Generic, Typeable)
+
+
+instance FunctorB Record1WS
+instance TraversableB Record1WS
+instance ProductB Record1WS
+instance ConstraintsB Record1WS
+instance ProofB Record1WS
+instance BareB Record1WS
+
+
+deriving instance ConstraintsOf Show f Record1WS => Show (Record1WS f)
+deriving instance ConstraintsOf Eq   f Record1WS => Eq   (Record1WS f)
+
+instance ConstraintsOf Arbitrary f Record1WS => Arbitrary (Record1WS f) where
+  arbitrary = Record1WS <$> arbitrary
 
 
 data Record3 f
@@ -135,6 +178,27 @@ deriving instance ConstraintsOf Eq   f Record3 => Eq   (Record3 f)
 
 instance ConstraintsOf Arbitrary f Record3 => Arbitrary (Record3 f) where
   arbitrary = Record3 <$> arbitrary <*> arbitrary <*> arbitrary
+
+data Record3S f
+  = Record3S
+      { rec3s_f1 :: !(f Int)
+      , rec3s_f2 :: !(f Bool)
+      , rec3s_f3 :: !(f Char)
+      }
+  deriving (Generic, Typeable)
+
+
+instance FunctorB Record3S
+instance TraversableB Record3S
+instance ProductB Record3S
+instance ConstraintsB Record3S
+instance ProofB Record3S
+
+deriving instance ConstraintsOf Show f Record3S => Show (Record3S f)
+deriving instance ConstraintsOf Eq   f Record3S => Eq   (Record3S f)
+
+instance ConstraintsOf Arbitrary f Record3S => Arbitrary (Record3S f) where
+  arbitrary = Record3S <$> arbitrary <*> arbitrary <*> arbitrary
 
 
 data Record3W f
@@ -159,6 +223,31 @@ deriving instance ConstraintsOf Eq   f Record3W => Eq   (Record3W f)
 
 instance ConstraintsOf Arbitrary f Record3W => Arbitrary (Record3W f) where
   arbitrary = Record3W <$> arbitrary <*> arbitrary <*> arbitrary
+
+
+data Record3WS f
+  = Record3WS
+      { rec3ws_f1 :: !(Wear f Int)
+      , rec3ws_f2 :: !(Wear f Bool)
+      , rec3ws_f3 :: !(Wear f Char)
+      }
+  deriving (Generic, Typeable)
+
+
+instance FunctorB Record3WS
+instance TraversableB Record3WS
+instance ProductB Record3WS
+instance ConstraintsB Record3WS
+instance ProofB Record3WS
+
+instance BareB Record3WS
+
+deriving instance ConstraintsOf Show f Record3WS => Show (Record3WS f)
+deriving instance ConstraintsOf Eq   f Record3WS => Eq   (Record3WS f)
+
+instance ConstraintsOf Arbitrary f Record3WS => Arbitrary (Record3WS f) where
+  arbitrary = Record3WS <$> arbitrary <*> arbitrary <*> arbitrary
+
 
 
 -----------------------------------------------------

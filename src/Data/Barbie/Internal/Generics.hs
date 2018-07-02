@@ -12,7 +12,7 @@
 {-# LANGUAGE TypeFamilies  #-}
 {-# LANGUAGE TypeOperators #-}
 module Data.Barbie.Internal.Generics
-  ( Target
+  ( Target (..)
   , unsafeTargetBarbie
   , unsafeUntarget
   , unsafeTarget
@@ -42,6 +42,7 @@ import Unsafe.Coerce (unsafeCoerce)
 --   if 'f' is applied in 'T', which are all the interesting
 --   cases!
 data Target (f :: * -> *) a
+  = Target (f a)
 
 unsafeTargetBarbie :: forall t b f . b f -> b (Target t)
 unsafeTargetBarbie = unsafeCoerce
