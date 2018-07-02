@@ -1,7 +1,11 @@
 # Changelog for barbies
 
+## 0.1.3.1
+  - Fix issue on Barbie-types with strictness annotations.
+
 ## 0.1.3.0
-  - Use both `Monoid` and `Semigroup` as constraints for the `Monoid` instance, so that this works with ghc 8.0 to 8.4 (Fraser Murray)
+  - Use both `Monoid` and `Semigroup` as constraints for the `Monoid` instance,
+    so that this works with ghc 8.0 to 8.4 (Fraser Murray)
 
 ## 0.1.2.0
   - Use `Monoid` and not `Semigroup` as constraints for the `Monoid` instance
