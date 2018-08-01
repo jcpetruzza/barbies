@@ -33,8 +33,8 @@
 --     , 'FunctorB', 'TraversableB', 'ProductB', 'ConstraintsB', 'ProofB'
 --     )
 --
--- deriving instance 'ConstraintsOf' 'Show' f Barbie => 'Show' Barbie
--- deriving instance 'ConstraintsOf' 'Eq'   f Barbie => 'Eq'   Barbie
+-- deriving instance 'ConstraintsOf' 'Show' f Barbie => 'Show' (Barbie f)
+-- deriving instance 'ConstraintsOf' 'Eq'   f Barbie => 'Eq'   (Barbie f)
 -- @
 --
 -- Sometimes one wants to use @Barbie 'Data.Functor.Identity.Identity'@
