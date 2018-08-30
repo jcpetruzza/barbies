@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass       #-}
 {-# LANGUAGE DeriveGeneric        #-}
 {-# LANGUAGE DeriveDataTypeable   #-}
-{-# LANGUAGE EmptyCase            #-}
 {-# LANGUAGE KindSignatures       #-}
 {-# LANGUAGE StandaloneDeriving   #-}
 {-# LANGUAGE TypeFamilies         #-}
@@ -45,21 +44,6 @@ import Data.Barbie
 import Data.Typeable
 import GHC.Generics
 import Test.Tasty.QuickCheck
-
----------------------------------------------------
--- Trivial Barbies
----------------------------------------------------
-
-data Void (f :: * -> *)
-  deriving (Generic, Typeable)
-
-instance Eq   (Void f) where (==) v = case v of
-instance Show (Void f) where showsPrec _ v = case v of
-
-instance FunctorB Void
-instance TraversableB Void
-instance ConstraintsB Void
-instance BareB Void
 
 ----------------------------------------------------
 -- Product Barbies

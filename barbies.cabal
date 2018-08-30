@@ -43,6 +43,7 @@ library
       Data.Barbie.Internal.Instances
       Data.Barbie.Internal.Tags
       Data.Barbie.Internal.Wear
+      Data.Barbie.Trivial
 
   hs-source-dirs:
       src

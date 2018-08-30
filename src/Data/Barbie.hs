@@ -93,6 +93,10 @@ module Data.Barbie
 
     -- * Wrapper
   , Barbie(..)
+
+    -- * Trivial Barbies
+  , Void
+  , Unit (..)
   )
 
 where
@@ -108,3 +112,4 @@ import Data.Barbie.Internal.Product
   , (/*/), (/*)
   )
 import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence, btraverse_)
+import Data.Barbie.Trivial(Void, Unit(..))
