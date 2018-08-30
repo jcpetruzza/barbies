@@ -1,5 +1,9 @@
 # Changelog for barbies
 
+## 0.1.4.0
+  - Add btraverse_
+  - Add the trivial Void and Unit barbies
+
 ## 0.1.3.1
   - Fix issue on Barbie-types with strictness annotations.
 
