@@ -13,6 +13,7 @@
 {-# LANGUAGE TypeOperators      #-}
 module Data.Barbie.Internal.Traversable
   ( TraversableB(..)
+  , btraverse_
   , bsequence
 
   , CanDeriveGenericInstance
@@ -25,7 +26,9 @@ where
 import Data.Barbie.Internal.Functor (FunctorB(..))
 import Data.Barbie.Internal.Generics
 import Data.Barbie.Internal.Tags (F,G)
+import Data.Functor (void)
 import Data.Functor.Compose (Compose(..))
+import Data.Functor.Const (Const(..))
 import GHC.Generics
 
 
@@ -48,6 +51,13 @@ class FunctorB b => TraversableB b where
     => (forall a . f a -> t (g a)) -> b f -> t (b g)
   btraverse = gbtraverseDefault
 
+
+
+-- | Map each element to an action, evaluate these actions from left to right,
+--   and ignore the results.
+btraverse_ :: (TraversableB b, Applicative t) => (forall a. f a -> t c) -> b f -> t ()
+btraverse_ f
+  = void . btraverse (fmap (const $ Const ()) . f)
 
 
 -- | Evaluate each action in the structure from left to right,

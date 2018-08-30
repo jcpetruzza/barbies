@@ -72,6 +72,7 @@ module Data.Barbie
 
     -- * Traversable
   , TraversableB(btraverse)
+  , btraverse_
   , bsequence
 
     -- * Product
@@ -106,4 +107,4 @@ import Data.Barbie.Internal.Product
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
   , (/*/), (/*)
   )
-import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence)
+import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence, btraverse_)
