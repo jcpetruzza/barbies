@@ -23,23 +23,23 @@ newtype Barbie b (f :: * -> *)
 
 -- Need to derive it manually to make GHC 8.0.2 happy
 instance ConstraintsB b => ConstraintsB (Barbie b) where
-  type ConstraintsOf c f (Barbie b) = ConstraintsOf c f b
+  type AllB c (Barbie b) = AllB c b
   adjProof = Barbie . adjProof . getBarbie
 
 instance TraversableB b => TraversableB (Barbie b) where
   btraverse f = fmap Barbie . btraverse f . getBarbie
 
 
-instance (ProofB b, ConstraintsOf Semigroup f b) => Semigroup (Barbie b f) where
+instance (ProofB b, AllB (ClassF Semigroup f) b) => Semigroup (Barbie b f) where
   (<>) = bzipWith3 mk bproof
     where
-      mk :: DictOf Semigroup f a -> f a -> f a -> f a
+      mk :: Dict (ClassF Semigroup f) a -> f a -> f a -> f a
       mk = requiringDict (<>)
 
-instance (ProofB b, ConstraintsOf Semigroup f b, ConstraintsOf Monoid f b) => Monoid (Barbie b f) where
+instance (ProofB b, AllB (ClassF Semigroup f) b, AllB (ClassF Monoid f) b) => Monoid (Barbie b f) where
   mempty = bmap mk bproof
     where
-      mk :: DictOf Monoid f a -> f a
+      mk :: Dict (ClassF Monoid f) a -> f a
       mk = requiringDict mempty
 
   mappend = (<>)
