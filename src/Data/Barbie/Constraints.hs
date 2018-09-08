@@ -24,13 +24,15 @@
 ----------------------------------------------------------------------------
 module Data.Barbie.Constraints
   ( -- * Proof of instance
-    DictOf(..)
-  , packDict
+    Dict(..)
   , requiringDict
 
     -- * Retrieving proofs
-  , ConstraintsB(ConstraintsOf)
+  , ConstraintsB(..)
   , ProofB(..)
+
+  , ConstraintsOf
+  , ClassF
   )
 
 where

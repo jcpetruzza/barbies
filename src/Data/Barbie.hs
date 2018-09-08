@@ -53,7 +53,7 @@
 --   = SignUpForm'
 --       { username  :: 'Wear' f 'String',
 --       , password  :: 'Wear' f 'String'
---       , mailingOk :: 'Wear' f 'Boolean'
+--       , mailingOk :: 'Wear' f 'Bool'
 --       }
 --   deriving ( ..., 'BareB')
 --
@@ -88,7 +88,8 @@ module Data.Barbie
   , bcoverWith
 
     -- * Constraints and proofs of instance
-  , ConstraintsB(ConstraintsOf, adjProof)
+  , ConstraintsB(AllB, NotBare, adjProof)
+  , ConstraintsOf
   , ProofB(bproof)
 
     -- * Wrapper
@@ -102,7 +103,7 @@ module Data.Barbie
 where
 
 import Data.Barbie.Internal.Bare(Bare, BareB(..), bstripFrom, bcoverWith, Wear)
-import Data.Barbie.Internal.Constraints(ConstraintsB(..))
+import Data.Barbie.Internal.Constraints(ConstraintsB(..), ConstraintsOf)
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Instances(Barbie(..))
 import Data.Barbie.Internal.ProofB(ProofB(..))
