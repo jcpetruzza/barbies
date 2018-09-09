@@ -33,6 +33,8 @@ module Data.Barbie.Constraints
 
   , ConstraintsOf
   , ClassF
+  , ClassFG
+  , NotBare
   )
 
 where
@@ -40,3 +42,4 @@ where
 import Data.Barbie.Internal.Constraints
 import Data.Barbie.Internal.Dicts
 import Data.Barbie.Internal.ProofB
+import Data.Barbie.Internal.Wear (NotBare)
