@@ -1,4 +1,4 @@
-module Data.Barbie.Internal.Tags
+module Data.Barbie.Internal.Deprecated.Tags
   ( F, G, FxG
   , P, PxF
   , I, B

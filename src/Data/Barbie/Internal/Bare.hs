@@ -14,9 +14,10 @@ module Data.Barbie.Internal.Bare
 
 where
 
+import Data.Barbie.Internal.Deprecated.Generics
+import Data.Barbie.Internal.Deprecated.Tags (I, B)
+
 import Data.Barbie.Internal.Functor (FunctorB(..))
-import Data.Barbie.Internal.Generics
-import Data.Barbie.Internal.Tags (I, B)
 import Data.Barbie.Internal.Wear
 import Data.Functor.Identity (Identity(..))
 

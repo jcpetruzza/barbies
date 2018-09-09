@@ -1,15 +1,15 @@
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Data.Barbie.Internal.Functor
+-- Module      :  Data.Barbie.Internal.Deprecated.Generics
 --
--- GHC is at the momemt unable to derive @'Generic1' b@ for a Barbie-type
--- @b@. Instead, we use a trick by which we use the uninhabited type
+-- GHC is at the moment unable to derive @'Generic1' b@ for a Barbie-type
+-- @b@. Instead, we use a trick by which we use the hidden type
 -- 'Target' to identify the point where an 'f' occurs. That is, we coerce
 -- a @b f@ into a @b 'Target'@, operate on the representation of this type,
 -- and finally coerce back to the desired type.
 ----------------------------------------------------------------------------
 {-# LANGUAGE TypeFamilies  #-}
-module Data.Barbie.Internal.Generics
+module Data.Barbie.Internal.Deprecated.Generics
   ( Target (..)
   , unsafeTargetBarbie
   , unsafeUntarget
@@ -19,16 +19,13 @@ module Data.Barbie.Internal.Generics
   , W
 
   , Repl, Repl'
-
   , RecRep
   , RecUsage(..), NonRec(..)
   , AnnRec, DeannRec
   , toWithRecAnn
   , fromWithRecAnn
 
-  )
-
-where
+  ) where
 
 import GHC.Generics
 import Unsafe.Coerce (unsafeCoerce)
@@ -104,7 +101,6 @@ type RecRep a = AnnRec a (Rep a)
 
 type Repl' f g rep
   = Repl f g (DeannRec rep)
-
 
 -- | We use 'W' to identify usagaes of 'Wear' in the generic
 --   representation of a barbie-type.

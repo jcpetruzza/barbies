@@ -7,7 +7,7 @@ module Data.Barbie.Internal.Wear
 where
 
 
-import Data.Barbie.Internal.Generics(Target, W)
+import Data.Barbie.Internal.Deprecated.Generics(Target, W)
 
 -- | The 'Wear' type-function allows one to define a Barbie-type as
 --

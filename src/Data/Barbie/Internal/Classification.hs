@@ -8,8 +8,8 @@ module Data.Barbie.Internal.Classification
 
 where
 
-import Data.Barbie.Internal.Generics(Target, RecUsage(..), NonRec(..), RecRep, W)
-import Data.Barbie.Internal.Tags(F)
+import Data.Barbie.Internal.Deprecated.Generics(Target, RecUsage(..), NonRec(..), RecRep, W)
+import Data.Barbie.Internal.Deprecated.Tags(F)
 
 import GHC.Generics
 

@@ -15,11 +15,12 @@ module Data.Barbie.Internal.Constraints
 
 where
 
+import Data.Barbie.Internal.Deprecated.Generics
+import Data.Barbie.Internal.Deprecated.Tags(F, PxF)
+
 import Data.Barbie.Internal.Classification (BarbieType(..), ClassifyBarbie, GClassifyBarbie)
 import Data.Barbie.Internal.Dicts(ClassF, Dict(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
-import Data.Barbie.Internal.Generics
-import Data.Barbie.Internal.Tags(F, PxF)
 import Data.Barbie.Internal.Wear(NotBare)
 
 import Data.Functor.Product(Product(..))

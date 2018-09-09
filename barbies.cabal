@@ -37,11 +37,12 @@ library
       Data.Barbie.Internal.Traversable
 
   other-modules:
+      Data.Barbie.Internal.Deprecated.Generics
+      Data.Barbie.Internal.Deprecated.Tags
+
       Data.Barbie.Internal.Classification
       Data.Barbie.Internal.Dicts
-      Data.Barbie.Internal.Generics
       Data.Barbie.Internal.Instances
-      Data.Barbie.Internal.Tags
       Data.Barbie.Internal.Wear
       Data.Barbie.Trivial
 

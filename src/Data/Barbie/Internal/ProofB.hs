@@ -11,12 +11,13 @@ module Data.Barbie.Internal.ProofB
 
 where
 
+import Data.Barbie.Internal.Deprecated.Generics
+import Data.Barbie.Internal.Deprecated.Tags(P, F)
+
 import Data.Barbie.Internal.Classification (BarbieType(..), ClassifyBarbie)
 import Data.Barbie.Internal.Dicts(Dict(..))
-import Data.Barbie.Internal.Generics
 import Data.Barbie.Internal.Constraints hiding (CanDeriveGenericInstance, AllBMatchesGenericDeriv)
 import Data.Barbie.Internal.Product(ProductB(..))
-import Data.Barbie.Internal.Tags(P, F)
 
 import Data.Proxy
 

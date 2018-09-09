@@ -12,9 +12,10 @@ module Data.Barbie.Internal.Product
 
 where
 
+import Data.Barbie.Internal.Deprecated.Generics
+import Data.Barbie.Internal.Deprecated.Tags(F, G, FxG)
+
 import Data.Barbie.Internal.Functor(FunctorB(..))
-import Data.Barbie.Internal.Generics
-import Data.Barbie.Internal.Tags(F, G, FxG)
 import Data.Functor.Product (Product(..))
 import Data.Functor.Prod
 

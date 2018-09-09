@@ -17,9 +17,10 @@ module Data.Barbie.Internal.Traversable
 
 where
 
+import Data.Barbie.Internal.Deprecated.Generics
+import Data.Barbie.Internal.Deprecated.Tags (F,G)
+
 import Data.Barbie.Internal.Functor (FunctorB(..))
-import Data.Barbie.Internal.Generics
-import Data.Barbie.Internal.Tags (F,G)
 import Data.Functor (void)
 import Data.Functor.Compose (Compose(..))
 import Data.Functor.Const (Const(..))
