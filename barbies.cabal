@@ -43,6 +43,7 @@ library
       Data.Barbie.Internal.Classification
       Data.Barbie.Internal.Dicts
       Data.Barbie.Internal.Instances
+      Data.Barbie.Internal.Tag
       Data.Barbie.Internal.Wear
       Data.Barbie.Trivial
 

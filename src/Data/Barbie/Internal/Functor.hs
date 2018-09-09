@@ -9,8 +9,7 @@ module Data.Barbie.Internal.Functor
 
 where
 
-import Data.Barbie.Internal.Deprecated.Generics
-import Data.Barbie.Internal.Deprecated.Tags (F,G)
+import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
 
 import GHC.Generics
 
@@ -28,9 +27,16 @@ class FunctorB b where
   bmap :: (forall a . f a -> g a) -> b f -> b g
 
   default bmap
-    :: CanDeriveGenericInstance b
+    :: forall f g
+    .  CanDeriveGenericInstance b f g
     => (forall a . f a -> g a) -> b f -> b g
   bmap = gbmapDefault
+
+data F_
+data G_
+
+type F = Tag F_
+type G = Tag G_
 
 -- | Intuivively, the requirements to have @'FunctorB' B@ derived are:
 --
@@ -41,83 +47,72 @@ class FunctorB b where
 --
 --     * Recursive usages of @B f@ are allowed to appear as argument to a
 --       'Functor' (e.g. @'Maybe' (B f)')
-type CanDeriveGenericInstance b
-  = ( Generic (b (Target F))
-    , Generic (b (Target G))
-    , GFunctorB (Rep (b (Target F)))
-    , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
+type CanDeriveGenericInstance b f g
+  = ( Generic (b (F f))
+    , Generic (b (G g))
+    , CoercibleTag F b f
+    , CoercibleTag G b g
+    , GFunctorB f g (Rep (b (F f))) (Rep (b (G g)))
     )
-
 
 -- | Default implementation of 'bmap' based on 'Generic'.
 gbmapDefault
-  :: CanDeriveGenericInstance b
+  :: CanDeriveGenericInstance b f g
   => (forall a . f a -> g a) -> b f -> b g
-gbmapDefault f b
-  = unsafeUntargetBarbie @G $ to $ gbmap f $ from (unsafeTargetBarbie @F b)
+gbmapDefault f
+  = coerceUntag @G
+      . to
+      . gbmap f
+      . from
+      . coerceTag @F
 
 
-class GFunctorB b where
-  gbmap :: (forall a . f a -> g a) -> b x -> Repl (Target F) (Target G) b x
+class GFunctorB f g repbf repbg where
+  gbmap :: (forall a . f a -> g a) -> repbf x -> repbg x
 
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-instance GFunctorB x => GFunctorB (M1 i c x) where
+instance GFunctorB f g bf bg => GFunctorB f g (M1 i c bf) (M1 i c bg) where
+  gbmap h = M1 . gbmap h . unM1
   {-# INLINE gbmap #-}
-  gbmap f (M1 x) = M1 (gbmap f x)
 
-instance GFunctorB V1 where
+instance GFunctorB f g V1 V1 where
   gbmap _ _ = undefined
 
-instance GFunctorB U1 where
+instance GFunctorB f g U1 U1 where
+  gbmap _ = id
   {-# INLINE gbmap #-}
-  gbmap _ u1 = u1
 
-instance (GFunctorB l, GFunctorB r) => GFunctorB (l :*: r) where
+instance(GFunctorB f g l l', GFunctorB f g r r') => GFunctorB f g (l :*: r) (l' :*: r') where
+  gbmap h (l :*: r) = (gbmap h l) :*: gbmap h r
   {-# INLINE gbmap #-}
-  gbmap f (l :*: r)
-    = (gbmap f l) :*: gbmap f r
 
-instance (GFunctorB l, GFunctorB r) => GFunctorB (l :+: r) where
+instance(GFunctorB f g l l', GFunctorB f g r r') => GFunctorB f g (l :+: r) (l' :+: r') where
+  gbmap h = \case
+    L1 l -> L1 (gbmap h l)
+    R1 r -> R1 (gbmap h r)
   {-# INLINE gbmap #-}
-  gbmap f = \case
-    L1 l -> L1 (gbmap f l)
-    R1 r -> R1 (gbmap f r)
 
 
 -- --------------------------------
 -- The interesting cases
 -- --------------------------------
 
-instance {-# OVERLAPPING #-} GFunctorB (K1 R (Target (W F) a)) where
+instance GFunctorB f g (Rec0 (F f a)) (Rec0 (G g a)) where
+  gbmap h (K1 (Tag fa)) = K1 (Tag (h fa))
   {-# INLINE gbmap #-}
-  gbmap f (K1 fa)
-    = K1 $ unsafeTarget @(W G) (f $ unsafeUntarget @(W F) fa)
 
-instance {-# OVERLAPPING #-} GFunctorB (K1 R (Target F a)) where
+instance FunctorB b => GFunctorB f g (Rec0 (b (F f))) (Rec0 (b (G g))) where
+  gbmap h (K1 bf) = K1 (bmap (Tag . h . unTag) bf)
   {-# INLINE gbmap #-}
-  gbmap f (K1 fa)
-    = K1 $ unsafeTarget @G (f $ unsafeUntarget @F fa)
 
-instance {-# OVERLAPPING #-} FunctorB b => GFunctorB (K1 R (b (Target F))) where
+instance (Functor h, FunctorB b) => GFunctorB f g (Rec0 (h (b (F f)))) (Rec0 (h (b (G g)))) where
+  gbmap h (K1 hbf) = K1 (fmap (bmap (Tag . h . unTag)) hbf)
   {-# INLINE gbmap #-}
-  gbmap f (K1 bf)
-    = K1 $ bmap (unsafeTarget @G . f . unsafeUntarget @F) bf
 
-instance {-# OVERLAPPING #-}
-  ( Functor h
-  , FunctorB b
-  , Repl (Target F) (Target G) (K1 R (h (b (Target F)))) -- shouldn't be
-      ~ (K1 R (h (b (Target G))))  -- necessary but ghc chokes otherwise
-  )
-  => GFunctorB (K1 R (h (b (Target F)))) where
+instance {-# OVERLAPPABLE #-} bf ~ bg => GFunctorB f g (Rec0 bf) (Rec0 bg) where
+  gbmap _ = id
   {-# INLINE gbmap #-}
-  gbmap f (K1 hbf)
-    = K1 (fmap (unsafeTargetBarbie @G . bmap f . unsafeUntargetBarbie @F) hbf)
-
-instance (K1 i c) ~ Repl (Target F) (Target G) (K1 i c) => GFunctorB (K1 i c) where
-  {-# INLINE gbmap #-}
-  gbmap _ k1 = k1

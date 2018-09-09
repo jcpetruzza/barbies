@@ -102,6 +102,9 @@ module Data.Barbie
     -- * Trivial Barbies
   , Void
   , Unit (..)
+
+    -- * Generic derivations
+  , Tag(..)
   )
 
 where
@@ -125,3 +128,5 @@ import Data.Barbie.Internal.Traversable
 import Data.Barbie.Internal.Wear(NotBare)
 
 import Data.Barbie.Trivial(Void, Unit(..))
+
+import Data.Barbie.Internal.Tag(Tag(..))
