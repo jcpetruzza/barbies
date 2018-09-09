@@ -67,7 +67,7 @@ import GHC.Generics
 -- @
 class FunctorB b => ConstraintsB b where
   -- | @'AllB' c b@ should contain a constraint @c x@ for each
-  --   @f x@ occurring in @b@. E.g.:
+  --   @x@ occurring under an @f@ in @b f@. E.g.:
   --
   -- @
   -- 'AllB' 'Show' Barbie = ('Show' 'String', 'Show' 'Int')
