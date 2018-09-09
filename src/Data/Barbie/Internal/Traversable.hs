@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Data.Barbie.Internal.Functor
+-- Module      :  Data.Barbie.Internal.Traversable
 ----------------------------------------------------------------------------
 {-# LANGUAGE TypeFamilies       #-}
 module Data.Barbie.Internal.Traversable
@@ -17,10 +17,9 @@ module Data.Barbie.Internal.Traversable
 
 where
 
-import Data.Barbie.Internal.Deprecated.Generics
-import Data.Barbie.Internal.Deprecated.Tags (F,G)
-
 import Data.Barbie.Internal.Functor (FunctorB(..))
+import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
+
 import Data.Functor (void)
 import Data.Functor.Compose (Compose(..))
 import Data.Functor.Const (Const(..))
@@ -43,7 +42,7 @@ class FunctorB b => TraversableB b where
   btraverse :: Applicative t => (forall a . f a -> t (g a)) -> b f -> t (b g)
 
   default btraverse
-    :: ( Applicative t, CanDeriveGenericInstance b)
+    :: ( Applicative t, CanDeriveGenericInstance b f g)
     => (forall a . f a -> t (g a)) -> b f -> t (b g)
   btraverse = gbtraverseDefault
 
@@ -74,6 +73,12 @@ bfoldMap f
   = execWr . btraverse_ (tell . f)
 
 
+data F_
+data G_
+
+type F = Tag F_
+type G = Tag G_
+
 -- | Intuivively, the requirements to have @'TraversableB' B@ derived are:
 --
 --     * There is an instance of @'Generic' (B f)@ for every @f@
@@ -83,91 +88,79 @@ bfoldMap f
 --
 --     * Recursive usages of @B f@ are allowed to appear as argument to a
 --       'Traversable' (e.g. @'Maybe' (B f)')
-type CanDeriveGenericInstance b
-  = ( Generic (b (Target F))
-    , Generic (b (Target G))
-    , GTraversableB (Rep (b (Target F)))
-    , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
+type CanDeriveGenericInstance b f g
+  = ( Generic (b (F f))
+    , Generic (b (G g))
+    , CoercibleTag F b f
+    , CoercibleTag G b g
+    , GTraversableB f g (Rep (b (F f))) (Rep (b (G g)))
     )
 
 -- | Default implementation of 'btraverse' based on 'Generic'.
 gbtraverseDefault
-  :: ( Applicative t, CanDeriveGenericInstance b)
+  :: ( Applicative t, CanDeriveGenericInstance b f g)
   => (forall a . f a -> t (g a))
   -> b f -> t (b g)
-gbtraverseDefault f b
-  = unsafeUntargetBarbie @G . to <$> gbtraverse f (from (unsafeTargetBarbie @F b))
+gbtraverseDefault h
+  = fmap (coerceUntag @G . to)
+      . gbtraverse h
+      . from
+      . coerceTag @F
 
 
-
-class GTraversableB b where
+class GTraversableB f g repbf repbg where
   gbtraverse
-    :: Applicative t
-    => (forall a . f a -> t (g a))
-    -> b x -> t (Repl (Target F) (Target G) b x)
+    :: Applicative t => (forall a . f a -> t (g a)) -> repbf x -> t (repbg x)
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-instance GTraversableB x => GTraversableB (M1 i c x) where
+instance GTraversableB f g bf bg => GTraversableB f g (M1 i c bf) (M1 i c bg) where
+  gbtraverse h = fmap M1 . gbtraverse h . unM1
   {-# INLINE gbtraverse #-}
-  gbtraverse f (M1 x) = M1 <$> gbtraverse f x
 
-instance GTraversableB V1 where
-  {-# INLINE gbtraverse #-}
+instance GTraversableB f g V1 V1 where
   gbtraverse _ _ = undefined
-
-instance GTraversableB U1 where
   {-# INLINE gbtraverse #-}
-  gbtraverse _ u1 = pure u1
 
-instance (GTraversableB l, GTraversableB r) => GTraversableB (l :*: r) where
+instance GTraversableB f g U1 U1 where
+  gbtraverse _ = pure
   {-# INLINE gbtraverse #-}
-  gbtraverse f (l :*: r)
-    = (:*:) <$> gbtraverse f l <*> gbtraverse f r
 
-instance (GTraversableB l, GTraversableB r) => GTraversableB (l :+: r) where
+instance (GTraversableB f g l l', GTraversableB f g r r') => GTraversableB f g (l :*: r) (l' :*: r') where
+  gbtraverse h (l :*: r) = (:*:) <$> gbtraverse h l <*> gbtraverse h r
   {-# INLINE gbtraverse #-}
-  gbtraverse f = \case
-    L1 l -> L1 <$> gbtraverse f l
-    R1 r -> R1 <$> gbtraverse f r
+
+instance (GTraversableB f g l l', GTraversableB f g r r') => GTraversableB f g (l :+: r) (l' :+: r') where
+  gbtraverse h = \case
+    L1 l -> L1 <$> gbtraverse h l
+    R1 r -> R1 <$> gbtraverse h r
+  {-# INLINE gbtraverse #-}
 
 
 -- --------------------------------
 -- The interesting cases
 -- --------------------------------
 
-instance {-# OVERLAPPING #-} GTraversableB (K1 R (Target (W F) a)) where
+instance GTraversableB f g (Rec0 (F f a)) (Rec0 (G g a)) where
+  gbtraverse h (K1 (Tag fa)) = K1 . Tag <$> h fa
   {-# INLINE gbtraverse #-}
-  gbtraverse f (K1 fa)
-    = K1 . unsafeTarget @(W G) <$> f (unsafeUntarget @(W F) fa)
 
-instance {-# OVERLAPPING #-} GTraversableB (K1 R (Target F a)) where
+instance TraversableB b => GTraversableB f g (Rec0 (b (F f))) (Rec0 (b (G g))) where
+  gbtraverse h (K1 bf)
+    = K1 <$> btraverse (fmap Tag . h . unTag) bf
   {-# INLINE gbtraverse #-}
-  gbtraverse f (K1 fa)
-    = K1 . unsafeTarget @G <$> f (unsafeUntarget @F fa)
 
-instance {-# OVERLAPPING #-} TraversableB b => GTraversableB (K1 R (b (Target F))) where
+instance (Traversable h, TraversableB b) => GTraversableB f g (K1 R (h (b (F f)))) (K1 R (h (b (G g)))) where
+  gbtraverse h (K1 hbf)
+    = K1 <$> traverse (btraverse (fmap Tag . h . unTag)) hbf
   {-# INLINE gbtraverse #-}
-  gbtraverse f (K1 bf)
-    = K1 <$> btraverse (fmap (unsafeTarget @G) . f . unsafeUntarget @F) bf
-
-instance {-# OVERLAPPING #-}
-  ( Traversable h
-  , TraversableB b
-  , Repl (Target F) (Target G) (K1 R (h (b (Target F)))) -- shouldn't be
-      ~ (K1 R (h (b (Target G))))  -- necessary but ghc chokes otherwise
-  )
-  => GTraversableB (K1 R (h (b (Target F)))) where
-  {-# INLINE gbtraverse #-}
-  gbtraverse f (K1 hbf)
-    = K1 <$> traverse (fmap (unsafeTargetBarbie @G) . btraverse f . unsafeUntargetBarbie @F) hbf
 
 
-instance (K1 i c) ~ Repl (Target F) (Target G) (K1 i c) => GTraversableB (K1 i c) where
+instance {-# OVERLAPPABLE #-} bf ~ bg => GTraversableB f g (Rec0 bf) (Rec0 bg) where
+  gbtraverse _ = pure
   {-# INLINE gbtraverse #-}
-  gbtraverse _ k1 = pure k1
 
 
 
