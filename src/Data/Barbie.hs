@@ -116,7 +116,11 @@ import Data.Barbie.Internal.Product
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
   , (/*/), (/*)
   )
-import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence, btraverse_)
+import Data.Barbie.Internal.Traversable
+  ( TraversableB(..)
+  , bsequence, bsequence'
+  , btraverse_
+  )
 import Data.Barbie.Internal.Wear(NotBare)
 
 import Data.Barbie.Trivial(Void, Unit(..))
