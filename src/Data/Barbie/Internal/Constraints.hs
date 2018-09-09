@@ -30,7 +30,7 @@ import Data.Barbie.Internal.Dicts(ClassF, Dict(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Generics
 import Data.Barbie.Internal.Tags(F, PxF)
-import Data.Barbie.Internal.Wear(Wear)
+import Data.Barbie.Internal.Wear(NotBare)
 
 import Data.Functor.Product(Product(..))
 import Data.Kind(Constraint)
@@ -52,9 +52,6 @@ import GHC.Generics
 -- instance 'ConstraintsB' T where
 --   type 'AllB' c T
 --     = (c 'Int', c 'String', c 'Bool')
---
---   type 'NotBare' T f
---     = ()
 --
 --   adjProof t = case t of
 --     A x y -> A ('Pair' ('packDict' x) ('packDict' y))
@@ -80,17 +77,6 @@ class FunctorB b => ConstraintsB b where
   type AllB (c :: * -> Constraint) b :: Constraint
   type AllB c b = GAllB c (RecRep (b (Target F)))
 
-  -- | When using 'Wear' in the definition of a Barbie-type, one will sometimes
-  --   need to express that the @f@ in @b f@ is not 'Data.Barbie.Internal.Wear.Bare'.
-  --   We use @'NotBare' b f@ for this. For example:
-  --
-  --   @
-  --   'NotBare' SignUpForm f = ('Wear' f 'String' ~ f 'String', 'Wear' f 'Bool' ~ 'Bool')
-  --   'NotBare' Barbie f = ()
-  --   @
-  type NotBare b (f :: * -> *) :: Constraint
-  type NotBare b f = GNotBare f (RecRep (b (Target F)))
-
   -- | Adjoint a proof-of-instance to a barbie-type.
   adjProof :: forall c f.  AllB c b => b f -> b (Product (Dict c) f)
 
@@ -107,9 +93,14 @@ class FunctorB b => ConstraintsB b where
 --   between the constraint @c@ and the type @a@. For example:
 --
 --   @
---   'ConstraintsOf' 'Show' f Barbie = ('Show' (f 'String'), c (f 'Int'), 'NotBare' Barbie f)
+--   'ConstraintsOf' 'Show' f Barbie
+--      = ( 'Show' (f 'String')
+--        , 'Show' (f 'Int')
+--        , 'Data.Barbie.Internal.Wear.Wear' f 'String' ~ f 'String'
+--        , 'Data.Barbie.Internal.Wear.Wear' f 'Int' ~ f 'Int'
+--        )
 --   @
-type ConstraintsOf c f b = (AllB (ClassF c f) b, NotBare b f)
+type ConstraintsOf c f b = (AllB (ClassF c f) b, AllB (NotBare f) b)
 
 
 -- | Intuivively, the requirements to have @'ConstraintsB' B@ derived are:
@@ -149,22 +140,6 @@ type family ConstraintByType bt (c :: * -> Constraint) r :: Constraint where
 
 type GAllB c r
   = ConstraintByType (GClassifyBarbie r) c r
-
-type GNotBare f r
-  = NotBareByType (GClassifyBarbie r) f r
-
-type family NotBareByType bt (f :: * -> *) r :: Constraint where
-  NotBareByType 'NonWearBarbie _ _ = ()
-  NotBareByType wbt f (M1 _i _c x) = NotBareByType wbt f x
-  NotBareByType wbt f V1 = ()
-  NotBareByType wbt f U1 = ()
-  NotBareByType wbt f (l :*: r) = (NotBareByType wbt f l, NotBareByType wbt f r)
-  NotBareByType wbt f (l :+: r) = (NotBareByType wbt f l, NotBareByType wbt f r)
-  NotBareByType wbt f (K1 R (NonRec (Target (W F) a))) = Wear f a ~ f a
-  NotBareByType wbt f (K1 R (NonRec (b (Target F)))) = NotBare b f
-  NotBareByType wbt f (K1 R (RecUsage (b (Target F)))) = () -- break recursion
-  NotBareByType wbt f (K1 _i _c) = ()
-
 
 -- | Default implementation of 'adjProof' based on 'Generic'.
 gadjProofDefault
