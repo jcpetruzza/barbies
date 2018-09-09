@@ -73,6 +73,7 @@ module Data.Barbie
     -- * Traversable
   , TraversableB(btraverse)
   , btraverse_
+  , bfoldMap
   , bsequence, bsequence'
 
     -- * Product
@@ -119,7 +120,7 @@ import Data.Barbie.Internal.Product
 import Data.Barbie.Internal.Traversable
   ( TraversableB(..)
   , bsequence, bsequence'
-  , btraverse_
+  , bfoldMap, btraverse_
   )
 import Data.Barbie.Internal.Wear(NotBare)
 

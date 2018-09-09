@@ -1,5 +1,6 @@
 {-# LANGUAGE TypeApplications    #-}
 import Test.Tasty (defaultMain, testGroup)
+import Test.Tasty.HUnit (testCase, (@?=))
 
 import qualified Spec.Bare as Bare
 import qualified Spec.Constraints as Constraints
@@ -8,8 +9,10 @@ import qualified Spec.Product as Product
 import qualified Spec.Traversable as Traversable
 import qualified Spec.Wrapper as Wrapper
 
-
 import Barbies
+
+import Data.Barbie (bfoldMap)
+import Data.Functor.Const(Const(..))
 
 main :: IO ()
 main
@@ -170,5 +173,11 @@ main
 
             , Wrapper.lawsMonoid @Record3S
             , Wrapper.lawsMonoid @Record3WS
+            ]
+
+        , testGroup "bfoldMap"
+            [ testCase "Record3" $ do
+                let b = Record3 (Const "tic") (Const "tac") (Const "toe")
+                bfoldMap getConst b @?= "tictactoe"
             ]
         ]
