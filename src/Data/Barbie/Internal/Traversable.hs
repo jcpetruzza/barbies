@@ -15,6 +15,7 @@ module Data.Barbie.Internal.Traversable
   ( TraversableB(..)
   , btraverse_
   , bsequence
+  , bsequence'
 
   , CanDeriveGenericInstance
   , GTraversableB
@@ -29,6 +30,7 @@ import Data.Barbie.Internal.Tags (F,G)
 import Data.Functor (void)
 import Data.Functor.Compose (Compose(..))
 import Data.Functor.Const (Const(..))
+import Data.Functor.Identity (Identity(..))
 import GHC.Generics
 
 
@@ -66,6 +68,10 @@ bsequence :: (Applicative f, TraversableB b) => b (Compose f g) -> f (b g)
 bsequence
   = btraverse getCompose
 
+-- | A version of 'bsequence' with @g@ specialized to 'Identity'.
+bsequence' :: (Applicative f, TraversableB b) => b f -> f (b Identity)
+bsequence'
+  = btraverse (fmap Identity)
 
 -- | Intuivively, the requirements to have @'TraversableB' B@ derived are:
 --

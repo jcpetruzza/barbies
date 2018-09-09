@@ -73,7 +73,7 @@ module Data.Barbie
     -- * Traversable
   , TraversableB(btraverse)
   , btraverse_
-  , bsequence
+  , bsequence, bsequence'
 
     -- * Product
   , ProductB(buniq, bprod)
