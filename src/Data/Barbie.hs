@@ -88,8 +88,9 @@ module Data.Barbie
   , bcoverWith
 
     -- * Constraints and proofs of instance
-  , ConstraintsB(AllB, NotBare, adjProof)
+  , ConstraintsB(AllB, adjProof)
   , ConstraintsOf
+  , NotBare
   , ProofB(bproof)
 
     -- * Wrapper
@@ -113,4 +114,6 @@ import Data.Barbie.Internal.Product
   , (/*/), (/*)
   )
 import Data.Barbie.Internal.Traversable(TraversableB(..), bsequence, btraverse_)
+import Data.Barbie.Internal.Wear(NotBare)
+
 import Data.Barbie.Trivial(Void, Unit(..))
