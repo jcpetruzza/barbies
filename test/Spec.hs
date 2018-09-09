@@ -10,6 +10,7 @@ import qualified Spec.Traversable as Traversable
 import qualified Spec.Wrapper as Wrapper
 
 import Barbies
+import BarbiesW
 
 import Data.Barbie (bfoldMap)
 import Data.Functor.Const(Const(..))

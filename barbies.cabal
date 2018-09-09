@@ -64,6 +64,7 @@ test-suite barbies-test
 
   other-modules:
       Barbies
+      BarbiesW
       Clothes
       Spec.Bare
       Spec.Constraints
