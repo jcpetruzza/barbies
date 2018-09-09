@@ -1,3 +1,4 @@
+{-# LANGUAGE AllowAmbiguousTypes  #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.Product
@@ -5,17 +6,17 @@ module Data.Barbie.Internal.Product
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
   , (/*/), (/*)
 
-  , CanDeriveGenericInstance, CanDeriveGenericInstance'
-  , GProductB
+  , CanDeriveGenericInstance
+  , Gbprod
+  , Gbuniq
   , gbprodDefault, gbuniqDefault
   )
 
 where
 
-import Data.Barbie.Internal.Deprecated.Generics
-import Data.Barbie.Internal.Deprecated.Tags(F, G, FxG)
-
 import Data.Barbie.Internal.Functor(FunctorB(..))
+import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
+
 import Data.Functor.Product (Product(..))
 import Data.Functor.Prod
 
@@ -53,10 +54,10 @@ class FunctorB b => ProductB b where
 
   buniq :: (forall a . f a) -> b f
 
-  default bprod :: CanDeriveGenericInstance b => b f -> b g -> b (Product f g)
+  default bprod :: CanDeriveGenericInstance b f g => b f -> b g -> b (Product f g)
   bprod = gbprodDefault
 
-  default buniq :: CanDeriveGenericInstance' b => (forall a . f a) -> b f
+  default buniq :: CanDeriveGenericInstance' b f => (forall a . f a) -> b f
   buniq = gbuniqDefault
 
 
@@ -92,6 +93,14 @@ bzipWith4 f bf bg bh bi
   = bmap (\(Pair (Pair (Pair fa ga) ha) ia) -> f fa ga ha ia)
          (bf `bprod` bg `bprod` bh `bprod` bi)
 
+data F_
+data G_
+data P_
+
+type F = Tag F_
+type G = Tag G_
+type P = Tag P_
+
 -- | The requirements to to derive @'ProductB' (B f)@ are more strict than those for
 --   'FunctorB' or 'TraversableB'. Intuitively, we need:
 --
@@ -101,19 +110,22 @@ bzipWith4 f bf bg bh bi
 --
 --     * Every field of @B@' constructor is of the form 'f t'. That is, @B@ has no
 --       hidden structure.
-type CanDeriveGenericInstance b
-  = ( Generic (b (Target F))
-    , Generic (b (Target G))
-    , Generic (b (Target FxG))
-    , GProductB (Rep (b (Target F)))
-    , Rep (b (Target G)) ~ Repl (Target F) (Target G) (Rep (b (Target F)))
-    , Rep (b (Target FxG)) ~ Repl (Target F) (Target FxG) (Rep (b (Target F)))
+type CanDeriveGenericInstance b f g
+  = ( Generic (b (F f))
+    , Generic (b (G g))
+    , Generic (b (P (Product f g)))
+    , CoercibleTag F b f
+    , CoercibleTag G b g
+    , CoercibleTag P b (Product f g)
+    , Gbprod f g (Rep (b (F f))) (Rep (b (G g))) (Rep (b (P (Product f g))))
     )
 
-type CanDeriveGenericInstance' b
-  = ( Generic (b (Target F))
-    , GProductB (Rep (b (Target F)))
+type CanDeriveGenericInstance' b f
+  = ( Generic (b (F f))
+    , CoercibleTag F b f
+    , Gbuniq f (Rep (b (F f)))
     )
+
 
 -- | Like 'bprod', but returns a binary 'Prod', instead of 'Product', which
 --   composes better.
@@ -147,83 +159,82 @@ infixr 4 /*
 
 -- | Default implementation of 'bprod' based on 'Generic'.
 gbprodDefault
-  :: CanDeriveGenericInstance b
+  :: forall b f g
+  .  CanDeriveGenericInstance b f g
   => b f -> b g -> b (Product f g)
 gbprodDefault l r
-  = let l' = from (unsafeTargetBarbie @F l)
-        r' = from (unsafeTargetBarbie @G r)
-     in unsafeUntargetBarbie @FxG $ to (gbprod l' r')
+  = let l' = from (coerceTag @F l)
+        r' = from (coerceTag @G r)
+    in coerceUntag @P $ to (gbprod @f @g l' r')
 
-gbuniqDefault
-  :: CanDeriveGenericInstance' b
-  => (forall a . f a) -> b f
+gbuniqDefault:: CanDeriveGenericInstance' b f => (forall a . f a) -> b f
 gbuniqDefault x
-  = unsafeUntargetBarbie @F $ to (gbuniq x)
+  = coerceUntag @F $ to (gbuniq x)
 
-class GProductB b where
-  gbprod
-    :: b x
-    -> Repl (Target F) (Target G) b x
-    -> Repl (Target F) (Target FxG) b x
+class Gbprod (f :: * -> *) (g :: * -> *) repbf repbg repbfg where
+  gbprod :: repbf x -> repbg x -> repbfg x
 
-  gbuniq
-    :: (forall a . f a) -> b x
+class Gbuniq f repbf where
+  gbuniq :: (forall a . f a) -> repbf x
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-instance GProductB x => GProductB (M1 i c x) where
+instance Gbprod f g repf repg repfg => Gbprod f g (M1 i c repf) (M1 i c repg) (M1 i c repfg) where
+  gbprod (M1 l) (M1 r) = M1 (gbprod @f @g l r)
   {-# INLINE gbprod #-}
-  gbprod (M1 l) (M1 r) = M1 (gbprod l r)
 
+instance Gbuniq f repbf => Gbuniq f (M1 i c repbf) where
+  gbuniq x = M1 (gbuniq @f x)
   {-# INLINE gbuniq #-}
-  gbuniq x = M1 (gbuniq x)
 
-instance GProductB U1 where
-  {-# INLINE gbprod #-}
+instance Gbprod f g U1 U1 U1 where
   gbprod U1 U1 = U1
-
-  {-# INLINE gbuniq #-}
-  gbuniq _ = U1
-
-instance(GProductB l, GProductB r) => GProductB (l :*: r) where
   {-# INLINE gbprod #-}
-  gbprod (l1 :*: l2) (r1 :*: r2)
-    = (l1 `gbprod` r1) :*: (l2 `gbprod` r2)
 
+instance Gbuniq f U1 where
+  gbuniq _ = U1
   {-# INLINE gbuniq #-}
+
+instance (Gbprod f g lf lg lfg, Gbprod f g rf rg rfg)
+  => Gbprod f g (lf :*: rf) (lg :*: rg) (lfg :*: rfg) where
+  gbprod (l1 :*: l2) (r1 :*: r2)
+    = (l1 `lprod` r1) :*: (l2 `rprod` r2)
+    where
+      lprod = gbprod @f @g
+      rprod = gbprod @f @g
+  {-# INLINE gbprod #-}
+
+instance (Gbuniq f lf, Gbuniq f rf) => Gbuniq f (lf :*: rf) where
   gbuniq x = (gbuniq x :*: gbuniq x)
+  {-# INLINE gbuniq #-}
 
 
 -- --------------------------------
 -- The interesting cases
 -- --------------------------------
 
-instance {-# OVERLAPPING #-} GProductB (K1 R (Target (W F) a)) where
+instance Gbprod f g (Rec0 (F f a)) (Rec0 (G g a)) (Rec0 (P (Product f g) a)) where
+  gbprod (K1 (Tag fa)) (K1 (Tag ga))
+    = K1 (Tag $ Pair fa ga)
   {-# INLINE gbprod #-}
-  gbprod (K1 fa) (K1 ga)
-    = let fxga = Pair (unsafeUntarget @(W F) fa) (unsafeUntarget @(W G) ga)
-      in K1 (unsafeTarget @(W FxG) fxga)
 
+instance Gbuniq f (Rec0 (F f a)) where
+  gbuniq x = K1 (Tag x)
   {-# INLINE gbuniq #-}
-  gbuniq x = K1 (unsafeTarget @(W F) x)
-
-instance {-# OVERLAPPING #-} GProductB (K1 R (Target F a)) where
-  {-# INLINE gbprod #-}
-  gbprod (K1 fa) (K1 ga)
-    = let fxga = Pair (unsafeUntarget @F fa) (unsafeUntarget @G ga)
-      in K1 (unsafeTarget @FxG fxga)
-
-  {-# INLINE gbuniq #-}
-  gbuniq x = K1 (unsafeTarget @F x)
 
 
-instance {-# OVERLAPPING #-} ProductB b => GProductB (K1 R (b (Target F))) where
-  {-# INLINE gbprod #-}
+instance
+  ( ProductB b
+  , CoercibleTag F b f
+  , CoercibleTag G b g
+  , CoercibleTag P b (Product f g)
+  ) => Gbprod f g (Rec0 (b (F f))) (Rec0 (b (G g))) (Rec0 (b (P (Product f g)))) where
   gbprod (K1 bf) (K1 bg)
-    = let bfxg = unsafeUntargetBarbie @F bf `bprod` unsafeUntargetBarbie @G bg
-      in K1 (unsafeTargetBarbie @FxG bfxg)
+    = K1 $ coerceTag @P (coerceUntag @F bf `bprod` coerceUntag @G bg)
+  {-# INLINE gbprod #-}
 
+instance (ProductB b, CoercibleTag F b f) => Gbuniq f (Rec0 (b (F f))) where
+  gbuniq x = K1 (coerceTag @F $ buniq x)
   {-# INLINE gbuniq #-}
-  gbuniq x = K1 (unsafeTargetBarbie @F (buniq x))
