@@ -12,6 +12,7 @@ module Data.Barbie.Internal.Dicts
   , requiringDict
 
   , ClassF
+  , ClassFG
   )
 
 where
@@ -36,6 +37,10 @@ instance Show (Dict c a) where
 instance Show1 (Dict c)  where
   liftShowsPrec _ _ = showsPrec
 
+-- | Turn a constrained-function into an unconstrained one
+--   that uses the packed instance dictionary instead.
+requiringDict :: (c  a => r) -> (Dict c a -> r)
+requiringDict r = \Dict -> r
 
 -- | 'ClassF' has one universal instance that makes @'ClassF' c f a@
 --   equivalent to @c (f a)@. However, we have
@@ -49,7 +54,7 @@ instance Show1 (Dict c)  where
 class c (f a) => ClassF c f a where
 instance c (f a) => ClassF c f a
 
--- | Turn a constrained-function into an unconstrained one
---   that uses the packed instance dictionary instead.
-requiringDict :: (c  a => r) -> (Dict c a -> r)
-requiringDict r = \Dict -> r
+
+-- | Like 'ClassF' but for binary relations.
+class c (f a) (g a) => ClassFG c f g a where
+instance c (f a) (g a) => ClassFG c f g a
