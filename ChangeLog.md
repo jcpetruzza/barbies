@@ -1,8 +1,16 @@
 # Changelog for barbies
 
+## 0.2.0.0
+  - Replace `ConstraintsOf` in `ConstraintsB` by `AllB`, which allows
+    constraints to be given on `a` instead of on `f a`. The `ClassF`
+    class lets us specify constraints on `f a` by doing `AllB (ClassF c f) b`.
+    `ConstraintsOf` becomes a type alias. Credit goes to Csongor Kiss.
+  - Add `bsequence'`, a frequent specialisation of `bsequence`.
+  - Add `bfoldMap`.
+
 ## 0.1.4.0
-  - Add btraverse_
-  - Add the trivial Void and Unit barbies
+  - Add `btraverse_`
+  - Add the trivial `Void` and `Unit` barbies
 
 ## 0.1.3.1
   - Fix issue on Barbie-types with strictness annotations.
@@ -20,6 +28,5 @@
 ## 0.1.0.1
   - Works under GHC 8.0.2, but notice one needs to use empty instance
     declarations, because ghc chokes on `deriving` clauses.
-
 
 ## 0.1.0.0 - Initial release
