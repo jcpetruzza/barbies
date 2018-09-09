@@ -1,9 +1,10 @@
+{-# LANGUAGE AllowAmbiguousTypes   #-}
 {-# LANGUAGE TypeFamilies          #-}
 {-# LANGUAGE UndecidableInstances  #-}
 module Data.Barbie.Internal.ProofB
   ( ProofB(..)
 
-  , CanDeriveGenericInstance, AllBMatchesGenericDeriv
+  , CanDeriveGenericInstance
   , GAllB
   , GProof
   , gbproofDefault
@@ -11,15 +12,10 @@ module Data.Barbie.Internal.ProofB
 
 where
 
-import Data.Barbie.Internal.Deprecated.Generics
-import Data.Barbie.Internal.Deprecated.Tags(P, F)
-
-import Data.Barbie.Internal.Classification (BarbieType(..), ClassifyBarbie)
 import Data.Barbie.Internal.Dicts(Dict(..))
-import Data.Barbie.Internal.Constraints hiding (CanDeriveGenericInstance, AllBMatchesGenericDeriv)
+import Data.Barbie.Internal.Constraints hiding (CanDeriveGenericInstance)
 import Data.Barbie.Internal.Product(ProductB(..))
-
-import Data.Proxy
+import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
 
 import GHC.Generics
 
@@ -30,25 +26,19 @@ import GHC.Generics
 class (ConstraintsB b, ProductB b) => ProofB b where
   bproof :: AllB c b => b (Dict c)
 
-  default bproof
-    :: ( CanDeriveGenericInstance b
-       , AllBMatchesGenericDeriv c b
-       , AllB c b
-       )
-    => b (Dict c)
+  default bproof :: (CanDeriveGenericInstance c b, AllB c b) => b (Dict c)
   bproof = gbproofDefault
+
+data P_
+type P = Tag P_
 
 -- | Every type that admits a generic instance of 'ProductB' and
 --   'ConstraintsB', has a generic instance of 'ProofB' as well.
-type CanDeriveGenericInstance b
-  = ( Generic (b (Target P))
-    , GProof (ClassifyBarbie b) b (RecRep (b (Target F)))
-    , Rep (b (Target P)) ~ Repl' (Target F) (Target P) (RecRep (b (Target F)))
-    )
-
-type AllBMatchesGenericDeriv c b
-  = ( AllB c b ~ GAllB c (RecRep (b (Target F)))
-    , AllB c b ~ ConstraintByType (ClassifyBarbie b) c (RecRep (b (Target F)))
+type CanDeriveGenericInstance c b
+  = ( Generic (b (P (Dict c)))
+    , CoercibleTag P b (Dict c)
+    , AllB c b ~ GAllB c b (P (Dict c)) (Rep (b (P (Dict c))))
+    , GProof c b (Rep (b (P (Dict c))))
     )
 
 -- ===============================================================
@@ -58,51 +48,35 @@ type AllBMatchesGenericDeriv c b
 -- | Default implementation of 'bproof' based on 'Generic'.
 gbproofDefault
   :: forall b c
-  .  ( CanDeriveGenericInstance b
-     , AllBMatchesGenericDeriv c b
+  .  ( CanDeriveGenericInstance c b
      , AllB c b
      )
   => b (Dict c)
 gbproofDefault
-  = unsafeUntargetBarbie @P $ to $ gbproof pcbf pbt pb
-  where
-    pcbf = Proxy :: Proxy (c (b f))
-    pbt  = Proxy :: Proxy (ClassifyBarbie b)
-    pb   = Proxy :: Proxy (RecRep (b (Target F)) x)
+  = coerceUntag @P $ to $ gbproof @c @b
 
 
-
-class GProof (bt :: BarbieType) b rep where
+class GProof c b repbd where
   gbproof
-    :: ( ConstraintByType bt c rep
-       , GAllB c (RecRep (b (Target F))) -- for the recursive case!
+    :: ( GAllB c b (P (Dict c)) repbd
+       , GAllB c b (P (Dict c)) (Rep (b (P (Dict c)))) -- for the recursive case
        )
-    => Proxy (c (b f))
-    -> Proxy bt
-    -> Proxy (rep x)
-    -> Repl' (Target F) (Target P) rep x
-
+    => repbd x
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-instance GProof bt b x => GProof bt b (M1 _i _c x) where
-  gbproof pcbf pbt pm1
-    = M1 (gbproof pcbf pbt (unM1 <$> pm1))
+instance GProof c b repbd => GProof c b (M1 i k repbd) where
+  gbproof = M1 (gbproof @c @b)
   {-# INLINE gbproof #-}
 
-instance GProof bt b U1 where
-  gbproof _ _ _ = U1
+instance GProof c b U1 where
+  gbproof = U1
   {-# INLINE gbproof #-}
 
-instance (GProof bt b l, GProof bt b r) => GProof bt b (l :*: r) where
-  gbproof pcbf pbt pp
-    =
-    gbproof pcbf pbt (left <$> pp) :*: gbproof pcbf pbt (right <$> pp)
-    where
-      left  (l :*: _) = l
-      right (_ :*: r) = r
+instance (GProof c b l, GProof c b r) => GProof c b (l :*: r) where
+  gbproof = gbproof @c @b @l :*: gbproof @c @b @r
   {-# INLINE gbproof #-}
 
 
@@ -110,38 +84,20 @@ instance (GProof bt b l, GProof bt b r) => GProof bt b (l :*: r) where
 -- The interesting cases
 -- --------------------------------
 
-instance {-# OVERLAPPING #-} GProof 'WearBarbie b (K1 R (NonRec (Target (W F) a))) where
-  gbproof pcbf _ _
-    = K1 $ unsafeTarget @(W P) (mkProof pcbf)
-    where
-      mkProof :: c a => Proxy (c (b f)) -> Dict c a
-      mkProof _ = Dict
+instance GProof c b (Rec0 (P (Dict c) a)) where
+  gbproof = K1 (Tag Dict)
   {-# INLINE gbproof #-}
 
-instance {-# OVERLAPPING #-} GProof 'NonWearBarbie b (K1 R (NonRec (Target F a))) where
-  gbproof pcbf _ _
-    = K1 $ unsafeTarget @P (mkProof pcbf)
-    where
-      mkProof :: c a => Proxy (c (b f)) -> Dict c a
-      mkProof _ = Dict
-  {-# INLINE gbproof #-}
+instance
+  ( Generic (b (P (Dict c)))
+  , GProof c b (Rep  (b (P (Dict c))))
+  ) => GProof c b (Rec0 (b (P (Dict c)))) where
+  gbproof = K1 $ to $ gbproof @c @b
 
-instance {-# OVERLAPPING #-}
-  ( CanDeriveGenericInstance b
-  , bt ~ ClassifyBarbie b
-  )
-    => GProof bt b (K1 R (RecUsage (b (Target F)))) where
-  gbproof pcbf pbt _
-    = K1 $ to $ gbproof pcbf pbt pr
-      where
-        pr = Proxy :: Proxy (RecRep (b (Target F)) x)
-  {-# INLINE gbproof #-}
 
-instance {-# OVERLAPPING #-}
-  ProofB b' => GProof bt b (K1 R (NonRec (b' (Target F)))) where
-  gbproof pcbf _ _
-    = K1 $ unsafeTargetBarbie @P (proof' pcbf)
-    where
-      proof' :: AllB c b' => Proxy (c (b f)) -> b' (Dict c)
-      proof' _ = bproof
-  {-# INLINE gbproof #-}
+instance {-# OVERLAPPABLE #-}
+  ( ProofB b'
+  , AllB c b'
+  , CoercibleTag P b' (Dict c)
+  ) => GProof c b (Rec0 (b' (P (Dict c)))) where
+  gbproof = K1 $ coerceTag @P (bproof @b')
