@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeApplications    #-}
 import Test.Tasty (defaultMain, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 

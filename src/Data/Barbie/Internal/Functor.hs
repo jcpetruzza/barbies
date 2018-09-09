@@ -1,13 +1,4 @@
-{-# LANGUAGE ConstraintKinds     #-}
-{-# LANGUAGE DefaultSignatures   #-}
-{-# LANGUAGE DeriveGeneric       #-}
-{-# LANGUAGE FlexibleContexts    #-}
-{-# LANGUAGE FlexibleInstances   #-}
-{-# LANGUAGE LambdaCase          #-}
-{-# LANGUAGE Rank2Types          #-}
-{-# LANGUAGE TypeApplications    #-}
 {-# LANGUAGE TypeFamilies        #-}
-{-# LANGUAGE TypeOperators       #-}
 module Data.Barbie.Internal.Functor
   ( FunctorB(..)
 

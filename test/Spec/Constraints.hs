@@ -1,5 +1,4 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 module Spec.Constraints
   ( lawAdjProofPrj
   , lawProofEquivPrj

@@ -1,12 +1,4 @@
-{-# LANGUAGE ConstraintKinds    #-}
-{-# LANGUAGE DefaultSignatures  #-}
-{-# LANGUAGE FlexibleContexts   #-}
-{-# LANGUAGE FlexibleInstances  #-}
-{-# LANGUAGE LambdaCase         #-}
-{-# LANGUAGE Rank2Types         #-}
 {-# LANGUAGE TypeFamilies       #-}
-{-# LANGUAGE TypeApplications   #-}
-{-# LANGUAGE TypeOperators      #-}
 module Data.Barbie.Internal.Bare
   ( Wear, Bare
   , BareB(..)

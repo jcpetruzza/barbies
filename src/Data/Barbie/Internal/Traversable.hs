@@ -2,15 +2,7 @@
 -- |
 -- Module      :  Data.Barbie.Internal.Functor
 ----------------------------------------------------------------------------
-{-# LANGUAGE ConstraintKinds    #-}
-{-# LANGUAGE DefaultSignatures  #-}
-{-# LANGUAGE FlexibleContexts   #-}
-{-# LANGUAGE FlexibleInstances  #-}
-{-# LANGUAGE LambdaCase         #-}
-{-# LANGUAGE Rank2Types         #-}
-{-# LANGUAGE TypeApplications   #-}
 {-# LANGUAGE TypeFamilies       #-}
-{-# LANGUAGE TypeOperators      #-}
 module Data.Barbie.Internal.Traversable
   ( TraversableB(..)
   , btraverse_

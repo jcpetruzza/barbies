@@ -1,7 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable         #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase                 #-}
-{-# LANGUAGE Rank2Types                 #-}
 module Clothes
 
 where

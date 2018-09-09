@@ -1,6 +1,4 @@
-{-# LANGUAGE DataKinds            #-}
 {-# LANGUAGE TypeFamilies         #-}
-{-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.Classification
   ( BarbieType(..)

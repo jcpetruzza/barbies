@@ -1,8 +1,3 @@
-{-# LANGUAGE EmptyCase            #-}
-{-# LANGUAGE DeriveGeneric        #-}
-{-# LANGUAGE DeriveDataTypeable   #-}
-{-# LANGUAGE KindSignatures       #-}
-{-# LANGUAGE StandaloneDeriving   #-}
 module Data.Barbie.Trivial
   ( Void
   , Unit (..)

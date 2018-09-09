@@ -1,8 +1,4 @@
 {-# LANGUAGE DeriveAnyClass       #-}
-{-# LANGUAGE DeriveGeneric        #-}
-{-# LANGUAGE DeriveDataTypeable   #-}
-{-# LANGUAGE KindSignatures       #-}
-{-# LANGUAGE StandaloneDeriving   #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
 module BarbiesW

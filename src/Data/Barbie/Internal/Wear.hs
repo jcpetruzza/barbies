@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleInstances      #-}
-{-# LANGUAGE MultiParamTypeClasses  #-}
 {-# LANGUAGE TypeFamilies           #-}
 module Data.Barbie.Internal.Wear
   ( Bare, Wear

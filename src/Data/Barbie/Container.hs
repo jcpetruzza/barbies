@@ -6,8 +6,6 @@
 -- @('Const' a)@ . The 'Container' wrapper gives us the expected
 -- instances for a container type.
 ----------------------------------------------------------------------------
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Container
   (
@@ -54,7 +52,7 @@ instance ProductB b => Applicative (Container b) where
     l <*> r
       = Container $ bmap (uncurryn appConst) (getContainer l /*/ getContainer r)
       where
-        appConst :: Const (a -> b) x -> Const a x -> Const b x
+        appConst :: Const (a -> a') x -> Const a x -> Const a' x
         appConst (Const f) (Const a)
           = Const (f a)
 

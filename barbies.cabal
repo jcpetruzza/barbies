@@ -55,7 +55,24 @@ library
   ghc-options: -Wall -Wnoncanonical-monoid-instances
 
   default-language: Haskell2010
-
+  default-extensions:
+      ConstraintKinds
+    , DataKinds
+    , DefaultSignatures
+    , DeriveGeneric
+    , DeriveDataTypeable
+    , EmptyCase
+    , ExplicitForAll
+    , FlexibleContexts
+    , FlexibleInstances
+    , KindSignatures
+    , LambdaCase
+    , MultiParamTypeClasses
+    , Rank2Types
+    , ScopedTypeVariables
+    , StandaloneDeriving
+    , TypeApplications
+    , TypeOperators
 
 test-suite barbies-test
   type: exitcode-stdio-1.0
@@ -87,3 +104,12 @@ test-suite barbies-test
     , tasty-quickcheck
 
   default-language: Haskell2010
+  default-extensions:
+    DeriveDataTypeable
+    DeriveGeneric
+    KindSignatures
+    LambdaCase
+    Rank2Types
+    ScopedTypeVariables
+    StandaloneDeriving
+    TypeApplications

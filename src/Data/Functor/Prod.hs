@@ -15,15 +15,9 @@
 --     ⋮
 -- @
 ----------------------------------------------------------------------------
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
 module Data.Functor.Prod
   ( -- * n-tuples of functors.
     Prod(Unit, Cons)

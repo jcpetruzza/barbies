@@ -8,9 +8,7 @@
 -- a @b f@ into a @b 'Target'@, operate on the representation of this type,
 -- and finally coerce back to the desired type.
 ----------------------------------------------------------------------------
-{-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE TypeFamilies  #-}
-{-# LANGUAGE TypeOperators #-}
 module Data.Barbie.Internal.Generics
   ( Target (..)
   , unsafeTargetBarbie
