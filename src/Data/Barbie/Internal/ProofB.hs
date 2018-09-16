@@ -3,6 +3,9 @@
 {-# LANGUAGE UndecidableInstances  #-}
 module Data.Barbie.Internal.ProofB
   ( ProofB(..)
+  , buniqC
+  , bmempty
+
 
   , CanDeriveGenericInstance
   , GAllB
@@ -12,8 +15,9 @@ module Data.Barbie.Internal.ProofB
 
 where
 
-import Data.Barbie.Internal.Dicts(Dict(..))
 import Data.Barbie.Internal.Constraints hiding (CanDeriveGenericInstance)
+import Data.Barbie.Internal.Dicts(ClassF, Dict(..), requiringDict)
+import Data.Barbie.Internal.Functor(bmap)
 import Data.Barbie.Internal.Product(ProductB(..))
 import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
 
@@ -40,6 +44,17 @@ type CanDeriveGenericInstance c b
     , AllB c b ~ GAllB c b (P (Dict c)) (Rep (b (P (Dict c))))
     , GProof c b (Rep (b (P (Dict c))))
     )
+
+-- | Like 'buniq' but an constraint is allowed to be required on
+--   each element of @b@.
+buniqC :: forall c f b . (AllB c b, ProofB b) => (forall a . c a => f a) -> b f
+buniqC x
+  = bmap (requiringDict @c x) bproof
+
+-- | Builds a @b f@, bu applying 'mempty' on every field of @b@.
+bmempty :: forall f b . (AllB (ClassF Monoid f) b, ProofB b) => b f
+bmempty
+  = buniqC @(ClassF Monoid f) mempty
 
 -- ===============================================================
 --  Generic derivations

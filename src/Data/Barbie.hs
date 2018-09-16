@@ -95,6 +95,8 @@ module Data.Barbie
   , ClassFG
   , NotBare
   , ProofB(bproof)
+  , buniqC
+  , bmempty
 
     -- * Wrapper
   , Barbie(..)
@@ -114,7 +116,7 @@ import Data.Barbie.Internal.Constraints(ConstraintsB(..), ConstraintsOf)
 import Data.Barbie.Internal.Dicts(ClassF, ClassFG)
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Instances(Barbie(..))
-import Data.Barbie.Internal.ProofB(ProofB(..))
+import Data.Barbie.Internal.ProofB(ProofB(..), buniqC, bmempty)
 import Data.Barbie.Internal.Product
   ( ProductB(..)
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4

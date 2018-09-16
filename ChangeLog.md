@@ -7,6 +7,7 @@
     `ConstraintsOf` becomes a type alias. Credit goes to Csongor Kiss.
   - Add `bsequence'`, a frequent specialisation of `bsequence`.
   - Add `bfoldMap`.
+  - Add `buniqC` and `bmempty`.
   - Improve the instance derivation mechanism. For barbie-types without `Wear`,
     the code should be indistinguishible from hand-written instances
     (not currently verified).

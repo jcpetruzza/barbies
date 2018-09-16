@@ -36,9 +36,5 @@ instance (ProofB b, AllB (ClassF Semigroup f) b) => Semigroup (Barbie b f) where
       mk = requiringDict (<>)
 
 instance (ProofB b, AllB (ClassF Semigroup f) b, AllB (ClassF Monoid f) b) => Monoid (Barbie b f) where
-  mempty = bmap mk bproof
-    where
-      mk :: Dict (ClassF Monoid f) a -> f a
-      mk = requiringDict mempty
-
+  mempty  = bmempty
   mappend = (<>)
