@@ -47,6 +47,8 @@ library
       Data.Barbie.Internal.Wear
       Data.Barbie.Trivial
 
+      Data.Generics.GenericN
+
   hs-source-dirs:
       src
 
