@@ -31,7 +31,7 @@ import GHC.Generics
 import GHC.TypeLits
 import Data.Coerce
 
-type family Param :: Nat -> k where
+data Param (n :: Nat) (a :: k)
 
 type family Indexed (t :: k) (i :: Nat) :: k where
   Indexed (t a) i = Indexed t (i + 1) (Param i)
