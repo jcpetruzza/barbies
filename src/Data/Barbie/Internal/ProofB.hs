@@ -6,8 +6,7 @@ module Data.Barbie.Internal.ProofB
   , buniqC
   , bmempty
 
-
-  , CanDeriveGenericInstance
+  , CanDeriveProofB
   , GAllB
   , GProof
   , gbproofDefault
@@ -15,12 +14,12 @@ module Data.Barbie.Internal.ProofB
 
 where
 
-import Data.Barbie.Internal.Constraints hiding (CanDeriveGenericInstance)
+import Data.Barbie.Internal.Constraints
 import Data.Barbie.Internal.Dicts(ClassF, Dict(..), requiringDict)
 import Data.Barbie.Internal.Functor(bmap)
 import Data.Barbie.Internal.Product(ProductB(..))
-import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
 
+import Data.Generics.GenericN (GenericN(..), toN, Rec(..), Param)
 import GHC.Generics
 
 -- | Barbie-types with products have a canonical proof of instance.
@@ -30,19 +29,15 @@ import GHC.Generics
 class (ConstraintsB b, ProductB b) => ProofB b where
   bproof :: AllB c b => b (Dict c)
 
-  default bproof :: (CanDeriveGenericInstance c b, AllB c b) => b (Dict c)
+  default bproof :: (CanDeriveProofB c b, AllB c b) => b (Dict c)
   bproof = gbproofDefault
-
-data P_
-type P = Tag P_
 
 -- | Every type that admits a generic instance of 'ProductB' and
 --   'ConstraintsB', has a generic instance of 'ProofB' as well.
-type CanDeriveGenericInstance c b
-  = ( Generic (b (P (Dict c)))
-    , CoercibleTag P b (Dict c)
-    , AllB c b ~ GAllB c b (P (Dict c)) (Rep (b (P (Dict c))))
-    , GProof c b (Rep (b (P (Dict c))))
+type CanDeriveProofB c b
+  = ( GenericN (b (Dict c))
+    , AllB c b ~ GAllB c b (Dict c) (RepN (b (Dict c)))
+    , GProof c b (RepN (b (Dict c)))
     )
 
 -- | Like 'buniq' but an constraint is allowed to be required on
@@ -63,18 +58,19 @@ bmempty
 -- | Default implementation of 'bproof' based on 'Generic'.
 gbproofDefault
   :: forall b c
-  .  ( CanDeriveGenericInstance c b
+  .  ( CanDeriveProofB c b
      , AllB c b
      )
   => b (Dict c)
 gbproofDefault
-  = coerceUntag @P $ to $ gbproof @c @b
+  = toN $ gbproof @c @b
+{-# INLINE gbproofDefault #-}
 
 
 class GProof c b repbd where
   gbproof
-    :: ( GAllB c b (P (Dict c)) repbd
-       , GAllB c b (P (Dict c)) (Rep (b (P (Dict c)))) -- for the recursive case
+    :: ( GAllB c b (Dict c) repbd
+       , GAllB c b (Dict c) (RepN (b (Dict c))) -- for the recursive case
        )
     => repbd x
 
@@ -99,20 +95,12 @@ instance (GProof c b l, GProof c b r) => GProof c b (l :*: r) where
 -- The interesting cases
 -- --------------------------------
 
-instance GProof c b (Rec0 (P (Dict c) a)) where
-  gbproof = K1 (Tag Dict)
+type P = Param 0
+
+instance GProof c b (Rec (P (Dict c) a) (Dict c a)) where
+  gbproof = Rec (K1 Dict)
   {-# INLINE gbproof #-}
 
-instance
-  ( Generic (b (P (Dict c)))
-  , GProof c b (Rep  (b (P (Dict c))))
-  ) => GProof c b (Rec0 (b (P (Dict c)))) where
-  gbproof = K1 $ to $ gbproof @c @b
-
-
-instance {-# OVERLAPPABLE #-}
-  ( ProofB b'
-  , AllB c b'
-  , CoercibleTag P b' (Dict c)
-  ) => GProof c b (Rec0 (b' (P (Dict c)))) where
-  gbproof = K1 $ coerceTag @P (bproof @b')
+instance (ProofB b', AllB c b')
+  => GProof c b (Rec (b' (P (Dict c))) (b' (Dict c))) where
+  gbproof = Rec $ K1 $ bproof @b'

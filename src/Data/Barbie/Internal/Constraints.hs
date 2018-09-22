@@ -5,7 +5,7 @@ module Data.Barbie.Internal.Constraints
   ( ConstraintsB(..)
   , ConstraintsOf
 
-  , CanDeriveGenericInstance
+  , CanDeriveConstraintsB
   , GAllBC
   , GAllB
   , GAdjProof
@@ -16,12 +16,11 @@ where
 
 import Data.Barbie.Internal.Dicts(ClassF, Dict(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
-import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
-import Data.Barbie.Internal.Deprecated.Wear
 
 import Data.Functor.Product(Product(..))
 import Data.Kind(Constraint)
 
+import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
 import GHC.Generics
 
 
@@ -60,14 +59,14 @@ class FunctorB b => ConstraintsB b where
   --
   -- For requiring constraints of the form @c (f a)@, see 'ConstraintsOf'.
   type AllB (c :: * -> Constraint) b :: Constraint
-  type AllB c b = GAllB c b (F X) (Rep (b (F X)))
+  type AllB c b = GAllB c b X (RepN (b X))
 
   -- | Adjoint a proof-of-instance to a barbie-type.
   adjProof :: forall c f.  AllB c b => b f -> b (Product (Dict c) f)
 
   default adjProof
     :: forall c f
-    .  ( CanDeriveGenericInstance c b f
+    .  ( CanDeriveConstraintsB c b f
        , AllB c b
        )
     => b f -> b (Product (Dict c) f)
@@ -84,15 +83,9 @@ class FunctorB b => ConstraintsB b where
 --        , 'Wear' f 'Int' ~ f 'Int'
 --        )
 --   @
-type ConstraintsOf c f b = (AllB (ClassF c f) b, AllB (NotBare f) b)
+type ConstraintsOf c f b = AllB (ClassF c f) b
 
 data X a
-
-data F_
-data P_
-
-type F = Tag F_
-type P = Tag P_
 
 -- | Intuivively, the requirements to have @'ConstraintsB' B@ derived are:
 --
@@ -100,13 +93,11 @@ type P = Tag P_
 --
 --     * If @f@ is used as argument to some type in the definition of @B@, it
 --       is only on a Barbie-type with a 'ConstraintsB' instance.
-type CanDeriveGenericInstance c b f
-  = ( Generic (b (F f))
-    , Generic (b (P (Product (Dict c) f)))
-    , CoercibleTag F b f
-    , CoercibleTag P b (Product (Dict c) f)
-    , AllB c b ~ GAllB c b (F f) (Rep (b (F f)))
-    , GAdjProof c b f (Rep (b (F f))) (Rep (b (P (Product (Dict c) f))))
+type CanDeriveConstraintsB c b f
+  = ( GenericN (b f)
+    , GenericN (b (Dict c `Product` f))
+    , AllB c b ~ GAllB c b f (RepN (b f))
+    , GAdjProof c b f (RepN (b f)) (RepN (b (Dict c `Product` f)))
     )
 
 
@@ -117,16 +108,13 @@ type CanDeriveGenericInstance c b f
 -- | Default implementation of 'adjProof' based on 'Generic'.
 gadjProofDefault
   :: forall b c f
-  . ( CanDeriveGenericInstance c b f
+  . ( CanDeriveConstraintsB c b f
     , AllB c b
     )
-  => b f -> b (Product (Dict c) f)
+  => b f -> b (Dict c `Product` f)
 gadjProofDefault
-  = coerceUntag @P
-      . to
-      . gadjProof @c @b @f
-      . from
-      . coerceTag @F
+  = toN . gadjProof @c @b @f . fromN
+{-# INLINE gadjProofDefault #-}
 
 
 class GAllBC (b :: (* -> *) -> *) (repbf :: * -> *) where
@@ -134,8 +122,8 @@ class GAllBC (b :: (* -> *) -> *) (repbf :: * -> *) where
 
 class GAllBC b repbf => GAdjProof c b f repbf repbdf where
   gadjProof
-    :: ( GAllB c b (F f) repbf
-       , GAllB c b (F f) (Rep (b (F f))) -- for the recursive case
+    :: ( GAllB c b f repbf
+       , GAllB c b f (RepN (b f)) -- for the recursive case
        )
     => repbf x -> repbdf x
 
@@ -192,48 +180,34 @@ instance (GAdjProof c b f l l', GAdjProof c b f r r') => GAdjProof c b f (l :+: 
 -- The interesting cases
 -- --------------------------------
 
-instance GAllBC b (Rec0 a) where
-  type GAllB c b f (Rec0 a) = GAllB_Rec0 c b f a
+instance GAllBC b (Rec p a) where
+  type GAllB c b f (Rec p a) = GAllB_Rec c b f a
 
-type family GAllB_Rec0 c b f a :: Constraint where
-  GAllB_Rec0 c b f (f a)  = c a
-  GAllB_Rec0 c b f (b  f) = () -- break recursion
-  GAllB_Rec0 c b f (b' f) = AllB c b'
-  GAllB_Rec0 c b f a      = ()
+type family GAllB_Rec c b f a :: Constraint where
+  GAllB_Rec c b f (f a)  = c a
+  GAllB_Rec c b f (b  f) = () -- break recursion
+  GAllB_Rec c b f (b' f) = AllB c b'
+  GAllB_Rec c b f a      = ()
 
+type P = Param 0
 
-instance GAdjProof c b f (Rec0 (F f a)) (Rec0 (P (Product (Dict c) f) a)) where
+instance GAdjProof c b f (Rec (P f a) (f a))
+                         (Rec (P (Dict c `Product` f) a) ((Dict c `Product` f) a)) where
   gadjProof
-    = K1 . Tag . Pair Dict . unTag . unK1
+    = Rec . K1 . Pair Dict . unK1 . unRec
   {-# INLINE gadjProof #-}
 
 
 instance
-  ( Generic (b (F f))
-  , Generic (b (P (Product (Dict c) f)))
-  , GAdjProof c b f (Rep (b (F f)))
-                    (Rep (b (P (Product (Dict c) f))))
-  )
-  => GAdjProof c b f (Rec0 (b (F f)))
-                     (Rec0 (b (P (Product (Dict c) f)))) where
-  gadjProof
-    = K1 . to . gadjProof @c @b @f . from . unK1
-  {-# INLINE gadjProof #-}
-
-
-instance {-# OVERLAPPABLE #-}
   ( ConstraintsB b'
   , AllB c b'
-  , CoercibleTag F b' f
-  , CoercibleTag P b' (Product (Dict c) f)
-  )
-    => GAdjProof c b f (Rec0 (b' (F f)))
-                       (Rec0 (b' (P (Product (Dict c) f)))) where
+  ) => GAdjProof c b f (Rec (b' (P f)) (b' f))
+                       (Rec (b' (P (Dict c `Product` f))) (b' (Dict c `Product` f))) where
   gadjProof
-    = K1 . coerceTag @P . adjProof . coerceUntag @F . unK1
+    = Rec . K1 . adjProof . unK1 . unRec
   {-# INLINE gadjProof #-}
 
 
-instance {-# OVERLAPPABLE #-} a ~ a' => GAdjProof c b f (Rec0 a) (Rec0 a') where
+instance a ~ a' => GAdjProof c b f (Rec a a) (Rec a' a') where
   gadjProof = id
   {-# INLINE gadjProof #-}

@@ -46,7 +46,6 @@ instance TraversableB Record0
 instance ProductB Record0
 instance ConstraintsB Record0
 instance ProofB Record0
-instance BareB Record0
 
 instance Arbitrary (Record0 f) where arbitrary = pure Record0
 
@@ -62,10 +61,10 @@ instance ProductB Record1
 instance ConstraintsB Record1
 instance ProofB Record1
 
-deriving instance ConstraintsOf Show f Record1 => Show (Record1 f)
-deriving instance ConstraintsOf Eq   f Record1 => Eq   (Record1 f)
+deriving instance AllB (ClassF Show f) Record1 => Show (Record1 f)
+deriving instance AllB (ClassF Eq   f) Record1 => Eq   (Record1 f)
 
-instance ConstraintsOf Arbitrary f Record1 => Arbitrary (Record1 f) where
+instance AllB (ClassF Arbitrary f) Record1 => Arbitrary (Record1 f) where
   arbitrary = Record1 <$> arbitrary
 
 
@@ -80,10 +79,10 @@ instance ProductB Record1S
 instance ConstraintsB Record1S
 instance ProofB Record1S
 
-deriving instance ConstraintsOf Show f Record1S => Show (Record1S f)
-deriving instance ConstraintsOf Eq   f Record1S => Eq   (Record1S f)
+deriving instance AllB (ClassF Show f) Record1S => Show (Record1S f)
+deriving instance AllB (ClassF Eq   f) Record1S => Eq   (Record1S f)
 
-instance ConstraintsOf Arbitrary f Record1S => Arbitrary (Record1S f) where
+instance AllB (ClassF Arbitrary f) Record1S => Arbitrary (Record1S f) where
   arbitrary = Record1S <$> arbitrary
 
 
@@ -102,10 +101,10 @@ instance ProductB Record3
 instance ConstraintsB Record3
 instance ProofB Record3
 
-deriving instance ConstraintsOf Show f Record3 => Show (Record3 f)
-deriving instance ConstraintsOf Eq   f Record3 => Eq   (Record3 f)
+deriving instance AllB (ClassF Show f) Record3 => Show (Record3 f)
+deriving instance AllB (ClassF Eq   f) Record3 => Eq   (Record3 f)
 
-instance ConstraintsOf Arbitrary f Record3 => Arbitrary (Record3 f) where
+instance AllB (ClassF Arbitrary f) Record3 => Arbitrary (Record3 f) where
   arbitrary = Record3 <$> arbitrary <*> arbitrary <*> arbitrary
 
 data Record3S f
@@ -123,10 +122,10 @@ instance ProductB Record3S
 instance ConstraintsB Record3S
 instance ProofB Record3S
 
-deriving instance ConstraintsOf Show f Record3S => Show (Record3S f)
-deriving instance ConstraintsOf Eq   f Record3S => Eq   (Record3S f)
+deriving instance AllB (ClassF Show f) Record3S => Show (Record3S f)
+deriving instance AllB (ClassF Eq   f) Record3S => Eq   (Record3S f)
 
-instance ConstraintsOf Arbitrary f Record3S => Arbitrary (Record3S f) where
+instance AllB (ClassF Arbitrary f) Record3S => Arbitrary (Record3S f) where
   arbitrary = Record3S <$> arbitrary <*> arbitrary <*> arbitrary
 
 
@@ -159,10 +158,10 @@ instance FunctorB Sum3
 instance TraversableB Sum3
 instance ConstraintsB Sum3
 
-deriving instance ConstraintsOf Show f Sum3 => Show (Sum3 f)
-deriving instance ConstraintsOf Eq   f Sum3 => Eq   (Sum3 f)
+deriving instance AllB (ClassF Show f) Sum3 => Show (Sum3 f)
+deriving instance AllB (ClassF Eq   f) Sum3 => Eq   (Sum3 f)
 
-instance ConstraintsOf Arbitrary f Sum3 => Arbitrary (Sum3 f) where
+instance AllB (ClassF Arbitrary f) Sum3 => Arbitrary (Sum3 f) where
   arbitrary
     = oneof
         [ pure Sum3_0
@@ -189,10 +188,10 @@ instance ProductB CompositeRecord
 instance ConstraintsB CompositeRecord
 instance ProofB CompositeRecord
 
-deriving instance ConstraintsOf Show f CompositeRecord => Show (CompositeRecord f)
-deriving instance ConstraintsOf Eq   f CompositeRecord => Eq   (CompositeRecord f)
+deriving instance AllB (ClassF Show f) CompositeRecord => Show (CompositeRecord f)
+deriving instance AllB (ClassF Eq   f) CompositeRecord => Eq   (CompositeRecord f)
 
-instance ConstraintsOf Arbitrary f CompositeRecord => Arbitrary (CompositeRecord f) where
+instance AllB (ClassF Arbitrary f) CompositeRecord => Arbitrary (CompositeRecord f) where
   arbitrary
     = CompositeRecord <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
@@ -206,10 +205,10 @@ instance FunctorB SumRec
 instance TraversableB SumRec
 instance ConstraintsB SumRec
 
-deriving instance ConstraintsOf Show f SumRec => Show (SumRec f)
-deriving instance ConstraintsOf Eq   f SumRec => Eq   (SumRec f)
+deriving instance AllB (ClassF Show f) SumRec => Show (SumRec f)
+deriving instance AllB (ClassF Eq   f) SumRec => Eq   (SumRec f)
 
-instance ConstraintsOf Arbitrary f SumRec => Arbitrary (SumRec f) where
+instance AllB (ClassF Arbitrary f) SumRec => Arbitrary (SumRec f) where
   arbitrary
     = oneof
         [ pure SumRec_0
@@ -227,8 +226,8 @@ instance ProductB InfRec
 instance ConstraintsB InfRec
 instance ProofB InfRec
 
-deriving instance ConstraintsOf Show f InfRec => Show (InfRec f)
-deriving instance ConstraintsOf Eq   f InfRec => Eq   (InfRec f)
+deriving instance AllB (ClassF Show f) InfRec => Show (InfRec f)
+deriving instance AllB (ClassF Eq   f) InfRec => Eq   (InfRec f)
 
 -----------------------------------------------------
 -- Nested under functors
@@ -249,5 +248,5 @@ instance TraversableB NestedF
 deriving instance (Show (f Int), Show (Record3 f), Show (Sum3 f)) => Show (NestedF f)
 deriving instance (Eq   (f Int), Eq   (Record3 f), Eq   (Sum3 f)) => Eq   (NestedF f)
 
-instance (Arbitrary (f Int), ConstraintsOf Arbitrary f Record3, ConstraintsOf Arbitrary f Sum3) => Arbitrary (NestedF f) where
+instance (Arbitrary (f Int), AllB (ClassF Arbitrary f) Record3, AllB (ClassF Arbitrary f) Sum3) => Arbitrary (NestedF f) where
   arbitrary = NestedF <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary

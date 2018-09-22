@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeFamilies       #-}
 module Data.Barbie.Internal.Bare
-  ( Wear, Bare
+  ( Wear, Bare, Covered
   , BareB(..)
   , bstripFrom, bcoverWith
 
@@ -8,18 +8,18 @@ module Data.Barbie.Internal.Bare
   , gbstripDefault
   , gbcoverDefault
 
-  , CanDeriveGenericInstance
+  , CanDeriveBareB
   )
 
 where
 
 import Data.Barbie.Internal.Functor (FunctorB(..))
-import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
-import Data.Barbie.Internal.Deprecated.Wear
+import Data.Barbie.Internal.Wear(Bare, Covered, Wear)
 import Data.Functor.Identity (Identity(..))
 
-import GHC.Generics
 import Data.Coerce (coerce)
+import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
+import GHC.Generics
 
 
 -- | Class of Barbie-types defined using 'Wear' and can therefore
@@ -29,50 +29,47 @@ import Data.Coerce (coerce)
 -- 'bcover' . 'bstrip' = 'id'
 -- 'bstrip' . 'bcover' = 'id'
 -- @
-class FunctorB b => BareB b where
-    bstrip :: b Identity -> b Bare
-    bcover :: b Bare -> b Identity
+class FunctorB (b Covered) => BareB b where
+    bstrip :: b Covered Identity -> b Bare Identity
+    bcover :: b Bare Identity -> b Covered Identity
 
-    default bstrip :: CanDeriveGenericInstance b => b Identity -> b Bare
+    default bstrip :: CanDeriveBareB b => b Covered Identity -> b Bare Identity
     bstrip = gbstripDefault
 
-    default bcover :: CanDeriveGenericInstance b => b Bare -> b Identity
+    default bcover :: CanDeriveBareB b => b Bare Identity -> b Covered Identity
     bcover = gbcoverDefault
 
 -- | Generalization of 'bstrip' to arbitrary functors
-bstripFrom :: BareB b => (forall a . f a -> a) -> b f -> b Bare
+bstripFrom :: BareB b => (forall a . f a -> a) -> b Covered f -> b Bare Identity
 bstripFrom f
   = bstrip . bmap (Identity . f)
 
 -- | Generalization of 'bcover' to arbitrary functors
-bcoverWith :: BareB b => (forall a . a -> f a) -> b Bare -> b f
+bcoverWith :: BareB b => (forall a . a -> f a) -> b Bare Identity -> b Covered f
 bcoverWith f
   = bmap (f . runIdentity) . bcover
 
 
-data I_
-
-type I = Tag I_
-
 -- | All types that admit a generic FunctorB' instance, and have all
 --   their occurrences of 'f' under a 'Wear' admit a generic 'BareB'
 --   instance.
-type CanDeriveGenericInstance b
-  = ( Generic (b (I Identity))
-    , Generic (b Bare)
-    , CoercibleTag I b Identity
-    , GBareB (Rep (b (I Identity))) (Rep (b Bare))
+type CanDeriveBareB b
+  = ( GenericN (b Bare Identity)
+    , GenericN (b Covered Identity)
+    , GBareB (RepN (b Covered Identity)) (RepN (b Bare Identity))
     )
 
--- | Default implementatio of 'bstrip' based on 'Generic'.
-gbstripDefault :: CanDeriveGenericInstance b => b Identity -> b Bare
+-- | Default implementation of 'bstrip' based on 'Generic'.
+gbstripDefault :: CanDeriveBareB b => b Covered Identity -> b Bare Identity
 gbstripDefault
-  = to . gbstrip . from . coerceTag @I
+  = toN . gbstrip . fromN
+{-# INLINE gbstripDefault #-}
 
--- | Default implementatio of 'bstrip' based on 'Generic'.
-gbcoverDefault :: CanDeriveGenericInstance b => b Bare -> b Identity
+-- | Default implementation of 'bstrip' based on 'Generic'.
+gbcoverDefault :: CanDeriveBareB b => b Bare Identity -> b Covered Identity
 gbcoverDefault
-  = coerceUntag @I . to . gbcover . from
+  = toN . gbcover . fromN
+{-# INLINE gbcoverDefault #-}
 
 
 class GBareB repbi repbb where
@@ -126,7 +123,9 @@ instance (GBareB l l', GBareB r r') => GBareB (l :+: r) (l' :+: r') where
 -- -- The interesting cases
 -- -- --------------------------------
 
-instance GBareB (Rec0 (I Identity a)) (Rec0 a) where
+type P = Param 0
+
+instance GBareB (Rec (P Identity a) (Identity a)) (Rec a a) where
   gbstrip = coerce
   {-# INLINE gbstrip #-}
 
@@ -134,25 +133,26 @@ instance GBareB (Rec0 (I Identity a)) (Rec0 a) where
   {-# INLINE gbcover #-}
 
 
-instance (BareB b, CoercibleTag I b Identity) => GBareB (Rec0 (b (I Identity))) (Rec0 (b Bare)) where
-  gbstrip = K1 . bstrip . coerceUntag @I . unK1
+instance BareB b => GBareB (Rec (b Covered (P Identity)) (b Covered Identity))
+                           (Rec (b Bare    (P Identity)) (b Bare    Identity)) where
+  gbstrip = Rec . K1 . bstrip . unK1 . unRec
   {-# INLINE gbstrip #-}
 
-  gbcover = K1 . coerceTag @I . bcover . unK1
+  gbcover = Rec . K1 .  bcover . unK1 . unRec
   {-# INLINE gbcover #-}
 
 
-instance
-  (Functor h, BareB b, CoercibleTag I b Identity)
-    => GBareB (Rec0 (h (b (I Identity)))) (Rec0 (h (b Bare))) where
-  gbstrip = K1 . fmap (bstrip . coerceUntag @I) . unK1
+instance (Functor h, BareB b)
+    => GBareB (Rec (h (b Covered (P Identity))) (h (b Covered Identity)))
+              (Rec (h (b Bare    (P Identity))) (h (b Bare    Identity))) where
+  gbstrip = Rec . K1 . fmap bstrip . unK1 . unRec
   {-# INLINE gbstrip #-}
 
-  gbcover = K1 . fmap (coerceTag @I . bcover) . unK1
+  gbcover = Rec . K1 . fmap bcover . unK1 . unRec
   {-# INLINE gbcover #-}
 
 
-instance {-# OVERLAPPABLE #-} repbi ~ repbb => GBareB (Rec0 repbi) (Rec0 repbb) where
+instance repbi ~ repbb => GBareB (Rec repbi repbi) (Rec repbb repbb) where
   gbstrip = id
   {-# INLINE gbstrip #-}
 

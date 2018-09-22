@@ -4,12 +4,12 @@ module Data.Barbie.Internal.Functor
 
   , GFunctorB
   , gbmapDefault
-  , CanDeriveGenericInstance
+  , CanDeriveFunctorB
   )
 
 where
 
-import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
+import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
 
 import GHC.Generics
 
@@ -28,15 +28,9 @@ class FunctorB b where
 
   default bmap
     :: forall f g
-    .  CanDeriveGenericInstance b f g
+    .  CanDeriveFunctorB b f g
     => (forall a . f a -> g a) -> b f -> b g
   bmap = gbmapDefault
-
-data F_
-data G_
-
-type F = Tag F_
-type G = Tag G_
 
 -- | Intuivively, the requirements to have @'FunctorB' B@ derived are:
 --
@@ -47,24 +41,19 @@ type G = Tag G_
 --
 --     * Recursive usages of @B f@ are allowed to appear as argument to a
 --       'Functor' (e.g. @'Maybe' (B f)')
-type CanDeriveGenericInstance b f g
-  = ( Generic (b (F f))
-    , Generic (b (G g))
-    , CoercibleTag F b f
-    , CoercibleTag G b g
-    , GFunctorB f g (Rep (b (F f))) (Rep (b (G g)))
+type CanDeriveFunctorB b f g
+  = ( GenericN (b f)
+    , GenericN (b g)
+    , GFunctorB f g (RepN (b f)) (RepN (b g))
     )
 
 -- | Default implementation of 'bmap' based on 'Generic'.
 gbmapDefault
-  :: CanDeriveGenericInstance b f g
+  :: CanDeriveFunctorB b f g
   => (forall a . f a -> g a) -> b f -> b g
 gbmapDefault f
-  = coerceUntag @G
-      . to
-      . gbmap f
-      . from
-      . coerceTag @F
+  = toN . gbmap f . fromN
+{-# INLINE gbmapDefault #-}
 
 
 class GFunctorB f g repbf repbg where
@@ -101,18 +90,20 @@ instance(GFunctorB f g l l', GFunctorB f g r r') => GFunctorB f g (l :+: r) (l' 
 -- The interesting cases
 -- --------------------------------
 
-instance GFunctorB f g (Rec0 (F f a)) (Rec0 (G g a)) where
-  gbmap h (K1 (Tag fa)) = K1 (Tag (h fa))
+type P = Param 0
+
+instance GFunctorB f g (Rec (P f a) (f a)) (Rec (P g a) (g a)) where
+  gbmap h (Rec (K1 fa)) = Rec (K1 (h fa))
   {-# INLINE gbmap #-}
 
-instance FunctorB b => GFunctorB f g (Rec0 (b (F f))) (Rec0 (b (G g))) where
-  gbmap h (K1 bf) = K1 (bmap (Tag . h . unTag) bf)
+instance FunctorB b => GFunctorB f g (Rec (b (P f)) (b f)) (Rec (b (P g)) (b g)) where
+  gbmap h (Rec (K1 bf)) = Rec (K1 (bmap h bf))
   {-# INLINE gbmap #-}
 
-instance (Functor h, FunctorB b) => GFunctorB f g (Rec0 (h (b (F f)))) (Rec0 (h (b (G g)))) where
-  gbmap h (K1 hbf) = K1 (fmap (bmap (Tag . h . unTag)) hbf)
+instance (Functor h, FunctorB b) => GFunctorB f g (Rec (h (b (P f))) (h (b f))) (Rec (h (b (P g))) (h (b g))) where
+  gbmap h (Rec (K1 hbf)) = Rec (K1 (fmap (bmap h) hbf))
   {-# INLINE gbmap #-}
 
-instance {-# OVERLAPPABLE #-} bf ~ bg => GFunctorB f g (Rec0 bf) (Rec0 bg) where
+instance bf ~ bg => GFunctorB f g (Rec bf bf) (Rec bg bg) where
   gbmap _ = id
   {-# INLINE gbmap #-}

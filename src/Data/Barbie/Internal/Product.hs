@@ -6,7 +6,7 @@ module Data.Barbie.Internal.Product
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
   , (/*/), (/*)
 
-  , CanDeriveGenericInstance
+  , CanDeriveProductB
   , Gbprod
   , Gbuniq
   , gbprodDefault, gbuniqDefault
@@ -15,11 +15,11 @@ module Data.Barbie.Internal.Product
 where
 
 import Data.Barbie.Internal.Functor(FunctorB(..))
-import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
 
 import Data.Functor.Product (Product(..))
 import Data.Functor.Prod
 
+import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
 import GHC.Generics
 
 
@@ -54,10 +54,10 @@ class FunctorB b => ProductB b where
 
   buniq :: (forall a . f a) -> b f
 
-  default bprod :: CanDeriveGenericInstance b f g => b f -> b g -> b (Product f g)
+  default bprod :: CanDeriveProductB b f g => b f -> b g -> b (Product f g)
   bprod = gbprodDefault
 
-  default buniq :: CanDeriveGenericInstance' b f => (forall a . f a) -> b f
+  default buniq :: CanDeriveProductB' b f => (forall a . f a) -> b f
   buniq = gbuniqDefault
 
 
@@ -93,14 +93,6 @@ bzipWith4 f bf bg bh bi
   = bmap (\(Pair (Pair (Pair fa ga) ha) ia) -> f fa ga ha ia)
          (bf `bprod` bg `bprod` bh `bprod` bi)
 
-data F_
-data G_
-data P_
-
-type F = Tag F_
-type G = Tag G_
-type P = Tag P_
-
 -- | The requirements to to derive @'ProductB' (B f)@ are more strict than those for
 --   'FunctorB' or 'TraversableB'. Intuitively, we need:
 --
@@ -110,20 +102,16 @@ type P = Tag P_
 --
 --     * Every field of @B@' constructor is of the form 'f t'. That is, @B@ has no
 --       hidden structure.
-type CanDeriveGenericInstance b f g
-  = ( Generic (b (F f))
-    , Generic (b (G g))
-    , Generic (b (P (Product f g)))
-    , CoercibleTag F b f
-    , CoercibleTag G b g
-    , CoercibleTag P b (Product f g)
-    , Gbprod f g (Rep (b (F f))) (Rep (b (G g))) (Rep (b (P (Product f g))))
+type CanDeriveProductB b f g
+  = ( GenericN (b f)
+    , GenericN (b g)
+    , GenericN (b (f `Product` g))
+    , Gbprod f g (RepN (b f)) (RepN (b g)) (RepN (b (f `Product` g)))
     )
 
-type CanDeriveGenericInstance' b f
-  = ( Generic (b (F f))
-    , CoercibleTag F b f
-    , Gbuniq f (Rep (b (F f)))
+type CanDeriveProductB' b f
+  = ( GenericN (b f)
+    , Gbuniq f (RepN (b f))
     )
 
 
@@ -160,16 +148,16 @@ infixr 4 /*
 -- | Default implementation of 'bprod' based on 'Generic'.
 gbprodDefault
   :: forall b f g
-  .  CanDeriveGenericInstance b f g
+  .  CanDeriveProductB b f g
   => b f -> b g -> b (Product f g)
 gbprodDefault l r
-  = let l' = from (coerceTag @F l)
-        r' = from (coerceTag @G r)
-    in coerceUntag @P $ to (gbprod @f @g l' r')
+  = toN $ gbprod @f @g (fromN l) (fromN r)
+{-# INLINE gbprodDefault #-}
 
-gbuniqDefault:: CanDeriveGenericInstance' b f => (forall a . f a) -> b f
+gbuniqDefault:: CanDeriveProductB' b f => (forall a . f a) -> b f
 gbuniqDefault x
-  = coerceUntag @F $ to (gbuniq x)
+  = toN (gbuniq x)
+{-# INLINE gbuniqDefault #-}
 
 class Gbprod (f :: * -> *) (g :: * -> *) repbf repbg repbfg where
   gbprod :: repbf x -> repbg x -> repbfg x
@@ -215,26 +203,27 @@ instance (Gbuniq f lf, Gbuniq f rf) => Gbuniq f (lf :*: rf) where
 -- The interesting cases
 -- --------------------------------
 
-instance Gbprod f g (Rec0 (F f a)) (Rec0 (G g a)) (Rec0 (P (Product f g) a)) where
-  gbprod (K1 (Tag fa)) (K1 (Tag ga))
-    = K1 (Tag $ Pair fa ga)
+type P = Param 0
+
+instance Gbprod f g (Rec (P f a) (f a))
+                    (Rec (P g a) (g a))
+                    (Rec (P (f `Product` g) a) (Product f g a)) where
+  gbprod (Rec (K1 fa)) (Rec (K1 ga))
+    = Rec (K1 (Pair fa ga))
   {-# INLINE gbprod #-}
 
-instance Gbuniq f (Rec0 (F f a)) where
-  gbuniq x = K1 (Tag x)
+instance Gbuniq f (Rec (P f a) (f a)) where
+  gbuniq x = Rec (K1 x)
   {-# INLINE gbuniq #-}
 
 
-instance
-  ( ProductB b
-  , CoercibleTag F b f
-  , CoercibleTag G b g
-  , CoercibleTag P b (Product f g)
-  ) => Gbprod f g (Rec0 (b (F f))) (Rec0 (b (G g))) (Rec0 (b (P (Product f g)))) where
-  gbprod (K1 bf) (K1 bg)
-    = K1 $ coerceTag @P (coerceUntag @F bf `bprod` coerceUntag @G bg)
+instance ProductB b => Gbprod f g (Rec (b (P f)) (b f))
+                                  (Rec (b (P g)) (b g))
+                                  (Rec (b (P (f `Product` g))) (b (f `Product` g))) where
+  gbprod (Rec (K1 bf)) (Rec (K1 bg))
+    = Rec (K1 (bf `bprod` bg))
   {-# INLINE gbprod #-}
 
-instance (ProductB b, CoercibleTag F b f) => Gbuniq f (Rec0 (b (F f))) where
-  gbuniq x = K1 (coerceTag @F $ buniq x)
+instance ProductB b => Gbuniq f (Rec (b (P f)) (b f)) where
+  gbuniq x = Rec (K1 (buniq x))
   {-# INLINE gbuniq #-}

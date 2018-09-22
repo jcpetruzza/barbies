@@ -111,6 +111,7 @@ module Data.Barbie
 
     -- * Generic derivations
   , Tag(..)
+  , Rec(..)
   )
 
 where
@@ -136,3 +137,5 @@ import Data.Barbie.Internal.Wear(Wear, Bare, Covered)
 import Data.Barbie.Trivial(Void, Unit(..))
 
 import Data.Barbie.Internal.Tag(Tag(..))
+
+import Data.Generics.GenericN (Rec(..))

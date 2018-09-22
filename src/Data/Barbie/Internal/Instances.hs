@@ -5,7 +5,6 @@ module Data.Barbie.Internal.Instances ( Barbie(..) )
 
 where
 
-import Data.Barbie.Internal.Bare
 import Data.Barbie.Internal.Constraints
 import Data.Barbie.Internal.Dicts
 import Data.Barbie.Internal.Functor
@@ -18,7 +17,7 @@ import Data.Semigroup (Semigroup, (<>))
 -- | A wrapper for Barbie-types, providing useful instances.
 newtype Barbie b (f :: * -> *)
   = Barbie { getBarbie :: b f }
-  deriving (FunctorB, ProductB, BareB, ProofB)
+  deriving (FunctorB, ProductB, ProofB)
 
 -- Need to derive it manually to make GHC 8.0.2 happy
 instance ConstraintsB b => ConstraintsB (Barbie b) where

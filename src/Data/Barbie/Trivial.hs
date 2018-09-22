@@ -5,7 +5,6 @@ module Data.Barbie.Trivial
 
 where
 
-import Data.Barbie.Internal.Bare(BareB(..))
 import Data.Barbie.Internal.Constraints(ConstraintsB(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.ProofB(ProofB(..))
@@ -42,7 +41,6 @@ instance Semigroup (Void f) where
 instance FunctorB Void
 instance TraversableB Void
 instance ConstraintsB Void
-instance BareB Void
 
 
 -- | A barbie type without structure.
@@ -65,4 +63,3 @@ instance TraversableB Unit
 instance ProductB Unit
 instance ConstraintsB Unit
 instance ProofB Unit
-instance BareB Unit

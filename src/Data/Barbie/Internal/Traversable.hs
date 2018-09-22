@@ -10,7 +10,7 @@ module Data.Barbie.Internal.Traversable
   , bsequence'
   , bfoldMap
 
-  , CanDeriveGenericInstance
+  , CanDeriveTraversableB
   , GTraversableB
   , gbtraverseDefault
   )
@@ -18,12 +18,12 @@ module Data.Barbie.Internal.Traversable
 where
 
 import Data.Barbie.Internal.Functor (FunctorB(..))
-import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
 
 import Data.Functor (void)
 import Data.Functor.Compose (Compose(..))
 import Data.Functor.Const (Const(..))
 import Data.Functor.Identity (Identity(..))
+import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
 import GHC.Generics
 
 
@@ -42,7 +42,7 @@ class FunctorB b => TraversableB b where
   btraverse :: Applicative t => (forall a . f a -> t (g a)) -> b f -> t (b g)
 
   default btraverse
-    :: ( Applicative t, CanDeriveGenericInstance b f g)
+    :: ( Applicative t, CanDeriveTraversableB b f g)
     => (forall a . f a -> t (g a)) -> b f -> t (b g)
   btraverse = gbtraverseDefault
 
@@ -73,12 +73,6 @@ bfoldMap f
   = execWr . btraverse_ (tell . f)
 
 
-data F_
-data G_
-
-type F = Tag F_
-type G = Tag G_
-
 -- | Intuivively, the requirements to have @'TraversableB' B@ derived are:
 --
 --     * There is an instance of @'Generic' (B f)@ for every @f@
@@ -88,24 +82,21 @@ type G = Tag G_
 --
 --     * Recursive usages of @B f@ are allowed to appear as argument to a
 --       'Traversable' (e.g. @'Maybe' (B f)')
-type CanDeriveGenericInstance b f g
-  = ( Generic (b (F f))
-    , Generic (b (G g))
-    , CoercibleTag F b f
-    , CoercibleTag G b g
-    , GTraversableB f g (Rep (b (F f))) (Rep (b (G g)))
+type CanDeriveTraversableB b f g
+  = ( GenericN (b f)
+    , GenericN (b g)
+    , GTraversableB f g (RepN (b f)) (RepN (b g))
     )
 
 -- | Default implementation of 'btraverse' based on 'Generic'.
 gbtraverseDefault
-  :: ( Applicative t, CanDeriveGenericInstance b f g)
+  :: forall b f g t
+  .  (Applicative t, CanDeriveTraversableB b f g)
   => (forall a . f a -> t (g a))
   -> b f -> t (b g)
 gbtraverseDefault h
-  = fmap (coerceUntag @G . to)
-      . gbtraverse h
-      . from
-      . coerceTag @F
+  = fmap toN . gbtraverse h . fromN
+{-# INLINE gbtraverseDefault #-}
 
 
 class GTraversableB f g repbf repbg where
@@ -143,22 +134,29 @@ instance (GTraversableB f g l l', GTraversableB f g r r') => GTraversableB f g (
 -- The interesting cases
 -- --------------------------------
 
-instance GTraversableB f g (Rec0 (F f a)) (Rec0 (G g a)) where
-  gbtraverse h (K1 (Tag fa)) = K1 . Tag <$> h fa
+type P = Param 0
+
+instance GTraversableB f g (Rec (P f a) (f a))
+                           (Rec (P g a) (g a)) where
+  gbtraverse h = fmap (Rec . K1) . h . unK1 . unRec
   {-# INLINE gbtraverse #-}
 
-instance TraversableB b => GTraversableB f g (Rec0 (b (F f))) (Rec0 (b (G g))) where
-  gbtraverse h (K1 bf)
-    = K1 <$> btraverse (fmap Tag . h . unTag) bf
+instance TraversableB b
+  => GTraversableB f g (Rec (b (P f)) (b f))
+                       (Rec (b (P g)) (b g)) where
+  gbtraverse h
+    = fmap (Rec . K1) . btraverse h . unK1 . unRec
   {-# INLINE gbtraverse #-}
 
-instance (Traversable h, TraversableB b) => GTraversableB f g (K1 R (h (b (F f)))) (K1 R (h (b (G g)))) where
-  gbtraverse h (K1 hbf)
-    = K1 <$> traverse (btraverse (fmap Tag . h . unTag)) hbf
+instance (Traversable h, TraversableB b)
+  => GTraversableB f g (Rec (h (b (P f))) (h (b f)))
+                       (Rec (h (b (P g))) (h (b g))) where
+  gbtraverse h
+    = fmap (Rec . K1) . traverse (btraverse h) . unK1 . unRec
   {-# INLINE gbtraverse #-}
 
 
-instance {-# OVERLAPPABLE #-} bf ~ bg => GTraversableB f g (Rec0 bf) (Rec0 bg) where
+instance bf ~ bg => GTraversableB f g (Rec bf bf) (Rec bg bg) where
   gbtraverse _ = pure
   {-# INLINE gbtraverse #-}
 

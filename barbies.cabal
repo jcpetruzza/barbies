@@ -88,7 +88,6 @@ test-suite barbies-test
   other-modules:
       Barbies
       BarbiesW
-      BarbiesWDeprecated
       Clothes
       Spec.Bare
       Spec.Constraints
