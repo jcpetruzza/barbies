@@ -31,10 +31,10 @@ import GHC.Generics
 import GHC.TypeLits
 import Data.Coerce
 
-data Param (n :: Nat) (a :: k)
+data Param (n :: Nat) (original :: k' -> k) (a :: k)
 
 type family Indexed (t :: k) (i :: Nat) :: k where
-  Indexed (t a) i = Indexed t (i + 1) (Param i)
+  Indexed (t a) i = Indexed t (i + 1) (Param i a)
   Indexed t _     = t
 
 newtype Rec (p :: Type) a x = Rec { unRec :: K1 R a x }
