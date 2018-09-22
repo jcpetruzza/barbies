@@ -50,6 +50,9 @@ type family Zip (a :: Type -> Type) (b :: Type -> Type) :: Type -> Type where
     = Rec p a
   Zip U1 U1
     = U1
+  Zip V1 V1
+    = V1
+
 
 class
   ( Coercible (Rep a) (RepN a)
