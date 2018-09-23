@@ -1,7 +1,6 @@
 {-# LANGUAGE TypeFamilies           #-}
 module Data.Barbie.Internal.Deprecated.Wear
   ( Bare, Wear
-  , NotBare
   )
 
 where
@@ -33,9 +32,3 @@ type family Wear f a where
 
 -- | 'Bare' is the only type such that @'Wear' 'Bare' a ~ a'@.
 data Bare a
-
--- | 'NotBare' has one universal instance that makes @'NotBare' f a@
---   equivalent to @'Wear' f a ~ f a@. This will hold every time
---   `f` is not `Bare`.
-class Wear f a ~ f a => NotBare f a where
-instance Wear f a ~ f a => NotBare f a
