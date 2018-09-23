@@ -38,24 +38,28 @@
 -- @
 --
 -- Sometimes one wants to use @Barbie 'Data.Functor.Identity.Identity'@
--- and it may feels lik a second-class record type, where one needs to
+-- and it may feel like a second-class record type, where one needs to
 -- unpack values in each field. For those cases, we can leverage on
 -- closed type-families ang get the best of both worlds:
 --
 -- @
 -- data 'Bare'
+-- data 'Covered'
 --
--- type family 'Wear' f a where
---   'Wear' 'Bare' a = a
---   'Wear' f      a = f a
+-- type family 'Wear' t f a where
+--   'Wear' 'Bare'    f a = a
+--   'Wear' 'Covered' f a = f a
 --
--- data SignUpForm f
+-- data SignUpForm t f
 --   = SignUpForm'
---       { username  :: 'Wear' f 'String',
---       , password  :: 'Wear' f 'String'
---       , mailingOk :: 'Wear' f 'Bool'
+--       { username  :: 'Wear' t f 'String',
+--       , password  :: 'Wear' t f 'String'
+--       , mailingOk :: 'Wear' t f 'Bool'
 --       }
---   deriving ( ..., 'BareB')
+--  instance 'FunctorB' (SignUpForm 'Covered')
+--  instance 'TraversableB' (SignUpForm 'Covered')
+--  ...,
+--  instance 'BareB' SignUpForm
 --
 -- type SignUpRaw  = SignUpForm 'Maybe'
 -- type SignUpData = SignUpForm 'Bare'
@@ -84,6 +88,7 @@ module Data.Barbie
     -- * Bare values
   , Wear
   , Bare
+  , Covered
   , BareB(bstrip, bcover)
   , bstripFrom
   , bcoverWith
@@ -93,7 +98,6 @@ module Data.Barbie
   , ConstraintsOf
   , ClassF
   , ClassFG
-  , NotBare
   , ProofB(bproof)
   , buniqC
   , bmempty
@@ -111,7 +115,7 @@ module Data.Barbie
 
 where
 
-import Data.Barbie.Internal.Bare(Bare, BareB(..), bstripFrom, bcoverWith, Wear)
+import Data.Barbie.Internal.Bare(BareB(..), bstripFrom, bcoverWith)
 import Data.Barbie.Internal.Constraints(ConstraintsB(..), ConstraintsOf)
 import Data.Barbie.Internal.Dicts(ClassF, ClassFG)
 import Data.Barbie.Internal.Functor(FunctorB(..))
@@ -127,7 +131,7 @@ import Data.Barbie.Internal.Traversable
   , bsequence, bsequence'
   , bfoldMap, btraverse_
   )
-import Data.Barbie.Internal.Deprecated.Wear(NotBare)
+import Data.Barbie.Internal.Wear(Wear, Bare, Covered)
 
 import Data.Barbie.Trivial(Void, Unit(..))
 
