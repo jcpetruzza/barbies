@@ -5,12 +5,17 @@
     constraints to be given on `a` instead of on `f a`. The `ClassF`
     class lets us specify constraints on `f a` by doing `AllB (ClassF c f) b`.
     `ConstraintsOf` becomes a type alias. Credit goes to Csongor Kiss.
+  - Changed the way `Wear` works: now wear-types need to have an extra
+    type parameter that controls whether they are `Bare` or `Covered`. This
+    let us remove all the "magic" that was involved, in the sense that
+    one couldn't have instances of `FunctorB`, etc, for wear-types wihtout
+    using `unsafeCoerce` (this was true also for handwritten instances).
   - Add `bsequence'`, a frequent specialisation of `bsequence`.
   - Add `bfoldMap`.
   - Add `buniqC` and `bmempty`.
-  - Improve the instance derivation mechanism. For barbie-types without `Wear`,
-    the code should be indistinguishible from hand-written instances
-    (not currently verified).
+  - Improve the internal instance derivation mechanism. We no longer
+    need `unsafeCoerce` and the code should be in general indistinguishible
+    from hand-written instances (not currently verified).
 
 ## 0.1.4.0
   - Add `btraverse_`
