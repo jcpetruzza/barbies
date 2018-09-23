@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeFamilies           #-}
-module Data.Barbie.Internal.Wear
+module Data.Barbie.Internal.Deprecated.Wear
   ( Bare, Wear
   , NotBare
   )

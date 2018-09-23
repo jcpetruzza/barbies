@@ -15,7 +15,7 @@ where
 
 import Data.Barbie.Internal.Functor (FunctorB(..))
 import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
-import Data.Barbie.Internal.Wear
+import Data.Barbie.Internal.Deprecated.Wear
 import Data.Functor.Identity (Identity(..))
 
 import GHC.Generics

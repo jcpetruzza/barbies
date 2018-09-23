@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass       #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module BarbiesW
+module BarbiesWDeprecated
   ( Record1W(..)
   , Record3W(..)
 
@@ -19,7 +19,8 @@ module BarbiesW
 
 where
 
-import Data.Barbie
+import Data.Barbie hiding (Wear)
+import Data.Barbie.Internal.Deprecated.Wear
 
 import Data.Typeable
 import GHC.Generics

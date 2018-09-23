@@ -127,7 +127,7 @@ import Data.Barbie.Internal.Traversable
   , bsequence, bsequence'
   , bfoldMap, btraverse_
   )
-import Data.Barbie.Internal.Wear(NotBare)
+import Data.Barbie.Internal.Deprecated.Wear(NotBare)
 
 import Data.Barbie.Trivial(Void, Unit(..))
 

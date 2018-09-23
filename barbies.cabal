@@ -36,6 +36,8 @@ library
       Data.Barbie.Internal.ProofB
       Data.Barbie.Internal.Traversable
 
+      Data.Barbie.Internal.Deprecated.Wear
+
   other-modules:
       Data.Barbie.Internal.Deprecated.Generics
       Data.Barbie.Internal.Deprecated.Tags
@@ -44,7 +46,6 @@ library
       Data.Barbie.Internal.Dicts
       Data.Barbie.Internal.Instances
       Data.Barbie.Internal.Tag
-      Data.Barbie.Internal.Wear
       Data.Barbie.Trivial
 
       Data.Generics.GenericN
@@ -85,7 +86,7 @@ test-suite barbies-test
 
   other-modules:
       Barbies
-      BarbiesW
+      BarbiesWDeprecated
       Clothes
       Spec.Bare
       Spec.Constraints

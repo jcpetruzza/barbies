@@ -9,7 +9,7 @@ import qualified Spec.Traversable as Traversable
 import qualified Spec.Wrapper as Wrapper
 
 import Barbies
-import BarbiesW
+import qualified BarbiesWDeprecated as Deprecated
 
 import Data.Barbie (bfoldMap)
 import Data.Functor.Const(Const(..))
@@ -26,24 +26,24 @@ main
             , Functor.laws @Record1S
             , Functor.laws @Record3S
 
-            , Functor.laws @Record1W
-            , Functor.laws @Record3W
+            , Functor.laws @Deprecated.Record1W
+            , Functor.laws @Deprecated.Record3W
 
-            , Functor.laws @Record1WS
-            , Functor.laws @Record3WS
+            , Functor.laws @Deprecated.Record1WS
+            , Functor.laws @Deprecated.Record3WS
 
             , Functor.laws @Ignore1
 
             , Functor.laws @Sum3
             , Functor.laws @SumRec
 
-            , Functor.laws @Sum3W
-            , Functor.laws @SumRecW
+            , Functor.laws @Deprecated.Sum3W
+            , Functor.laws @Deprecated.SumRecW
 
             , Functor.laws @CompositeRecord
             , Functor.laws @NestedF
 
-            , Functor.laws @CompositeRecordW
+            , Functor.laws @Deprecated.CompositeRecordW
             ]
 
         , testGroup "Traversable Laws"
@@ -54,24 +54,24 @@ main
             , Traversable.laws @Record1S
             , Traversable.laws @Record3S
 
-            , Traversable.laws @Record1W
-            , Traversable.laws @Record3W
+            , Traversable.laws @Deprecated.Record1W
+            , Traversable.laws @Deprecated.Record3W
 
-            , Traversable.laws @Record1WS
-            , Traversable.laws @Record3WS
+            , Traversable.laws @Deprecated.Record1WS
+            , Traversable.laws @Deprecated.Record3WS
 
             , Traversable.laws @Ignore1
 
             , Traversable.laws @Sum3
             , Traversable.laws @SumRec
 
-            , Traversable.laws @Sum3W
-            , Traversable.laws @SumRecW
+            , Traversable.laws @Deprecated.Sum3W
+            , Traversable.laws @Deprecated.SumRecW
 
             , Traversable.laws @CompositeRecord
             , Traversable.laws @NestedF
 
-            , Traversable.laws @CompositeRecordW
+            , Traversable.laws @Deprecated.CompositeRecordW
             ]
 
         , testGroup "Product Laws"
@@ -83,12 +83,12 @@ main
             , Product.laws @Record1S
             , Product.laws @Record3S
 
-            , Product.laws @Record1W
-            , Product.laws @Record3W
-            , Product.laws @CompositeRecordW
+            , Product.laws @Deprecated.Record1W
+            , Product.laws @Deprecated.Record3W
+            , Product.laws @Deprecated.CompositeRecordW
 
-            , Product.laws @Record1WS
-            , Product.laws @Record3WS
+            , Product.laws @Deprecated.Record1WS
+            , Product.laws @Deprecated.Record3WS
             ]
 
         , testGroup "Uniq Laws"
@@ -100,12 +100,12 @@ main
             , Product.uniqLaws @Record1S
             , Product.uniqLaws @Record3S
 
-            , Product.uniqLaws @Record1W
-            , Product.uniqLaws @Record3W
-            , Product.uniqLaws @CompositeRecordW
+            , Product.uniqLaws @Deprecated.Record1W
+            , Product.uniqLaws @Deprecated.Record3W
+            , Product.uniqLaws @Deprecated.CompositeRecordW
 
-            , Product.uniqLaws @Record1WS
-            , Product.uniqLaws @Record3WS
+            , Product.uniqLaws @Deprecated.Record1WS
+            , Product.uniqLaws @Deprecated.Record3WS
             ]
 
         , testGroup "adjProof projection"
@@ -116,22 +116,22 @@ main
             , Constraints.lawAdjProofPrj @Record1S
             , Constraints.lawAdjProofPrj @Record3S
 
-            , Constraints.lawAdjProofPrj @Record1W
-            , Constraints.lawAdjProofPrj @Record3W
+            , Constraints.lawAdjProofPrj @Deprecated.Record1W
+            , Constraints.lawAdjProofPrj @Deprecated.Record3W
 
-            , Constraints.lawAdjProofPrj @Record1WS
-            , Constraints.lawAdjProofPrj @Record3WS
+            , Constraints.lawAdjProofPrj @Deprecated.Record1WS
+            , Constraints.lawAdjProofPrj @Deprecated.Record3WS
 
             , Constraints.lawAdjProofPrj @Ignore1
 
             , Constraints.lawAdjProofPrj @Sum3
             , Constraints.lawAdjProofPrj @SumRec
 
-            , Constraints.lawAdjProofPrj @Sum3W
-            , Constraints.lawAdjProofPrj @SumRecW
+            , Constraints.lawAdjProofPrj @Deprecated.Sum3W
+            , Constraints.lawAdjProofPrj @Deprecated.SumRecW
 
             , Constraints.lawAdjProofPrj @CompositeRecord
-            , Constraints.lawAdjProofPrj @CompositeRecordW
+            , Constraints.lawAdjProofPrj @Deprecated.CompositeRecordW
             ]
 
         , testGroup "bproof projection"
@@ -143,36 +143,36 @@ main
             , Constraints.lawProofEquivPrj @Record1S
             , Constraints.lawProofEquivPrj @Record3S
 
-            , Constraints.lawProofEquivPrj @Record1W
-            , Constraints.lawProofEquivPrj @Record3W
-            , Constraints.lawProofEquivPrj @CompositeRecordW
+            , Constraints.lawProofEquivPrj @Deprecated.Record1W
+            , Constraints.lawProofEquivPrj @Deprecated.Record3W
+            , Constraints.lawProofEquivPrj @Deprecated.CompositeRecordW
 
-            , Constraints.lawProofEquivPrj @Record1WS
-            , Constraints.lawProofEquivPrj @Record3WS
+            , Constraints.lawProofEquivPrj @Deprecated.Record1WS
+            , Constraints.lawProofEquivPrj @Deprecated.Record3WS
             ]
 
         , testGroup "Bare laws"
-            [ Bare.laws @Record1W
-            , Bare.laws @Record3W
-            , Bare.laws @Record1WS
-            , Bare.laws @Record3WS
-            , Bare.laws @Sum3W
-            , Bare.laws @SumRecW
-            , Bare.laws @NestedFW
+            [ Bare.laws @Deprecated.Record1W
+            , Bare.laws @Deprecated.Record3W
+            , Bare.laws @Deprecated.Record1WS
+            , Bare.laws @Deprecated.Record3WS
+            , Bare.laws @Deprecated.Sum3W
+            , Bare.laws @Deprecated.SumRecW
+            , Bare.laws @Deprecated.NestedFW
             ]
 
         , testGroup "Generic wrapper"
             [ Wrapper.lawsMonoid @Record1
-            , Wrapper.lawsMonoid @Record1W
+            , Wrapper.lawsMonoid @Deprecated.Record1W
 
             , Wrapper.lawsMonoid @Record1S
-            , Wrapper.lawsMonoid @Record1WS
+            , Wrapper.lawsMonoid @Deprecated.Record1WS
 
             , Wrapper.lawsMonoid @Record3
-            , Wrapper.lawsMonoid @Record3W
+            , Wrapper.lawsMonoid @Deprecated.Record3W
 
             , Wrapper.lawsMonoid @Record3S
-            , Wrapper.lawsMonoid @Record3WS
+            , Wrapper.lawsMonoid @Deprecated.Record3WS
             ]
 
         , testGroup "bfoldMap"

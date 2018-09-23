@@ -17,7 +17,7 @@ where
 import Data.Barbie.Internal.Dicts(ClassF, Dict(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Tag (Tag(..), CoercibleTag(..))
-import Data.Barbie.Internal.Wear(NotBare)
+import Data.Barbie.Internal.Deprecated.Wear
 
 import Data.Functor.Product(Product(..))
 import Data.Kind(Constraint)
@@ -80,8 +80,8 @@ class FunctorB b => ConstraintsB b where
 --   'ConstraintsOf' 'Show' f Barbie
 --      = ( 'Show' (f 'String')
 --        , 'Show' (f 'Int')
---        , 'Data.Barbie.Internal.Wear.Wear' f 'String' ~ f 'String'
---        , 'Data.Barbie.Internal.Wear.Wear' f 'Int' ~ f 'Int'
+--        , 'Wear' f 'String' ~ f 'String'
+--        , 'Wear' f 'Int' ~ f 'Int'
 --        )
 --   @
 type ConstraintsOf c f b = (AllB (ClassF c f) b, AllB (NotBare f) b)
