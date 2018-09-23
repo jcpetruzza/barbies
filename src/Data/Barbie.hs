@@ -77,7 +77,6 @@ module Data.Barbie
   , Unit (..)
 
     -- * Generic derivations
-  , Tag(..)
   , Rec(..)
   )
 
@@ -99,7 +98,4 @@ import Data.Barbie.Internal.Traversable
   , bfoldMap, btraverse_
   )
 import Data.Barbie.Trivial(Void, Unit(..))
-
-import Data.Barbie.Internal.Tag(Tag(..))
-
 import Data.Generics.GenericN (Rec(..))
