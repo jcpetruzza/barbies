@@ -37,12 +37,7 @@ library
       Data.Barbie.Internal.ProofB
       Data.Barbie.Internal.Traversable
 
-      Data.Barbie.Internal.Deprecated.Wear
-
   other-modules:
-      Data.Barbie.Internal.Deprecated.Generics
-      Data.Barbie.Internal.Deprecated.Tags
-
       Data.Barbie.Internal.Dicts
       Data.Barbie.Internal.Instances
       Data.Barbie.Internal.Wear
