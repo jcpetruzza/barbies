@@ -25,6 +25,7 @@ library
 
   exposed-modules:
       Data.Barbie
+      Data.Barbie.Bare
       Data.Barbie.Constraints
       Data.Barbie.Container
       Data.Functor.Prod

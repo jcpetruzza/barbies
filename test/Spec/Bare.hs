@@ -3,7 +3,7 @@ module Spec.Bare ( laws )
 
 where
 
-import Data.Barbie (BareB(..), Covered)
+import Data.Barbie.Bare (BareB(..), Covered)
 import Data.Functor.Identity
 
 import Data.Typeable (Typeable, typeRep, Proxy(..))

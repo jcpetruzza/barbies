@@ -11,7 +11,8 @@ import qualified Spec.Wrapper as Wrapper
 import Barbies
 import BarbiesW
 
-import Data.Barbie (bfoldMap, Covered)
+import Data.Barbie (bfoldMap)
+import Data.Barbie.Bare(Covered)
 import Data.Functor.Const(Const(..))
 
 main :: IO ()

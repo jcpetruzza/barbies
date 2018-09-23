@@ -22,6 +22,7 @@ module BarbiesW
 where
 
 import Data.Barbie
+import Data.Barbie.Bare
 
 import Data.Typeable
 import GHC.Generics

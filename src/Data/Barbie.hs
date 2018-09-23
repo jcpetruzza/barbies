@@ -39,33 +39,8 @@
 --
 -- Sometimes one wants to use @Barbie 'Data.Functor.Identity.Identity'@
 -- and it may feel like a second-class record type, where one needs to
--- unpack values in each field. For those cases, we can leverage on
--- closed type-families ang get the best of both worlds:
---
--- @
--- data 'Bare'
--- data 'Covered'
---
--- type family 'Wear' t f a where
---   'Wear' 'Bare'    f a = a
---   'Wear' 'Covered' f a = f a
---
--- data SignUpForm t f
---   = SignUpForm'
---       { username  :: 'Wear' t f 'String',
---       , password  :: 'Wear' t f 'String'
---       , mailingOk :: 'Wear' t f 'Bool'
---       }
---  instance 'FunctorB' (SignUpForm 'Covered')
---  instance 'TraversableB' (SignUpForm 'Covered')
---  ...,
---  instance 'BareB' SignUpForm
---
--- type SignUpRaw  = SignUpForm 'Maybe'
--- type SignUpData = SignUpForm 'Bare'
---
--- formData = SignUpForm "jbond" "shaken007" False :: SignUpData
--- @
+-- unpack values in each field. "Data.Barbie.Bare" offers a way to have
+-- bare versions of a barbie-type.
 
 
 ----------------------------------------------------------------------------
@@ -84,14 +59,6 @@ module Data.Barbie
   , ProductB(buniq, bprod)
   , (/*/), (/*)
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
-
-    -- * Bare values
-  , Wear
-  , Bare
-  , Covered
-  , BareB(bstrip, bcover)
-  , bstripFrom
-  , bcoverWith
 
     -- * Constraints and proofs of instance
   , ConstraintsB(AllB, adjProof)
@@ -116,7 +83,6 @@ module Data.Barbie
 
 where
 
-import Data.Barbie.Internal.Bare(BareB(..), bstripFrom, bcoverWith)
 import Data.Barbie.Internal.Constraints(ConstraintsB(..), ConstraintsOf)
 import Data.Barbie.Internal.Dicts(ClassF, ClassFG)
 import Data.Barbie.Internal.Functor(FunctorB(..))
@@ -132,8 +98,6 @@ import Data.Barbie.Internal.Traversable
   , bsequence, bsequence'
   , bfoldMap, btraverse_
   )
-import Data.Barbie.Internal.Wear(Wear, Bare, Covered)
-
 import Data.Barbie.Trivial(Void, Unit(..))
 
 import Data.Barbie.Internal.Tag(Tag(..))
