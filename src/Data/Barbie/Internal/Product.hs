@@ -7,8 +7,7 @@ module Data.Barbie.Internal.Product
   , (/*/), (/*)
 
   , CanDeriveProductB
-  , Gbprod
-  , Gbuniq
+  , GProductB
   , gbprodDefault, gbuniqDefault
   )
 
@@ -57,7 +56,7 @@ class FunctorB b => ProductB b where
   default bprod :: CanDeriveProductB b f g => b f -> b g -> b (Product f g)
   bprod = gbprodDefault
 
-  default buniq :: CanDeriveProductB' b f => (forall a . f a) -> b f
+  default buniq :: CanDeriveProductB b f f => (forall a . f a) -> b f
   buniq = gbuniqDefault
 
 
@@ -106,12 +105,7 @@ type CanDeriveProductB b f g
   = ( GenericN (b f)
     , GenericN (b g)
     , GenericN (b (f `Product` g))
-    , Gbprod f g (RepN (b f)) (RepN (b g)) (RepN (b (f `Product` g)))
-    )
-
-type CanDeriveProductB' b f
-  = ( GenericN (b f)
-    , Gbuniq f (RepN (b f))
+    , GProductB f g (RepN (b f)) (RepN (b g)) (RepN (b (f `Product` g)))
     )
 
 
@@ -154,39 +148,43 @@ gbprodDefault l r
   = toN $ gbprod @f @g (fromN l) (fromN r)
 {-# INLINE gbprodDefault #-}
 
-gbuniqDefault:: CanDeriveProductB' b f => (forall a . f a) -> b f
+gbuniqDefault:: forall b f . CanDeriveProductB b f f => (forall a . f a) -> b f
 gbuniqDefault x
-  = toN (gbuniq x)
+  = toN (gbuniq @f @f @_ @(RepN (b f)) @(RepN (b (f `Product` f))) x)
 {-# INLINE gbuniqDefault #-}
 
-class Gbprod (f :: * -> *) (g :: * -> *) repbf repbg repbfg where
+class GProductB (f :: * -> *) (g :: * -> *) repbf repbg repbfg where
   gbprod :: repbf x -> repbg x -> repbfg x
 
-class Gbuniq f repbf where
   gbuniq :: (forall a . f a) -> repbf x
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-instance Gbprod f g repf repg repfg => Gbprod f g (M1 i c repf) (M1 i c repg) (M1 i c repfg) where
+instance GProductB f g repf repg repfg => GProductB f g (M1 i c repf)
+                                                        (M1 i c repg)
+                                                        (M1 i c repfg) where
   gbprod (M1 l) (M1 r) = M1 (gbprod @f @g l r)
   {-# INLINE gbprod #-}
 
-instance Gbuniq f repbf => Gbuniq f (M1 i c repbf) where
-  gbuniq x = M1 (gbuniq @f x)
+  gbuniq x = M1 (gbuniq @f @g @repf @repg @repfg x)
   {-# INLINE gbuniq #-}
 
-instance Gbprod f g U1 U1 U1 where
+
+instance GProductB f g U1 U1 U1 where
   gbprod U1 U1 = U1
   {-# INLINE gbprod #-}
 
-instance Gbuniq f U1 where
   gbuniq _ = U1
   {-# INLINE gbuniq #-}
 
-instance (Gbprod f g lf lg lfg, Gbprod f g rf rg rfg)
-  => Gbprod f g (lf :*: rf) (lg :*: rg) (lfg :*: rfg) where
+instance
+  ( GProductB f g lf lg lfg
+  , GProductB f g rf rg rfg
+  ) => GProductB f g (lf  :*: rf)
+                     (lg  :*: rg)
+                     (lfg :*: rfg) where
   gbprod (l1 :*: l2) (r1 :*: r2)
     = (l1 `lprod` r1) :*: (l2 `rprod` r2)
     where
@@ -194,8 +192,7 @@ instance (Gbprod f g lf lg lfg, Gbprod f g rf rg rfg)
       rprod = gbprod @f @g
   {-# INLINE gbprod #-}
 
-instance (Gbuniq f lf, Gbuniq f rf) => Gbuniq f (lf :*: rf) where
-  gbuniq x = (gbuniq x :*: gbuniq x)
+  gbuniq x = (gbuniq @f @g @lf @lg @lfg x :*: gbuniq @f @g @rf @rg @rfg x)
   {-# INLINE gbuniq #-}
 
 
@@ -205,25 +202,25 @@ instance (Gbuniq f lf, Gbuniq f rf) => Gbuniq f (lf :*: rf) where
 
 type P = Param 0
 
-instance Gbprod f g (Rec (P f a) (f a))
-                    (Rec (P g a) (g a))
-                    (Rec (P (f `Product` g) a) (Product f g a)) where
+instance GProductB f g (Rec (P f a) (f a))
+                       (Rec (P g a) (g a))
+                       (Rec (P (f `Product` g) a) ((f `Product` g) a)) where
   gbprod (Rec (K1 fa)) (Rec (K1 ga))
     = Rec (K1 (Pair fa ga))
   {-# INLINE gbprod #-}
 
-instance Gbuniq f (Rec (P f a) (f a)) where
   gbuniq x = Rec (K1 x)
   {-# INLINE gbuniq #-}
 
 
-instance ProductB b => Gbprod f g (Rec (b (P f)) (b f))
-                                  (Rec (b (P g)) (b g))
-                                  (Rec (b (P (f `Product` g))) (b (f `Product` g))) where
+instance
+  ProductB b
+    => GProductB f g (Rec (b (P f)) (b f))
+                     (Rec (b (P g)) (b g))
+                     (Rec (b (P (f `Product` g))) (b (f `Product` g))) where
   gbprod (Rec (K1 bf)) (Rec (K1 bg))
     = Rec (K1 (bf `bprod` bg))
   {-# INLINE gbprod #-}
 
-instance ProductB b => Gbuniq f (Rec (b (P f)) (b f)) where
   gbuniq x = Rec (K1 (buniq x))
   {-# INLINE gbuniq #-}
