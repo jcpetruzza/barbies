@@ -18,8 +18,7 @@ import Data.Barbie.Internal.Wear(Bare, Covered, Wear)
 import Data.Functor.Identity (Identity(..))
 
 import Data.Coerce (coerce)
-import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
-import GHC.Generics
+import Data.Generics.GenericN
 
 
 -- | Class of Barbie-types defined using 'Wear' and can therefore

@@ -25,6 +25,7 @@ module Data.Generics.GenericN
   , SameOrParam
   , Rec (Rec, unRec)
   , GenericN (..)
+  , module GHC.Generics
   ) where
 
 import Data.Kind

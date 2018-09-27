@@ -18,8 +18,7 @@ import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Functor.Product (Product(..))
 import Data.Functor.Prod
 
-import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param, SameOrParam)
-import GHC.Generics
+import Data.Generics.GenericN
 
 
 -- | Barbie-types that can form products, subject to the laws:

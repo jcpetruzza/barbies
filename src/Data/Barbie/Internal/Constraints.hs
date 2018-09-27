@@ -21,8 +21,7 @@ import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Functor.Product(Product(..))
 import Data.Kind(Constraint)
 
-import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param, SameOrParam)
-import GHC.Generics
+import Data.Generics.GenericN
 
 
 -- | Instances of this class provide means to talk about constraints,

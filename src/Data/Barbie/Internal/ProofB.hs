@@ -19,8 +19,7 @@ import Data.Barbie.Internal.Dicts(ClassF, Dict(..), requiringDict)
 import Data.Barbie.Internal.Functor(bmap)
 import Data.Barbie.Internal.Product(ProductB(..))
 
-import Data.Generics.GenericN (GenericN(..), toN, Rec(..), Param)
-import GHC.Generics
+import Data.Generics.GenericN
 
 -- | Barbie-types with products have a canonical proof of instance.
 --

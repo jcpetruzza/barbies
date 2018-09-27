@@ -23,8 +23,7 @@ import Data.Functor (void)
 import Data.Functor.Compose (Compose(..))
 import Data.Functor.Const (Const(..))
 import Data.Functor.Identity (Identity(..))
-import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param, SameOrParam)
-import GHC.Generics
+import Data.Generics.GenericN
 
 
 -- | Barbie-types that can be traversed from left to right. Instances should

@@ -9,8 +9,7 @@ module Data.Barbie.Internal.Functor
 
 where
 
-import Data.Generics.GenericN(GenericN(..), toN, fromN, Rec(..), Param, SameOrParam)
-import GHC.Generics
+import Data.Generics.GenericN
 
 -- | Barbie-types that can be mapped over. Instances of 'FunctorB' should
 --   satisfy the following laws:
