@@ -128,7 +128,6 @@ deriving instance AllB (ClassF Eq   f) Record3S => Eq   (Record3S f)
 instance AllB (ClassF Arbitrary f) Record3S => Arbitrary (Record3S f) where
   arbitrary = Record3S <$> arbitrary <*> arbitrary <*> arbitrary
 
-
 -----------------------------------------------------
 -- Bad products
 -----------------------------------------------------
@@ -250,3 +249,34 @@ deriving instance (Eq   (f Int), Eq   (Record3 f), Eq   (Sum3 f)) => Eq   (Neste
 
 instance (Arbitrary (f Int), AllB (ClassF Arbitrary f) Record3, AllB (ClassF Arbitrary f) Sum3) => Arbitrary (NestedF f) where
   arbitrary = NestedF <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
+
+
+-----------------------------------------------------
+-- Parametric barbies
+-----------------------------------------------------
+
+data ParB b (f :: * -> *)
+  = ParB (b f)
+  deriving (Generic, Typeable)
+
+instance FunctorB b => FunctorB (ParB b)
+instance TraversableB b => TraversableB (ParB b)
+instance ProductB b => ProductB (ParB b)
+-- instance ConstraintsB b => ConstraintsB (ParB b)
+
+data ParBH h b (f :: * -> *)
+  = ParBH (h (b f))
+  deriving (Generic, Typeable)
+
+instance (Functor h, FunctorB b) => FunctorB (ParBH h b)
+instance (Traversable h, TraversableB b) => TraversableB (ParBH h b)
+
+data ParX a f
+  = ParX (f a)
+  deriving (Generic, Typeable)
+
+instance FunctorB (ParX a)
+instance TraversableB (ParX a)
+instance ProductB (ParX a)
+instance ConstraintsB (ParX a)

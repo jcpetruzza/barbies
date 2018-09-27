@@ -18,7 +18,7 @@ import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Functor.Product (Product(..))
 import Data.Functor.Prod
 
-import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
+import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param, SameOrParam)
 import GHC.Generics
 
 
@@ -200,11 +200,11 @@ instance
 -- The interesting cases
 -- --------------------------------
 
-type P = Param 0
+type P0 = Param 0
 
-instance GProductB f g (Rec (P f a) (f a))
-                       (Rec (P g a) (g a))
-                       (Rec (P (f `Product` g) a) ((f `Product` g) a)) where
+instance GProductB f g (Rec (P0 f a) (f a))
+                       (Rec (P0 g a) (g a))
+                       (Rec (P0 (f `Product` g) a) ((f `Product` g) a)) where
   gbprod (Rec (K1 fa)) (Rec (K1 ga))
     = Rec (K1 (Pair fa ga))
   {-# INLINE gbprod #-}
@@ -214,10 +214,11 @@ instance GProductB f g (Rec (P f a) (f a))
 
 
 instance
-  ProductB b
-    => GProductB f g (Rec (b (P f)) (b f))
-                     (Rec (b (P g)) (b g))
-                     (Rec (b (P (f `Product` g))) (b (f `Product` g))) where
+  ( SameOrParam b b'
+  , ProductB b'
+  ) => GProductB f g (Rec (b (P0 f)) (b' f))
+                     (Rec (b (P0 g)) (b' g))
+                     (Rec (b (P0 (f `Product` g))) (b' (f `Product` g))) where
   gbprod (Rec (K1 bf)) (Rec (K1 bg))
     = Rec (K1 (bf `bprod` bg))
   {-# INLINE gbprod #-}

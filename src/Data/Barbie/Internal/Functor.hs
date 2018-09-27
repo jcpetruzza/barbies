@@ -9,8 +9,7 @@ module Data.Barbie.Internal.Functor
 
 where
 
-import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
-
+import Data.Generics.GenericN(GenericN(..), toN, fromN, Rec(..), Param, SameOrParam)
 import GHC.Generics
 
 -- | Barbie-types that can be mapped over. Instances of 'FunctorB' should
@@ -90,20 +89,31 @@ instance(GFunctorB f g l l', GFunctorB f g r r') => GFunctorB f g (l :+: r) (l' 
 -- The interesting cases
 -- --------------------------------
 
-type P = Param 0
+type P0 = Param 0
 
-instance GFunctorB f g (Rec (P f a) (f a)) (Rec (P g a) (g a)) where
+instance GFunctorB f g (Rec (P0 f a) (f a))
+                       (Rec (P0 g a) (g a)) where
   gbmap h (Rec (K1 fa)) = Rec (K1 (h fa))
   {-# INLINE gbmap #-}
 
-instance FunctorB b => GFunctorB f g (Rec (b (P f)) (b f)) (Rec (b (P g)) (b g)) where
+instance
+  ( SameOrParam b b'
+  , FunctorB b'
+  ) => GFunctorB f g (Rec (b (P0 f)) (b' f))
+                     (Rec (b (P0 g)) (b' g)) where
   gbmap h (Rec (K1 bf)) = Rec (K1 (bmap h bf))
   {-# INLINE gbmap #-}
 
-instance (Functor h, FunctorB b) => GFunctorB f g (Rec (h (b (P f))) (h (b f))) (Rec (h (b (P g))) (h (b g))) where
+instance
+  ( SameOrParam h h'
+  , SameOrParam b b'
+  , Functor h'
+  , FunctorB b'
+  ) => GFunctorB f g (Rec (h (b (P0 f))) (h' (b' f)))
+                     (Rec (h (b (P0 g))) (h' (b' g))) where
   gbmap h (Rec (K1 hbf)) = Rec (K1 (fmap (bmap h) hbf))
   {-# INLINE gbmap #-}
 
-instance bf ~ bg => GFunctorB f g (Rec bf bf) (Rec bg bg) where
+instance GFunctorB f g (Rec x x) (Rec x x) where
   gbmap _ = id
   {-# INLINE gbmap #-}

@@ -23,7 +23,7 @@ import Data.Functor (void)
 import Data.Functor.Compose (Compose(..))
 import Data.Functor.Const (Const(..))
 import Data.Functor.Identity (Identity(..))
-import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
+import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param, SameOrParam)
 import GHC.Generics
 
 
@@ -134,29 +134,35 @@ instance (GTraversableB f g l l', GTraversableB f g r r') => GTraversableB f g (
 -- The interesting cases
 -- --------------------------------
 
-type P = Param 0
+type P0 = Param 0
 
-instance GTraversableB f g (Rec (P f a) (f a))
-                           (Rec (P g a) (g a)) where
+instance GTraversableB f g (Rec (P0 f a) (f a))
+                           (Rec (P0 g a) (g a)) where
   gbtraverse h = fmap (Rec . K1) . h . unK1 . unRec
   {-# INLINE gbtraverse #-}
 
-instance TraversableB b
-  => GTraversableB f g (Rec (b (P f)) (b f))
-                       (Rec (b (P g)) (b g)) where
+instance
+  ( SameOrParam b b'
+  , TraversableB b'
+  ) => GTraversableB f g (Rec (b (P0 f)) (b' f))
+                         (Rec (b (P0 g)) (b' g)) where
   gbtraverse h
     = fmap (Rec . K1) . btraverse h . unK1 . unRec
   {-# INLINE gbtraverse #-}
 
-instance (Traversable h, TraversableB b)
-  => GTraversableB f g (Rec (h (b (P f))) (h (b f)))
-                       (Rec (h (b (P g))) (h (b g))) where
+instance
+   ( SameOrParam h h'
+   , SameOrParam b b'
+   , Traversable h'
+   , TraversableB b'
+   ) => GTraversableB f g (Rec (h (b (P0 f))) (h' (b' f)))
+                          (Rec (h (b (P0 g))) (h' (b' g))) where
   gbtraverse h
     = fmap (Rec . K1) . traverse (btraverse h) . unK1 . unRec
   {-# INLINE gbtraverse #-}
 
 
-instance bf ~ bg => GTraversableB f g (Rec bf bf) (Rec bg bg) where
+instance GTraversableB f g (Rec a a) (Rec a a) where
   gbtraverse _ = pure
   {-# INLINE gbtraverse #-}
 

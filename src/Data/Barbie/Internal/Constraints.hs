@@ -8,6 +8,7 @@ module Data.Barbie.Internal.Constraints
   , CanDeriveConstraintsB
   , GAllBC
   , GAllB
+  , X
   , GAdjProof
   , gadjProofDefault
   )
@@ -20,7 +21,7 @@ import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Functor.Product(Product(..))
 import Data.Kind(Constraint)
 
-import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param)
+import Data.Generics.GenericN (GenericN(..), toN, fromN, Rec(..), Param, SameOrParam)
 import GHC.Generics
 
 
@@ -59,7 +60,7 @@ class FunctorB b => ConstraintsB b where
   --
   -- For requiring constraints of the form @c (f a)@, see 'ConstraintsOf'.
   type AllB (c :: * -> Constraint) b :: Constraint
-  type AllB c b = GAllB c b X (RepN (b X))
+  type AllB c b = GAllB c b (RepN (b X))
 
   -- | Adjoint a proof-of-instance to a barbie-type.
   adjProof :: forall c f.  AllB c b => b f -> b (Product (Dict c) f)
@@ -96,8 +97,8 @@ data X a
 type CanDeriveConstraintsB c b f
   = ( GenericN (b f)
     , GenericN (b (Dict c `Product` f))
-    , AllB c b ~ GAllB c b f (RepN (b f))
-    , GAdjProof c b f (RepN (b f)) (RepN (b (Dict c `Product` f)))
+    , AllB c b ~ GAllB c b (RepN (b X))
+    , GAdjProof c b f (RepN (b X)) (RepN (b f)) (RepN (b (Dict c `Product` f)))
     )
 
 
@@ -113,17 +114,17 @@ gadjProofDefault
     )
   => b f -> b (Dict c `Product` f)
 gadjProofDefault
-  = toN . gadjProof @c @b @f . fromN
+  = toN . gadjProof @c @b @f @(RepN (b X)) . fromN
 {-# INLINE gadjProofDefault #-}
 
 
 class GAllBC (b :: (* -> *) -> *) (repbf :: * -> *) where
-  type GAllB (c :: * -> Constraint) b (f :: * -> *) repbf :: Constraint
+  type GAllB (c :: * -> Constraint) b repbf :: Constraint
 
-class GAllBC b repbf => GAdjProof c b f repbf repbdf where
+class GAllBC b repbx => GAdjProof c b (f :: * -> *) repbx repbf repbdf where
   gadjProof
-    :: ( GAllB c b f repbf
-       , GAllB c b f (RepN (b f)) -- for the recursive case
+    :: ( GAllB c b repbx
+       , GAllB c b (RepN (b X)) -- for the recursive case
        )
     => repbf x -> repbdf x
 
@@ -133,46 +134,60 @@ class GAllBC b repbf => GAdjProof c b f repbf repbdf where
 -- ----------------------------------
 
 instance GAllBC b repbf => GAllBC b (M1 i k repbf) where
-  type GAllB c b f (M1 i k repbf) = GAllB c b f repbf
+  type GAllB c b (M1 i k repbf) = GAllB c b repbf
 
-instance GAdjProof c b f repbf repbdf => GAdjProof c b f (M1 i k repbf) (M1 i k repbdf) where
-  gadjProof = M1 . gadjProof @c @b @f . unM1
+instance
+  GAdjProof c b f repbx repbf repbdf
+    => GAdjProof c b f (M1 i k repbx)
+                       (M1 i k repbf)
+                       (M1 i k repbdf) where
+  gadjProof = M1 . gadjProof @c @b @f @repbx . unM1
   {-# INLINE gadjProof #-}
 
 
 
 instance GAllBC b V1 where
-  type GAllB c b f V1 = ()
+  type GAllB c b V1 = ()
 
-instance GAdjProof c b f V1 V1 where
+instance GAdjProof c b f V1 V1 V1 where
   gadjProof _ = undefined
 
 
 
 instance GAllBC b U1 where
-  type GAllB c b f U1 = ()
+  type GAllB c b U1 = ()
 
-instance GAdjProof c b f U1 U1 where
+instance GAdjProof c b f U1 U1 U1 where
   gadjProof = id
   {-# INLINE gadjProof #-}
 
 
 instance (GAllBC b l, GAllBC b r) => GAllBC b (l :*: r) where
-  type GAllB c b f (l :*: r) = (GAllB c b f l, GAllB c b f r)
+  type GAllB c b (l :*: r) = (GAllB c b l, GAllB c b r)
 
-instance (GAdjProof c b f l l', GAdjProof c b f r r') => GAdjProof c b f (l :*: r) (l' :*: r') where
+instance
+  ( GAdjProof c b f lx lf ldf
+  , GAdjProof c b f rx rf rdf
+  ) => GAdjProof c b f (lx  :*: rx)
+                       (lf  :*: rf)
+                       (ldf :*: rdf) where
   gadjProof (l :*: r)
-    = (gadjProof @c @b @f l) :*: (gadjProof @c @b @f r)
+    = (gadjProof @c @b @f @lx l) :*: (gadjProof @c @b @f @rx r)
   {-# INLINE gadjProof #-}
 
 
 instance (GAllBC b l, GAllBC b r) => GAllBC b (l :+: r) where
-  type GAllB c b f (l :+: r) = (GAllB c b f l, GAllB c b f r)
+  type GAllB c b (l :+: r) = (GAllB c b l, GAllB c b r)
 
-instance (GAdjProof c b f l l', GAdjProof c b f r r') => GAdjProof c b f (l :+: r) (l' :+: r') where
+instance
+  ( GAdjProof c b f lx lf ldf
+  , GAdjProof c b f rx rf rdf
+  ) => GAdjProof c b f (lx  :+: rx)
+                       (lf  :+: rf)
+                       (ldf :+: rdf) where
   gadjProof = \case
-    L1 l -> L1 (gadjProof @c @b @f l)
-    R1 r -> R1 (gadjProof @c @b @f r)
+    L1 l -> L1 (gadjProof @c @b @f @lx l)
+    R1 r -> R1 (gadjProof @c @b @f @rx r)
   {-# INLINE gadjProof #-}
 
 
@@ -181,33 +196,38 @@ instance (GAdjProof c b f l l', GAdjProof c b f r r') => GAdjProof c b f (l :+: 
 -- --------------------------------
 
 instance GAllBC b (Rec p a) where
-  type GAllB c b f (Rec p a) = GAllB_Rec c b f a
+  type GAllB c b (Rec p a) = GAllB_Rec c b a
 
-type family GAllB_Rec c b f a :: Constraint where
-  GAllB_Rec c b f (f a)  = c a
-  GAllB_Rec c b f (b  f) = () -- break recursion
-  GAllB_Rec c b f (b' f) = AllB c b'
-  GAllB_Rec c b f a      = ()
+type family GAllB_Rec c (b :: (* -> *) -> *) a :: Constraint where
+  GAllB_Rec c b (X a)  = c a
+  GAllB_Rec c b (b  X) = () -- break recursion
+  GAllB_Rec c b (b' X) = AllB c b'
+  GAllB_Rec c b a      = ()
 
-type P = Param 0
+type P0 (f :: * -> *) = Param 0 f
 
-instance GAdjProof c b f (Rec (P f a) (f a))
-                         (Rec (P (Dict c `Product` f) a) ((Dict c `Product` f) a)) where
+instance GAdjProof c b f (Rec (P0 X a) (X a))
+                         (Rec (P0 f a) (f a))
+                         (Rec (P0 (Dict c `Product` f) a) ((Dict c `Product` f) a)) where
   gadjProof
     = Rec . K1 . Pair Dict . unK1 . unRec
   {-# INLINE gadjProof #-}
 
 
 instance
-  ( ConstraintsB b'
-  , AllB c b'
-  ) => GAdjProof c b f (Rec (b' (P f)) (b' f))
-                       (Rec (b' (P (Dict c `Product` f))) (b' (Dict c `Product` f))) where
+  ( SameOrParam b' b''
+  , ConstraintsB b''
+  , AllB c b''
+  ) => GAdjProof c b f (Rec (b' (P0 X)) (b'' X))
+                       (Rec (b' (P0 f)) (b'' f))
+                       (Rec (b' (P0 (Dict c `Product` f))) (b'' (Dict c `Product` f))) where
   gadjProof
     = Rec . K1 . adjProof . unK1 . unRec
   {-# INLINE gadjProof #-}
 
 
-instance a ~ a' => GAdjProof c b f (Rec a a) (Rec a' a') where
+instance GAdjProof c b f (Rec a a)
+                         (Rec a a)
+                         (Rec a a) where
   gadjProof = id
   {-# INLINE gadjProof #-}

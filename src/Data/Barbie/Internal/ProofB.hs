@@ -36,8 +36,8 @@ class (ConstraintsB b, ProductB b) => ProofB b where
 --   'ConstraintsB', has a generic instance of 'ProofB' as well.
 type CanDeriveProofB c b
   = ( GenericN (b (Dict c))
-    , AllB c b ~ GAllB c b (Dict c) (RepN (b (Dict c)))
-    , GProof c b (RepN (b (Dict c)))
+    , AllB c b ~ GAllB c b (RepN (b X))
+    , GProof c b (RepN (b X)) (RepN (b (Dict c)))
     )
 
 -- | Like 'buniq' but an constraint is allowed to be required on
@@ -63,14 +63,14 @@ gbproofDefault
      )
   => b (Dict c)
 gbproofDefault
-  = toN $ gbproof @c @b
+  = toN $ gbproof @c @b @(RepN (b X))
 {-# INLINE gbproofDefault #-}
 
 
-class GProof c b repbd where
+class GProof c b repbx repbd where
   gbproof
-    :: ( GAllB c b (Dict c) repbd
-       , GAllB c b (Dict c) (RepN (b (Dict c))) -- for the recursive case
+    :: ( GAllB c b repbx
+       , GAllB c b (RepN (b X)) -- for the recursive case
        )
     => repbd x
 
@@ -78,16 +78,20 @@ class GProof c b repbd where
 -- Trivial cases
 -- ----------------------------------
 
-instance GProof c b repbd => GProof c b (M1 i k repbd) where
-  gbproof = M1 (gbproof @c @b)
+instance GProof c b repbx repbd => GProof c b (M1 i k repbx) (M1 i k repbd) where
+  gbproof = M1 (gbproof @c @b @repbx)
   {-# INLINE gbproof #-}
 
-instance GProof c b U1 where
+instance GProof c b U1 U1 where
   gbproof = U1
   {-# INLINE gbproof #-}
 
-instance (GProof c b l, GProof c b r) => GProof c b (l :*: r) where
-  gbproof = gbproof @c @b @l :*: gbproof @c @b @r
+instance
+  ( GProof c b lx ld
+  , GProof c b rx rd
+  ) => GProof c b (lx :*: rx)
+                  (ld :*: rd) where
+  gbproof = gbproof @c @b @lx @ld :*: gbproof @c @b @rx @rd
   {-# INLINE gbproof #-}
 
 
@@ -95,12 +99,14 @@ instance (GProof c b l, GProof c b r) => GProof c b (l :*: r) where
 -- The interesting cases
 -- --------------------------------
 
-type P = Param 0
+type P0 = Param 0
 
-instance GProof c b (Rec (P (Dict c) a) (Dict c a)) where
+instance GProof c b (Rec (P0 X a) (X a))
+                    (Rec (P0 (Dict c) a) (Dict c a)) where
   gbproof = Rec (K1 Dict)
   {-# INLINE gbproof #-}
 
 instance (ProofB b', AllB c b')
-  => GProof c b (Rec (b' (P (Dict c))) (b' (Dict c))) where
+  => GProof c b (Rec (b' (P0 X)) (b' X))
+                (Rec (b' (P0 (Dict c))) (b' (Dict c))) where
   gbproof = Rec $ K1 $ bproof @b'

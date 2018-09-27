@@ -22,6 +22,7 @@
 
 module Data.Generics.GenericN
   ( Param
+  , SameOrParam
   , Rec (Rec, unRec)
   , GenericN (..)
   ) where
@@ -74,3 +75,13 @@ instance
   fromN :: forall x. a -> RepN a x
   fromN = coerce (from :: a -> Rep a x)
   {-# INLINE fromN #-}
+
+
+-- | @'SameOrParam' a b@ holds iff @a ~ b@ or @'Param' n a ~ b@.
+--   It is useful when defining generic instances and one don't
+--   want to differentiate the case of a parameter-usage from
+--   the usage of a constant.
+class SameOrParam (a :: k) (b :: k)
+instance SameOrParam a a
+instance SameOrParam (Param n a) a
+instance SameOrParam a (Param n a)
