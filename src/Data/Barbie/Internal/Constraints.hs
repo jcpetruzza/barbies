@@ -8,7 +8,8 @@ module Data.Barbie.Internal.Constraints
   , CanDeriveConstraintsB
   , GAllBC
   , GAllB
-  , X
+  , GAllBRep, X
+  , TagSelf, Self, Other
   , GAdjProof
   , gadjProofDefault
   )
@@ -59,7 +60,7 @@ class FunctorB b => ConstraintsB b where
   --
   -- For requiring constraints of the form @c (f a)@, see 'ConstraintsOf'.
   type AllB (c :: * -> Constraint) b :: Constraint
-  type AllB c b = GAllB c b (RepN (b X))
+  type AllB c b = GAllB c (GAllBRep b)
 
   -- | Adjoint a proof-of-instance to a barbie-type.
   adjProof :: forall c f.  AllB c b => b f -> b (Product (Dict c) f)
@@ -85,6 +86,10 @@ class FunctorB b => ConstraintsB b where
 --   @
 type ConstraintsOf c f b = AllB (ClassF c f) b
 
+-- | The representation used for the generic computation of the @'AllB' c b@
+--   constraints. Here 'X' is an arbitrary constant since the actual
+--   argument to @b@ is irrelevant.
+type GAllBRep b = TagSelf b (RepN (b X))
 data X a
 
 -- | Intuivively, the requirements to have @'ConstraintsB' B@ derived are:
@@ -96,8 +101,8 @@ data X a
 type CanDeriveConstraintsB c b f
   = ( GenericN (b f)
     , GenericN (b (Dict c `Product` f))
-    , AllB c b ~ GAllB c b (RepN (b X))
-    , GAdjProof c b f (RepN (b X)) (RepN (b f)) (RepN (b (Dict c `Product` f)))
+    , AllB c b ~ GAllB c (GAllBRep b)
+    , GAdjProof c f (GAllBRep b) (RepN (b f)) (RepN (b (Dict c `Product` f)))
     )
 
 
@@ -113,80 +118,76 @@ gadjProofDefault
     )
   => b f -> b (Dict c `Product` f)
 gadjProofDefault
-  = toN . gadjProof @c @b @f @(RepN (b X)) . fromN
+  = toN . gadjProof @c @f @(GAllBRep b) . fromN
 {-# INLINE gadjProofDefault #-}
 
+class GAllBC (repbf :: * -> *) where
+  type GAllB (c :: * -> Constraint) repbf :: Constraint
 
-class GAllBC (b :: (* -> *) -> *) (repbf :: * -> *) where
-  type GAllB (c :: * -> Constraint) b repbf :: Constraint
-
-class GAllBC b repbx => GAdjProof c b (f :: * -> *) repbx repbf repbdf where
+class GAllBC repbx => GAdjProof c (f :: * -> *) repbx repbf repbdf where
   gadjProof
-    :: ( GAllB c b repbx
-       , GAllB c b (RepN (b X)) -- for the recursive case
-       )
-    => repbf x -> repbdf x
+    :: GAllB c repbx => repbf x -> repbdf x
 
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-instance GAllBC b repbf => GAllBC b (M1 i k repbf) where
-  type GAllB c b (M1 i k repbf) = GAllB c b repbf
+instance GAllBC repbf => GAllBC (M1 i k repbf) where
+  type GAllB c (M1 i k repbf) = GAllB c repbf
 
 instance
-  GAdjProof c b f repbx repbf repbdf
-    => GAdjProof c b f (M1 i k repbx)
-                       (M1 i k repbf)
-                       (M1 i k repbdf) where
-  gadjProof = M1 . gadjProof @c @b @f @repbx . unM1
+  GAdjProof c f repbx repbf repbdf
+    => GAdjProof c f (M1 i k repbx)
+                     (M1 i k repbf)
+                     (M1 i k repbdf) where
+  gadjProof = M1 . gadjProof @c @f @repbx . unM1
   {-# INLINE gadjProof #-}
 
 
 
-instance GAllBC b V1 where
-  type GAllB c b V1 = ()
+instance GAllBC V1 where
+  type GAllB c V1 = ()
 
-instance GAdjProof c b f V1 V1 V1 where
+instance GAdjProof c f V1 V1 V1 where
   gadjProof _ = undefined
 
 
 
-instance GAllBC b U1 where
-  type GAllB c b U1 = ()
+instance GAllBC U1 where
+  type GAllB c U1 = ()
 
-instance GAdjProof c b f U1 U1 U1 where
+instance GAdjProof c f U1 U1 U1 where
   gadjProof = id
   {-# INLINE gadjProof #-}
 
 
-instance (GAllBC b l, GAllBC b r) => GAllBC b (l :*: r) where
-  type GAllB c b (l :*: r) = (GAllB c b l, GAllB c b r)
+instance (GAllBC l, GAllBC r) => GAllBC (l :*: r) where
+  type GAllB c (l :*: r) = (GAllB c l, GAllB c r)
 
 instance
-  ( GAdjProof c b f lx lf ldf
-  , GAdjProof c b f rx rf rdf
-  ) => GAdjProof c b f (lx  :*: rx)
-                       (lf  :*: rf)
-                       (ldf :*: rdf) where
+  ( GAdjProof c f lx lf ldf
+  , GAdjProof c f rx rf rdf
+  ) => GAdjProof c f (lx  :*: rx)
+                     (lf  :*: rf)
+                     (ldf :*: rdf) where
   gadjProof (l :*: r)
-    = (gadjProof @c @b @f @lx l) :*: (gadjProof @c @b @f @rx r)
+    = (gadjProof @c @f @lx l) :*: (gadjProof @c @f @rx r)
   {-# INLINE gadjProof #-}
 
 
-instance (GAllBC b l, GAllBC b r) => GAllBC b (l :+: r) where
-  type GAllB c b (l :+: r) = (GAllB c b l, GAllB c b r)
+instance (GAllBC l, GAllBC r) => GAllBC (l :+: r) where
+  type GAllB c (l :+: r) = (GAllB c l, GAllB c r)
 
 instance
-  ( GAdjProof c b f lx lf ldf
-  , GAdjProof c b f rx rf rdf
-  ) => GAdjProof c b f (lx  :+: rx)
-                       (lf  :+: rf)
-                       (ldf :+: rdf) where
+  ( GAdjProof c f lx lf ldf
+  , GAdjProof c f rx rf rdf
+  ) => GAdjProof c f (lx  :+: rx)
+                     (lf  :+: rf)
+                     (ldf :+: rdf) where
   gadjProof = \case
-    L1 l -> L1 (gadjProof @c @b @f @lx l)
-    R1 r -> R1 (gadjProof @c @b @f @rx r)
+    L1 l -> L1 (gadjProof @c @f @lx l)
+    R1 r -> R1 (gadjProof @c @f @rx r)
   {-# INLINE gadjProof #-}
 
 
@@ -194,39 +195,102 @@ instance
 -- The interesting cases
 -- --------------------------------
 
-instance GAllBC b (Rec p a) where
-  type GAllB c b (Rec p a) = GAllB_Rec c b a
+type P0 = Param 0
 
-type family GAllB_Rec c (b :: (* -> *) -> *) a :: Constraint where
-  GAllB_Rec c b (X a)  = c a
-  GAllB_Rec c b (b  X) = () -- break recursion
-  GAllB_Rec c b (b' X) = AllB c b'
-  GAllB_Rec c b a      = ()
 
-type P0 (f :: * -> *) = Param 0 f
+instance GAllBC (Rec (P0 X a) (X a)) where
+  type GAllB c (Rec (P0 X a) (X a)) = c a
 
-instance GAdjProof c b f (Rec (P0 X a) (X a))
-                         (Rec (P0 f a) (f a))
-                         (Rec (P0 (Dict c `Product` f) a) ((Dict c `Product` f) a)) where
+instance GAdjProof c f (Rec (P0 X a) (X a))
+                       (Rec (P0 f a) (f a))
+                       (Rec (P0 (Dict c `Product` f) a) ((Dict c `Product` f) a)) where
   gadjProof
     = Rec . K1 . Pair Dict . unK1 . unRec
   {-# INLINE gadjProof #-}
 
 
+
+instance GAllBC (Rec (Self b (P0 X)) (b X)) where
+   type GAllB c (Rec (Self b (P0 X)) (b X)) = ()
+
 instance
-  ( SameOrParam b' b''
-  , ConstraintsB b''
-  , AllB c b''
-  ) => GAdjProof c b f (Rec (b' (P0 X)) (b'' X))
-                       (Rec (b' (P0 f)) (b'' f))
-                       (Rec (b' (P0 (Dict c `Product` f))) (b'' (Dict c `Product` f))) where
+  ( ConstraintsB b
+  , AllB c b
+  ) => GAdjProof c f (Rec (Self b (P0 X)) (b X))
+                     (Rec (b (P0 f)) (b f))
+                     (Rec (b (P0 (Dict c `Product` f))) (b (Dict c `Product` f))) where
+  gadjProof
+    = Rec . K1 . adjProof . unK1 . unRec
+  {-# INLINE gadjProof #-}
+
+instance
+  ( ConstraintsB b'
+  , SameOrParam b b'
+  ) => GAllBC (Rec (Other b (P0 X)) (b' X)) where
+  type GAllB c (Rec (Other b (P0 X)) (b' X)) = AllB c b'
+
+instance
+  ( SameOrParam b b'
+  , ConstraintsB b'
+  , AllB c b'
+  ) => GAdjProof c f (Rec (Other b (P0 X)) (b' X))
+                     (Rec (b (P0 f)) (b' f))
+                     (Rec (b (P0 (Dict c `Product` f))) (b' (Dict c `Product` f))) where
   gadjProof
     = Rec . K1 . adjProof . unK1 . unRec
   {-# INLINE gadjProof #-}
 
 
-instance GAdjProof c b f (Rec a a)
-                         (Rec a a)
-                         (Rec a a) where
+
+instance GAllBC (Rec a a) where
+  type GAllB c (Rec a a) = ()
+
+instance GAdjProof c f (Rec a a)
+                       (Rec a a)
+                       (Rec a a) where
   gadjProof = id
   {-# INLINE gadjProof #-}
+
+
+-- ============================================================================
+-- ## Identifying recursive usages of the barbie-type ##
+--
+-- We use type-families to generically compute @'AllB' c b@. Intuitively, if
+-- @b' f@ occurs inside @b f@, then we should just add @AllB b' c@ to
+-- @AllB b c@. The problem is that if @b@ is a recursive type, and @b'@ is @b@,
+-- then ghc will choke and blow the stack (instead of computing a fixpoint).
+--
+-- So, we would like to behave differently when @b = b'@ and add @()@ instead
+-- of `AllB b f` to break the recursion. Our trick will be to use a type
+-- family to inspect @RepN (b f)@ and distinguish recursive usages from
+-- non-recursive ones, tagging them with different types, so we can distinguish
+-- them in the instances.
+-- ============================================================================
+
+data Self  (b :: (* -> *) -> *) (f :: * -> *)
+data Other (b :: (* -> *) -> *) (f :: * -> *)
+
+type family TagSelf (b :: (* -> *) -> *) (repbf :: * -> *) :: * -> * where
+  TagSelf b (M1 mt m s)
+    = M1 mt m (TagSelf b s)
+
+  TagSelf b (l :+: r)
+    = TagSelf b l :+: TagSelf b r
+
+  TagSelf b (l :*: r)
+    = TagSelf b l :*: TagSelf b r
+
+  TagSelf b (Rec (b f) (b g))
+    = Rec (Self b f) (b g)
+
+  TagSelf b (Rec (b' f) (b'' (g :: * -> *)))
+    = Rec (Other b' f) (b'' g)
+
+  TagSelf b (Rec p a)
+    = Rec p a
+
+  TagSelf b U1
+    = U1
+
+  TagSelf b V1
+    = V1

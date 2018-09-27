@@ -263,7 +263,7 @@ data ParB b (f :: * -> *)
 instance FunctorB b => FunctorB (ParB b)
 instance TraversableB b => TraversableB (ParB b)
 instance ProductB b => ProductB (ParB b)
--- instance ConstraintsB b => ConstraintsB (ParB b)
+instance ConstraintsB b => ConstraintsB (ParB b)
 
 data ParBH h b (f :: * -> *)
   = ParBH (h (b f))
