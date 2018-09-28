@@ -4,7 +4,9 @@
   - Replace `ConstraintsOf` in `ConstraintsB` by `AllB`, which allows
     constraints to be given on `a` instead of on `f a`. The `ClassF`
     class lets us specify constraints on `f a` by doing `AllB (ClassF c f) b`.
-    `ConstraintsOf` becomes a type alias. Credit goes to Csongor Kiss.
+    `ConstraintsOf` becomes then a type alias. Credit goes to Csongor Kiss.
+  - `ConstraintsOf` is ultimately deprecated in favour of `AllBF`, which
+    is shorter and more consistent with `AllB`.
   - Changed the way `Wear` works: now wear-types need to have an extra
     type parameter that controls whether they are `Bare` or `Covered`. This
     let us remove all the "magic" that was involved, in the sense that

@@ -31,9 +31,12 @@ module Data.Barbie.Constraints
   , ConstraintsB(..)
   , ProofB(..)
 
-  , ConstraintsOf
+  , AllBF
   , ClassF
   , ClassFG
+
+    -- * Deprecated
+  , ConstraintsOf
   )
 
 where

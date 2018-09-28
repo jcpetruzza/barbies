@@ -3,6 +3,7 @@
 {-# LANGUAGE UndecidableInstances  #-}
 module Data.Barbie.Internal.Constraints
   ( ConstraintsB(..)
+  , AllBF
   , ConstraintsOf
 
   , CanDeriveConstraintsB
@@ -58,7 +59,7 @@ class FunctorB b => ConstraintsB b where
   -- 'AllB' 'Show' Barbie = ('Show' 'String', 'Show' 'Int')
   -- @
   --
-  -- For requiring constraints of the form @c (f a)@, see 'ConstraintsOf'.
+  -- For requiring constraints of the form @c (f a)@, see 'AllBF'.
   type AllB (c :: * -> Constraint) b :: Constraint
   type AllB c b = GAllB c (GAllBRep b)
 
@@ -77,14 +78,18 @@ class FunctorB b => ConstraintsB b where
 --   between the constraint @c@ and the type @a@. For example:
 --
 --   @
---   'ConstraintsOf' 'Show' f Barbie
+--   'AllBF' 'Show' f Barbie
 --      = ( 'Show' (f 'String')
 --        , 'Show' (f 'Int')
 --        , 'Wear' f 'String' ~ f 'String'
 --        , 'Wear' f 'Int' ~ f 'Int'
 --        )
 --   @
-type ConstraintsOf c f b = AllB (ClassF c f) b
+type AllBF c f b = AllB (ClassF c f) b
+
+
+{-# DEPRECATED ConstraintsOf "Use AllBF" #-}
+type ConstraintsOf c f b = AllBF c f b
 
 -- | The representation used for the generic computation of the @'AllB' c b@
 --   constraints. Here 'X' is an arbitrary constant since the actual

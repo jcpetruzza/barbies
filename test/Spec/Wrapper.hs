@@ -6,7 +6,7 @@ module Spec.Wrapper (
 
 where
 
-import Data.Barbie (Barbie(..), ConstraintsOf, ProofB)
+import Data.Barbie (AllBF, Barbie(..), ProofB)
 
 import Data.Semigroup (Semigroup, (<>))
 
@@ -17,8 +17,8 @@ lawsMonoid
   :: forall b
   .  ( Arbitrary (b []), Eq (b []), Show (b [])
      , ProofB b
-     , ConstraintsOf Semigroup [] b
-     , ConstraintsOf Monoid [] b
+     , AllBF Semigroup [] b
+     , AllBF Monoid [] b
      )
   => TestTree
 lawsMonoid
