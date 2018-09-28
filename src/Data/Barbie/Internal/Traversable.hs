@@ -30,8 +30,8 @@ import Data.Generics.GenericN
 --   satisfy the following laws:
 --
 -- @
---  t . 'btraverse' f = 'btraverse' (t . f)  -- naturality
--- 'btraverse' 'Data.Functor.Identity' = 'Data.Functor.Identity'         -- identity
+--  t . 'btraverse' f   = 'btraverse' (t . f)  -- naturality
+-- 'btraverse' 'Data.Functor.Identity' = 'Data.Functor.Identity'           -- identity
 -- 'btraverse' ('Compose' . 'fmap' g . f) = 'Compose' . 'fmap' ('btraverse' g) . 'btraverse' f -- composition
 -- @
 --
@@ -72,15 +72,18 @@ bfoldMap f
   = execWr . btraverse_ (tell . f)
 
 
--- | Intuivively, the requirements to have @'TraversableB' B@ derived are:
+-- | @'CanDeriveTraversableB' B f g@ is in practice a predicate about @B@ only.
+--   It is analogous to 'Data.Barbie.Internal.Functor.CanDeriveFunctorB', so it
+--   essentially requires the following to hold, for any arbitrary @f@:
 --
---     * There is an instance of @'Generic' (B f)@ for every @f@
+--     * There is an instance of @'Generic' (B f)@.
 --
---     * If @f@ is used as argument to some type in the definition of @B@, it
---       is only on a Barbie-type with a 'TraversableB' instance.
+--     * @B f@ can contain fields of type @b f@ as long as there exists a
+--       @'TraversableB' b@ instance. In particular, recursive usages of @B f@
+--       are allowed.
 --
---     * Recursive usages of @B f@ are allowed to appear as argument to a
---       'Traversable' (e.g. @'Maybe' (B f)')
+--     * @B f@ can also contain usages of @b f@ under a @'Traversable' h@.
+--       For example, one could use @'Maybe' (B f)@ when defining @B f@.
 type CanDeriveTraversableB b f g
   = ( GenericN (b f)
     , GenericN (b g)

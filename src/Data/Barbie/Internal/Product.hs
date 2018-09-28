@@ -24,22 +24,34 @@ import Data.Generics.GenericN
 -- | Barbie-types that can form products, subject to the laws:
 --
 -- @
--- 'bmap' \('Pair' a _) . 'uncurry' . 'bprod' = 'fst'
--- 'bmap' \('Pair' _ b) . 'uncurry' . 'bprod' = 'snd'
+-- 'bmap' (\\('Pair' a _) -> a) . 'uncurry' . 'bprod' = 'fst'
+-- 'bmap' (\\('Pair' _ b) -> b) . 'uncurry' . 'bprod' = 'snd'
 -- @
 --
 -- Notice that because of the laws, having an internal product structure is not
 -- enough to have a lawful instance. E.g.
 --
 -- @
--- data Ok  f = Ok {o1 :: f 'String', o2 :: f 'Int'}        -- has an instance
+-- data Ok  f = Ok {o1 :: f 'String', o2 :: f 'Int'}
 -- data Bad f = Bad{b1 :: f 'String', hiddenFromArg: 'Int'} -- no lawful instance
 -- @
 --
 -- Intuitively, the laws for this class require that `b` hides no structure
--- from its argument @f@. Because of this, any @x :: forall a . f a@
--- determines a unique value of @b f@, witnessed by the 'buniq' method.
--- Formally:
+-- from its argument @f@. Because of this, if we are given any:
+--
+-- @
+-- x :: forall a . f a
+-- @
+--
+-- then this determines a unique value of type @b f@, witnessed by the 'buniq'
+-- method.
+-- For example:
+--
+-- @
+-- 'buniq' x = Ok {o1 = x, o2 = x}
+-- @
+--
+-- Formally, 'buniq' should satisfy:
 --
 -- @
 -- 'const' ('buniq' x) = 'bmap' ('const' x)
@@ -48,11 +60,11 @@ import Data.Generics.GenericN
 -- There is a default implementation of 'bprod' and 'buniq' for 'Generic' types,
 -- so instances can derived automatically.
 class FunctorB b => ProductB b where
-  bprod :: b f -> b g -> b (Product f g)
+  bprod :: b f -> b g -> b (f `Product` g)
 
   buniq :: (forall a . f a) -> b f
 
-  default bprod :: CanDeriveProductB b f g => b f -> b g -> b (Product f g)
+  default bprod :: CanDeriveProductB b f g => b f -> b g -> b (f `Product` g)
   bprod = gbprodDefault
 
   default buniq :: CanDeriveProductB b f f => (forall a . f a) -> b f
@@ -60,11 +72,11 @@ class FunctorB b => ProductB b where
 
 
 -- | An alias of 'bprod', since this is like a 'zip' for Barbie-types.
-bzip :: ProductB b => b f -> b g -> b (Product f g)
+bzip :: ProductB b => b f -> b g -> b (f `Product` g)
 bzip = bprod
 
 -- | An equivalent of 'unzip' for Barbie-types.
-bunzip :: ProductB b => b (Product f g) -> (b f, b g)
+bunzip :: ProductB b => b (f `Product` g) -> (b f, b g)
 bunzip bfg = (bmap (\(Pair a _) -> a) bfg, bmap (\(Pair _ b) -> b) bfg)
 
 -- | An equivalent of 'Data.List.zipWith' for Barbie-types.
@@ -91,15 +103,16 @@ bzipWith4 f bf bg bh bi
   = bmap (\(Pair (Pair (Pair fa ga) ha) ia) -> f fa ga ha ia)
          (bf `bprod` bg `bprod` bh `bprod` bi)
 
--- | The requirements to to derive @'ProductB' (B f)@ are more strict than those for
---   'FunctorB' or 'TraversableB'. Intuitively, we need:
+
+-- | @'CanDeriveProductB' B f g@ is in practice a predicate about @B@ only.
+--   Intuitively, it says that the following holds, for any arbitrary @f@:
 --
---     * There is an instance of @'Generic' (B f)@ for every @f@
+--     * There is an instance of @'Generic' (B f)@.
 --
---     * @B@ has only one constructor.
+--     * @B@ has only one constructor (that is, it is not a sum-type).
 --
---     * Every field of @B@' constructor is of the form 'f t'. That is, @B@ has no
---       hidden structure.
+--     * Every field of @B f@ is of the form @f a@, for some type @a@.
+--       In other words, @B@ has no "hidden" structure.
 type CanDeriveProductB b f g
   = ( GenericN (b f)
     , GenericN (b g)
@@ -118,7 +131,7 @@ l /*/ r
   = bmap (\(Pair f g) -> Cons f (Cons g Unit)) (l `bprod` r)
 infixr 4 /*/
 
--- | Similar to '/*/' but one of the sides is already a 'Prod fs'.
+-- | Similar to '/*/' but one of the sides is already a @'Prod' fs@.
 --
 --   Note that '/*', '/*/' and 'uncurryn' are meant to be used together:
 --   '/*' and '/*/' combine @b f1, b f2...b fn@ into a single product that
@@ -142,7 +155,7 @@ infixr 4 /*
 gbprodDefault
   :: forall b f g
   .  CanDeriveProductB b f g
-  => b f -> b g -> b (Product f g)
+  => b f -> b g -> b (f `Product` g)
 gbprodDefault l r
   = toN $ gbprod @f @g (fromN l) (fromN r)
 {-# INLINE gbprodDefault #-}

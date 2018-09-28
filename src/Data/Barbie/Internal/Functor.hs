@@ -30,15 +30,17 @@ class FunctorB b where
     => (forall a . f a -> g a) -> b f -> b g
   bmap = gbmapDefault
 
--- | Intuivively, the requirements to have @'FunctorB' B@ derived are:
+-- | @'CanDeriveFunctorB' B f g@ is in practice a predicate about @B@ only.
+--   Intuitively, it says that the following holds, for any arbitrary @f@:
 --
---     * There is an instance of @'Generic' (B f)@ for every @f@
+--     * There is an instance of @'Generic' (B f)@.
 --
---     * If @f@ is used as argument to some type in the definition of @B@, it
---       is only on a Barbie-type with a 'FunctorB' instance.
+--     * @B f@ can contain fields of type @b f@ as long as there exists a
+--       @'FunctorB' b@ instance. In particular, recursive usages of @B f@
+--       are allowed.
 --
---     * Recursive usages of @B f@ are allowed to appear as argument to a
---       'Functor' (e.g. @'Maybe' (B f)')
+--     * @B f@ can also contain usages of @b f@ under a @'Functor' h@.
+--       For example, one could use @'Maybe' (B f)@ when defining @B f@.
 type CanDeriveFunctorB b f g
   = ( GenericN (b f)
     , GenericN (b g)

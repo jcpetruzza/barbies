@@ -39,13 +39,13 @@ type CanDeriveProofB c b
     , GProofB c (GAllBRep b) (RepN (b (Dict c)))
     )
 
--- | Like 'buniq' but an constraint is allowed to be required on
+-- | Like 'buniq' but a constraint is allowed to be required on
 --   each element of @b@.
 buniqC :: forall c f b . (AllB c b, ProofB b) => (forall a . c a => f a) -> b f
 buniqC x
   = bmap (requiringDict @c x) bproof
 
--- | Builds a @b f@, bu applying 'mempty' on every field of @b@.
+-- | Builds a @b f@, by applying 'mempty' on every field of @b@.
 bmempty :: forall f b . (AllB (ClassF Monoid f) b, ProofB b) => b f
 bmempty
   = buniqC @(ClassF Monoid f) mempty

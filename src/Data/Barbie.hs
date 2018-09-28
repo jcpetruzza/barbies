@@ -51,21 +51,23 @@ module Data.Barbie
 
     -- * Traversable
   , TraversableB(btraverse)
+    -- ** Utility functions
   , btraverse_
   , bfoldMap
   , bsequence, bsequence'
 
     -- * Product
   , ProductB(buniq, bprod)
-  , (/*/), (/*)
+    -- ** Utility functions
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
+    -- ** Applicative-like interface
+  , (/*/), (/*)
 
     -- * Constraints and proofs of instance
   , ConstraintsB(AllB, adjProof)
   , AllBF
-  , ClassF
-  , ClassFG
   , ProofB(bproof)
+    -- ** Utility functions
   , buniqC
   , bmempty
 
@@ -86,7 +88,6 @@ module Data.Barbie
 where
 
 import Data.Barbie.Internal.Constraints(ConstraintsB(..), AllBF, ConstraintsOf)
-import Data.Barbie.Internal.Dicts(ClassF, ClassFG)
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Instances(Barbie(..))
 import Data.Barbie.Internal.ProofB(ProofB(..), buniqC, bmempty)

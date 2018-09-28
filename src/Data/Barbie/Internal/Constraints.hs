@@ -26,8 +26,7 @@ import Data.Generics.GenericN
 
 
 -- | Instances of this class provide means to talk about constraints,
---   both at compile-time, using 'AllB' and at run-time,
---   in the form of class instance dictionaries, via 'adjProof'.
+--   both at compile-time, using 'AllB', and at run-time via 'adjProof'.
 --
 --   A manual definition would look like this:
 --
@@ -35,54 +34,48 @@ import Data.Generics.GenericN
 -- data T f = A (f 'Int') (f 'String') | B (f 'Bool') (f 'Int')
 --
 -- instance 'ConstraintsB' T where
---   type 'AllB' c T
---     = (c 'Int', c 'String', c 'Bool')
+--   type 'AllB' c T = (c 'Int', c 'String', c 'Bool')
 --
 --   adjProof t = case t of
---     A x y -> A ('Pair' ('packDict' x) ('packDict' y))
---     B z w -> B ('Pair' ('packDict' z) ('packDict' w))
+--     A x y -> A ('Pair' 'Dict' x) ('Pair' 'Dict' y)
+--     B z w -> B ('Pair' 'Dict' z) ('Pair' 'Dict' w)
 -- @
 --
 -- There is a default implementation of 'AllB' for
 -- 'Generic' types, so in practice one will simply do:
 --
 -- @
--- derive instance 'Generic' T
+-- derive instance 'Generic' (T f)
 -- instance 'ConstraintsB' T
 -- @
 class FunctorB b => ConstraintsB b where
-  -- | @'AllB' c b@ should contain a constraint @c x@ for each
-  --   @x@ occurring under an @f@ in @b f@. E.g.:
+  -- | @'AllB' c b@ should contain a constraint @c a@ for each
+  --   @a@ occurring under an @f@ in @b f@. E.g.:
   --
   -- @
-  -- 'AllB' 'Show' Barbie = ('Show' 'String', 'Show' 'Int')
+  -- 'AllB' 'Show' Barbie ~ ('Show' 'String', 'Show' 'Int')
   -- @
   --
-  -- For requiring constraints of the form @c (f a)@, see 'AllBF'.
+  -- For requiring constraints of the form @c (f a)@, use 'AllBF'.
   type AllB (c :: * -> Constraint) b :: Constraint
   type AllB c b = GAllB c (GAllBRep b)
 
-  -- | Adjoint a proof-of-instance to a barbie-type.
-  adjProof :: forall c f.  AllB c b => b f -> b (Product (Dict c) f)
+  adjProof :: forall c f.  AllB c b => b f -> b (Dict c `Product` f)
 
   default adjProof
     :: forall c f
     .  ( CanDeriveConstraintsB c b f
        , AllB c b
        )
-    => b f -> b (Product (Dict c) f)
+    => b f -> b (Dict c `Product` f)
   adjProof = gadjProofDefault
 
 -- | Similar to 'AllB' but will put the functor argument @f@
 --   between the constraint @c@ and the type @a@. For example:
 --
 --   @
---   'AllBF' 'Show' f Barbie
---      = ( 'Show' (f 'String')
---        , 'Show' (f 'Int')
---        , 'Wear' f 'String' ~ f 'String'
---        , 'Wear' f 'Int' ~ f 'Int'
---        )
+--   'AllB'  'Show'   Barbie ~ ('Show'    'String',  'Show'    'Int')
+--   'AllBF' 'Show' f Barbie ~ ('Show' (f 'String'), 'Show' (f 'Int'))
 --   @
 type AllBF c f b = AllB (ClassF c f) b
 
@@ -96,12 +89,14 @@ type ConstraintsOf c f b = AllBF c f b
 type GAllBRep b = TagSelf b (RepN (b X))
 data X a
 
--- | Intuivively, the requirements to have @'ConstraintsB' B@ derived are:
+-- | @'CanDeriveConstraintsB' B f g@ is in practice a predicate about @B@ only.
+--   Intuitively, it says that the following holds, for any arbitrary @f@:
 --
---     * There is an instance of @'Generic' (B f)@ for every @f@
+--     * There is an instance of @'Generic' (B f)@.
 --
---     * If @f@ is used as argument to some type in the definition of @B@, it
---       is only on a Barbie-type with a 'ConstraintsB' instance.
+--     * @B f@ can contain fields of type @b f@ as long as there exists a
+--       @'ConstraintsB' b@ instance. In particular, recursive usages of @B f@
+--       are allowed.
 type CanDeriveConstraintsB c b f
   = ( GenericN (b f)
     , GenericN (b (Dict c `Product` f))
@@ -262,21 +257,21 @@ instance GConstraintsB c f (Rec a a)
 -- ============================================================================
 -- ## Identifying recursive usages of the barbie-type ##
 --
--- We use type-families to generically compute @'AllB' c b@. Intuitively, if
--- @b' f@ occurs inside @b f@, then we should just add @AllB b' c@ to
--- @AllB b c@. The problem is that if @b@ is a recursive type, and @b'@ is @b@,
--- then ghc will choke and blow the stack (instead of computing a fixpoint).
---
--- So, we would like to behave differently when @b = b'@ and add @()@ instead
--- of `AllB b f` to break the recursion. Our trick will be to use a type
--- family to inspect @RepN (b f)@ and distinguish recursive usages from
--- non-recursive ones, tagging them with different types, so we can distinguish
--- them in the instances.
 -- ============================================================================
 
 data Self  (b :: (* -> *) -> *) (f :: * -> *)
 data Other (b :: (* -> *) -> *) (f :: * -> *)
 
+-- | We use type-families to generically compute @'AllB' c b@. Intuitively, if
+--   @b' f@ occurs inside @b f@, then we should just add @AllB b' c@ to
+--   @AllB b c@. The problem is that if @b@ is a recursive type, and @b'@ is @b@,
+--   then ghc will choke and blow the stack (instead of computing a fixpoint).
+--
+--   So, we would like to behave differently when @b = b'@ and add @()@ instead
+--   of `AllB b f` to break the recursion. Our trick will be to use a type
+--   family to inspect @RepN (b f)@ and distinguish recursive usages from
+--   non-recursive ones, tagging them with different types, so we can distinguish
+--   them in the instances.
 type family TagSelf (b :: (* -> *) -> *) (repbf :: * -> *) :: * -> * where
   TagSelf b (M1 mt m s)
     = M1 mt m (TagSelf b s)
