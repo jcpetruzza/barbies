@@ -28,18 +28,19 @@ library
       Data.Barbie.Bare
       Data.Barbie.Constraints
       Data.Barbie.Container
+      Data.Barbie.Internal
       Data.Functor.Prod
 
+
+  other-modules:
       Data.Barbie.Internal.Bare
       Data.Barbie.Internal.Constraints
+      Data.Barbie.Internal.Dicts
       Data.Barbie.Internal.Functor
+      Data.Barbie.Internal.Instances
       Data.Barbie.Internal.Product
       Data.Barbie.Internal.ProofB
       Data.Barbie.Internal.Traversable
-
-  other-modules:
-      Data.Barbie.Internal.Dicts
-      Data.Barbie.Internal.Instances
       Data.Barbie.Internal.Wear
       Data.Barbie.Trivial
 

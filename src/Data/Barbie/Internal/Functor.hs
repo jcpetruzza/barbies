@@ -2,7 +2,7 @@
 module Data.Barbie.Internal.Functor
   ( FunctorB(..)
 
-  , GFunctorB
+  , GFunctorB(..)
   , gbmapDefault
   , CanDeriveFunctorB
   )

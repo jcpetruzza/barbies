@@ -8,7 +8,7 @@ module Data.Barbie.Internal.ProofB
 
   , CanDeriveProofB
   , GAllB
-  , GProof
+  , GProofB(..)
   , gbproofDefault
   )
 
@@ -36,7 +36,7 @@ class (ConstraintsB b, ProductB b) => ProofB b where
 type CanDeriveProofB c b
   = ( GenericN (b (Dict c))
     , AllB c b ~ GAllB c (GAllBRep b)
-    , GProof c (GAllBRep b) (RepN (b (Dict c)))
+    , GProofB c (GAllBRep b) (RepN (b (Dict c)))
     )
 
 -- | Like 'buniq' but an constraint is allowed to be required on
@@ -66,7 +66,7 @@ gbproofDefault
 {-# INLINE gbproofDefault #-}
 
 
-class GProof c repbx repbd where
+class GProofB c repbx repbd where
   gbproof
     :: GAllB c repbx => repbd x
 
@@ -74,19 +74,19 @@ class GProof c repbx repbd where
 -- Trivial cases
 -- ----------------------------------
 
-instance GProof c repbx repbd => GProof c (M1 i k repbx) (M1 i k repbd) where
+instance GProofB c repbx repbd => GProofB c (M1 i k repbx) (M1 i k repbd) where
   gbproof = M1 (gbproof @c @repbx)
   {-# INLINE gbproof #-}
 
-instance GProof c U1 U1 where
+instance GProofB c U1 U1 where
   gbproof = U1
   {-# INLINE gbproof #-}
 
 instance
-  ( GProof c lx ld
-  , GProof c rx rd
-  ) => GProof c (lx :*: rx)
-                (ld :*: rd) where
+  ( GProofB c lx ld
+  , GProofB c rx rd
+  ) => GProofB c (lx :*: rx)
+                 (ld :*: rd) where
   gbproof = gbproof @c @lx @ld :*: gbproof @c @rx @rd
   {-# INLINE gbproof #-}
 
@@ -97,17 +97,17 @@ instance
 
 type P0 = Param 0
 
-instance GProof c (Rec (P0 X a) (X a))
-                  (Rec (P0 (Dict c) a) (Dict c a)) where
+instance GProofB c (Rec (P0 X a) (X a))
+                   (Rec (P0 (Dict c) a) (Dict c a)) where
   gbproof = Rec (K1 Dict)
   {-# INLINE gbproof #-}
 
 instance (ProofB b', AllB c b')
-  => GProof c (Rec (Self b' (P0 X)) (b' X))
-              (Rec (b' (P0 (Dict c))) (b' (Dict c))) where
+  => GProofB c (Rec (Self b' (P0 X)) (b' X))
+               (Rec (b' (P0 (Dict c))) (b' (Dict c))) where
   gbproof = Rec $ K1 $ bproof @b'
 
 instance (ProofB b', AllB c b')
-  => GProof c (Rec (Other b' (P0 X)) (b' X))
-              (Rec (b' (P0 (Dict c))) (b' (Dict c))) where
+  => GProofB c (Rec (Other b' (P0 X)) (b' X))
+               (Rec (b' (P0 (Dict c))) (b' (Dict c))) where
   gbproof = Rec $ K1 $ bproof @b'

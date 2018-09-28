@@ -11,7 +11,7 @@ module Data.Barbie.Internal.Traversable
   , bfoldMap
 
   , CanDeriveTraversableB
-  , GTraversableB
+  , GTraversableB(..)
   , gbtraverseDefault
   )
 

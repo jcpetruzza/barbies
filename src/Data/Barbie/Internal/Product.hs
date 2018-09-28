@@ -7,7 +7,7 @@ module Data.Barbie.Internal.Product
   , (/*/), (/*)
 
   , CanDeriveProductB
-  , GProductB
+  , GProductB(..)
   , gbprodDefault, gbuniqDefault
   )
 
