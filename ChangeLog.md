@@ -18,6 +18,7 @@
   - Improve the internal instance derivation mechanism. We no longer
     need `unsafeCoerce` and the code should be in general indistinguishible
     from hand-written instances (not currently verified).
+  - Fix support for barbie-types that have additional type parameters (#5).
 
 ## 0.1.4.0
   - Add `btraverse_`
