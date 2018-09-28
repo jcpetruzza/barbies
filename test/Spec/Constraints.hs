@@ -7,7 +7,7 @@ module Spec.Constraints
 where
 
 import Clothes(F)
-import Data.Barbie(bmap, ConstraintsB(..), ProofB(..))
+import Data.Barbie(bmap, ConstraintsB(..), AllBF, ProofB(..))
 import Data.Barbie.Constraints(ClassF, Dict)
 
 import Data.Functor.Product (Product(Pair))
@@ -19,7 +19,7 @@ import Test.Tasty.QuickCheck(Arbitrary(..), testProperty, (===))
 
 lawAdjProofPrj
   :: forall b
-  . ( ConstraintsB b, AllB (ClassF Show F) b
+  . ( ConstraintsB b, AllBF Show F b
     , Eq (b F)
     , Show (b F)
     , Arbitrary (b F)
@@ -35,7 +35,7 @@ lawAdjProofPrj
 
 lawProofEquivPrj
   :: forall b
-  . ( ProofB b, AllB (ClassF Show F) b
+  . ( ProofB b, AllBF Show F b
     , Eq (b (Dict (ClassF Show F)))
     , Show (b F), Show (b (Dict (ClassF Show F)))
     , Arbitrary (b F)

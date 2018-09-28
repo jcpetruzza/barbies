@@ -46,7 +46,7 @@ buniqC x
   = bmap (requiringDict @c x) bproof
 
 -- | Builds a @b f@, by applying 'mempty' on every field of @b@.
-bmempty :: forall f b . (AllB (ClassF Monoid f) b, ProofB b) => b f
+bmempty :: forall f b . (AllBF Monoid f b, ProofB b) => b f
 bmempty
   = buniqC @(ClassF Monoid f) mempty
 

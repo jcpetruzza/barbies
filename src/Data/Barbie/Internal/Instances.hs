@@ -28,12 +28,12 @@ instance TraversableB b => TraversableB (Barbie b) where
   btraverse f = fmap Barbie . btraverse f . getBarbie
 
 
-instance (ProofB b, AllB (ClassF Semigroup f) b) => Semigroup (Barbie b f) where
+instance (ProofB b, AllBF Semigroup f b) => Semigroup (Barbie b f) where
   (<>) = bzipWith3 mk bproof
     where
       mk :: Dict (ClassF Semigroup f) a -> f a -> f a -> f a
       mk = requiringDict (<>)
 
-instance (ProofB b, AllB (ClassF Semigroup f) b, AllB (ClassF Monoid f) b) => Monoid (Barbie b f) where
+instance (ProofB b, AllBF Semigroup f b, AllBF Monoid f b) => Monoid (Barbie b f) where
   mempty  = bmempty
   mappend = (<>)
