@@ -4,14 +4,17 @@
 module Data.Barbie.Internal.Constraints
   ( ConstraintsB(..)
   , AllBF
-  , ConstraintsOf
 
   , CanDeriveConstraintsB
   , GAllBC(..)
   , GAllBRep, X
   , TagSelf, Self, Other
   , GConstraintsB(..)
-  , gadjProofDefault
+  , gbaddDictsDefault
+
+    -- DEPRECATED STUFF
+  , adjProof
+  , ConstraintsOf
   )
 
 where
@@ -26,7 +29,8 @@ import Data.Generics.GenericN
 
 
 -- | Instances of this class provide means to talk about constraints,
---   both at compile-time, using 'AllB', and at run-time via 'adjProof'.
+--   both at compile-time, using 'AllB', and at run-time, in the form
+--   of 'Dict', via 'baddDicts'.
 --
 --   A manual definition would look like this:
 --
@@ -36,12 +40,19 @@ import Data.Generics.GenericN
 -- instance 'ConstraintsB' T where
 --   type 'AllB' c T = (c 'Int', c 'String', c 'Bool')
 --
---   adjProof t = case t of
+--   'baddDicts' t = case t of
 --     A x y -> A ('Pair' 'Dict' x) ('Pair' 'Dict' y)
 --     B z w -> B ('Pair' 'Dict' z) ('Pair' 'Dict' w)
 -- @
 --
--- There is a default implementation of 'AllB' for
+-- Now if we given a @T f@, we need to use the 'Show' instance of
+-- their fields, we can use:
+--
+-- @
+-- 'baddDicts' :: AllB Show b => b f -> b ('Dict' 'Show' `Product` b)
+-- @
+--
+-- There is a default implementation of 'ConstraintsB' for
 -- 'Generic' types, so in practice one will simply do:
 --
 -- @
@@ -60,15 +71,15 @@ class FunctorB b => ConstraintsB b where
   type AllB (c :: * -> Constraint) b :: Constraint
   type AllB c b = GAllB c (GAllBRep b)
 
-  adjProof :: forall c f.  AllB c b => b f -> b (Dict c `Product` f)
+  baddDicts :: forall c f.  AllB c b => b f -> b (Dict c `Product` f)
 
-  default adjProof
+  default baddDicts
     :: forall c f
     .  ( CanDeriveConstraintsB c b f
        , AllB c b
        )
     => b f -> b (Dict c `Product` f)
-  adjProof = gadjProofDefault
+  baddDicts = gbaddDictsDefault
 
 -- | Similar to 'AllB' but will put the functor argument @f@
 --   between the constraint @c@ and the type @a@. For example:
@@ -80,8 +91,14 @@ class FunctorB b => ConstraintsB b where
 type AllBF c f b = AllB (ClassF c f) b
 
 
-{-# DEPRECATED ConstraintsOf "Use AllBF" #-}
+{-# DEPRECATED ConstraintsOf "Renamed to AllBF (now based on AllB)" #-}
 type ConstraintsOf c f b = AllBF c f b
+
+{-# DEPRECATED adjProof "Renamed to baddDicts" #-}
+adjProof
+  :: forall b c f.  (ConstraintsB b, AllB c b) => b f -> b (Dict c `Product` f)
+adjProof = baddDicts
+
 
 -- | The representation used for the generic computation of the @'AllB' c b@
 --   constraints. Here 'X' is an arbitrary constant since the actual
@@ -109,23 +126,22 @@ type CanDeriveConstraintsB c b f
 --  Generic derivations
 -- ===============================================================
 
--- | Default implementation of 'adjProof' based on 'Generic'.
-gadjProofDefault
+-- | Default implementation of 'baddDicts' based on 'Generic'.
+gbaddDictsDefault
   :: forall b c f
   . ( CanDeriveConstraintsB c b f
     , AllB c b
     )
   => b f -> b (Dict c `Product` f)
-gadjProofDefault
-  = toN . gadjProof @c @f @(GAllBRep b) . fromN
-{-# INLINE gadjProofDefault #-}
+gbaddDictsDefault
+  = toN . gbaddDicts @c @f @(GAllBRep b) . fromN
+{-# INLINE gbaddDictsDefault #-}
 
 class GAllBC (repbf :: * -> *) where
   type GAllB (c :: * -> Constraint) repbf :: Constraint
 
 class GAllBC repbx => GConstraintsB c (f :: * -> *) repbx repbf repbdf where
-  gadjProof
-    :: GAllB c repbx => repbf x -> repbdf x
+  gbaddDicts :: GAllB c repbx => repbf x -> repbdf x
 
 
 -- ----------------------------------
@@ -140,8 +156,8 @@ instance
     => GConstraintsB c f (M1 i k repbx)
                          (M1 i k repbf)
                          (M1 i k repbdf) where
-  gadjProof = M1 . gadjProof @c @f @repbx . unM1
-  {-# INLINE gadjProof #-}
+  gbaddDicts = M1 . gbaddDicts @c @f @repbx . unM1
+  {-# INLINE gbaddDicts #-}
 
 
 
@@ -149,7 +165,7 @@ instance GAllBC V1 where
   type GAllB c V1 = ()
 
 instance GConstraintsB c f V1 V1 V1 where
-  gadjProof _ = undefined
+  gbaddDicts _ = undefined
 
 
 
@@ -157,8 +173,8 @@ instance GAllBC U1 where
   type GAllB c U1 = ()
 
 instance GConstraintsB c f U1 U1 U1 where
-  gadjProof = id
-  {-# INLINE gadjProof #-}
+  gbaddDicts = id
+  {-# INLINE gbaddDicts #-}
 
 
 instance (GAllBC l, GAllBC r) => GAllBC (l :*: r) where
@@ -170,9 +186,9 @@ instance
   ) => GConstraintsB c f (lx  :*: rx)
                          (lf  :*: rf)
                          (ldf :*: rdf) where
-  gadjProof (l :*: r)
-    = (gadjProof @c @f @lx l) :*: (gadjProof @c @f @rx r)
-  {-# INLINE gadjProof #-}
+  gbaddDicts (l :*: r)
+    = (gbaddDicts @c @f @lx l) :*: (gbaddDicts @c @f @rx r)
+  {-# INLINE gbaddDicts #-}
 
 
 instance (GAllBC l, GAllBC r) => GAllBC (l :+: r) where
@@ -184,10 +200,10 @@ instance
   ) => GConstraintsB c f (lx  :+: rx)
                          (lf  :+: rf)
                          (ldf :+: rdf) where
-  gadjProof = \case
-    L1 l -> L1 (gadjProof @c @f @lx l)
-    R1 r -> R1 (gadjProof @c @f @rx r)
-  {-# INLINE gadjProof #-}
+  gbaddDicts = \case
+    L1 l -> L1 (gbaddDicts @c @f @lx l)
+    R1 r -> R1 (gbaddDicts @c @f @rx r)
+  {-# INLINE gbaddDicts #-}
 
 
 -- --------------------------------
@@ -204,9 +220,9 @@ instance GConstraintsB c f (Rec (P0 X a) (X a))
                            (Rec (P0 f a) (f a))
                            (Rec (P0 (Dict c `Product` f) a)
                                    ((Dict c `Product` f) a)) where
-  gadjProof
+  gbaddDicts
     = Rec . K1 . Pair Dict . unK1 . unRec
-  {-# INLINE gadjProof #-}
+  {-# INLINE gbaddDicts #-}
 
 
 
@@ -220,9 +236,9 @@ instance
                          (Rec (b (P0 f)) (b f))
                          (Rec (b (P0 (Dict c `Product` f)))
                               (b     (Dict c `Product` f))) where
-  gadjProof
-    = Rec . K1 . adjProof . unK1 . unRec
-  {-# INLINE gadjProof #-}
+  gbaddDicts
+    = Rec . K1 . baddDicts . unK1 . unRec
+  {-# INLINE gbaddDicts #-}
 
 instance
   ( ConstraintsB b'
@@ -238,9 +254,9 @@ instance
                          (Rec (b (P0 f)) (b' f))
                          (Rec (b (P0 (Dict c `Product` f)))
                               (b'    (Dict c `Product` f))) where
-  gadjProof
-    = Rec . K1 . adjProof . unK1 . unRec
-  {-# INLINE gadjProof #-}
+  gbaddDicts
+    = Rec . K1 . baddDicts . unK1 . unRec
+  {-# INLINE gbaddDicts #-}
 
 
 
@@ -250,8 +266,8 @@ instance GAllBC (Rec a a) where
 instance GConstraintsB c f (Rec a a)
                            (Rec a a)
                            (Rec a a) where
-  gadjProof = id
-  {-# INLINE gadjProof #-}
+  gbaddDicts = id
+  {-# INLINE gbaddDicts #-}
 
 
 -- ============================================================================

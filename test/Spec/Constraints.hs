@@ -1,6 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 module Spec.Constraints
-  ( lawAdjProofPrj
+  ( lawAddDictPrj
   , lawProofEquivPrj
   )
 
@@ -17,7 +17,7 @@ import Test.Tasty(TestTree)
 import Test.Tasty.QuickCheck(Arbitrary(..), testProperty, (===))
 
 
-lawAdjProofPrj
+lawAddDictPrj
   :: forall b
   . ( ConstraintsB b, AllBF Show F b
     , Eq (b F)
@@ -26,9 +26,9 @@ lawAdjProofPrj
     , Typeable b
     )
   => TestTree
-lawAdjProofPrj
+lawAddDictPrj
   = testProperty (show (typeRep (Proxy :: Proxy b))) $ \b ->
-      bmap second (adjProof b :: b (Product (Dict (ClassF Show F)) F)) === b
+      bmap second (baddDicts b :: b (Dict (ClassF Show F) `Product` F)) === b
   where
     second (Pair _ b) = b
 
@@ -44,6 +44,6 @@ lawProofEquivPrj
   => TestTree
 lawProofEquivPrj
   = testProperty (show (typeRep (Proxy :: Proxy b))) $ \b ->
-      bmap first (adjProof b :: b (Product (Dict (ClassF Show F)) F)) === bproof
+      bmap first (baddDicts b :: b (Dict (ClassF Show F) `Product` F)) === bproof
   where
     first (Pair a _) = a

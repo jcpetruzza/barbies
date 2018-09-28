@@ -109,30 +109,30 @@ main
             , Product.uniqLaws @(Record3WS Covered)
             ]
 
-        , testGroup "adjProof projection"
-            [ Constraints.lawAdjProofPrj @Record0
-            , Constraints.lawAdjProofPrj @Record1
-            , Constraints.lawAdjProofPrj @Record3
+        , testGroup "adDict projection"
+            [ Constraints.lawAddDictPrj @Record0
+            , Constraints.lawAddDictPrj @Record1
+            , Constraints.lawAddDictPrj @Record3
 
-            , Constraints.lawAdjProofPrj @Record1S
-            , Constraints.lawAdjProofPrj @Record3S
+            , Constraints.lawAddDictPrj @Record1S
+            , Constraints.lawAddDictPrj @Record3S
 
-            , Constraints.lawAdjProofPrj @(Record1W Covered)
-            , Constraints.lawAdjProofPrj @(Record3W Covered)
+            , Constraints.lawAddDictPrj @(Record1W Covered)
+            , Constraints.lawAddDictPrj @(Record3W Covered)
 
-            , Constraints.lawAdjProofPrj @(Record1WS Covered)
-            , Constraints.lawAdjProofPrj @(Record3WS Covered)
+            , Constraints.lawAddDictPrj @(Record1WS Covered)
+            , Constraints.lawAddDictPrj @(Record3WS Covered)
 
-            , Constraints.lawAdjProofPrj @Ignore1
+            , Constraints.lawAddDictPrj @Ignore1
 
-            , Constraints.lawAdjProofPrj @Sum3
-            , Constraints.lawAdjProofPrj @SumRec
+            , Constraints.lawAddDictPrj @Sum3
+            , Constraints.lawAddDictPrj @SumRec
 
-            , Constraints.lawAdjProofPrj @(Sum3W Covered)
-            , Constraints.lawAdjProofPrj @(SumRecW Covered)
+            , Constraints.lawAddDictPrj @(Sum3W Covered)
+            , Constraints.lawAddDictPrj @(SumRecW Covered)
 
-            , Constraints.lawAdjProofPrj @CompositeRecord
-            , Constraints.lawAdjProofPrj @(CompositeRecordW Covered)
+            , Constraints.lawAddDictPrj @CompositeRecord
+            , Constraints.lawAddDictPrj @(CompositeRecordW Covered)
             ]
 
         , testGroup "bproof projection"

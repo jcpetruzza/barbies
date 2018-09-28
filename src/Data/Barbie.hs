@@ -63,8 +63,8 @@ module Data.Barbie
     -- ** Applicative-like interface
   , (/*/), (/*)
 
-    -- * Constraints and proofs of instance
-  , ConstraintsB(AllB, adjProof)
+    -- * Constraints and instance dictionaries
+  , ConstraintsB(AllB, baddDicts)
   , AllBF
   , ProofB(bproof)
     -- ** Utility functions
@@ -82,12 +82,15 @@ module Data.Barbie
   , Rec(..)
 
     -- * Deprecations
-  , ConstraintsOf
+  , Deprecated.ConstraintsOf
+  , Deprecated.adjProof
   )
 
 where
 
-import Data.Barbie.Internal.Constraints(ConstraintsB(..), AllBF, ConstraintsOf)
+import Data.Barbie.Internal.Constraints(ConstraintsB(..), AllBF)
+import qualified Data.Barbie.Internal.Constraints as Deprecated
+
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Instances(Barbie(..))
 import Data.Barbie.Internal.ProofB(ProofB(..), buniqC, bmempty)

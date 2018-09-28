@@ -23,11 +23,11 @@
 -- This module adds support to overcome this problem.
 ----------------------------------------------------------------------------
 module Data.Barbie.Constraints
-  ( -- * Proof of instance
+  ( -- * Instance dictionaries
     Dict(..)
   , requiringDict
 
-    -- * Retrieving proofs
+    -- * Retrieving dictionaries
   , ConstraintsB(..)
   , ProofB(..)
 
@@ -37,6 +37,7 @@ module Data.Barbie.Constraints
 
     -- * Deprecated
   , ConstraintsOf
+  , adjProof
   )
 
 where

@@ -22,7 +22,7 @@ newtype Barbie b (f :: * -> *)
 -- Need to derive it manually to make GHC 8.0.2 happy
 instance ConstraintsB b => ConstraintsB (Barbie b) where
   type AllB c (Barbie b) = AllB c b
-  adjProof = Barbie . adjProof . getBarbie
+  baddDicts = Barbie . baddDicts . getBarbie
 
 instance TraversableB b => TraversableB (Barbie b) where
   btraverse f = fmap Barbie . btraverse f . getBarbie

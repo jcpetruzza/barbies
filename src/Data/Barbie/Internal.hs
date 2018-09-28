@@ -16,7 +16,7 @@ module Data.Barbie.Internal
   , Internal.CanDeriveProductB
 
     -- * Constraints
-  , Internal.gadjProofDefault
+  , Internal.gbaddDictsDefault
   , Internal.GConstraintsB(..)
   , Internal.CanDeriveConstraintsB
   , Internal.GAllBC(..)
