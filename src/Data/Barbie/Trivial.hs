@@ -7,8 +7,8 @@ where
 
 import Data.Barbie.Internal.Constraints(ConstraintsB(..))
 import Data.Barbie.Internal.Functor(FunctorB(..))
-import Data.Barbie.Internal.ProofB(ProofB(..))
 import Data.Barbie.Internal.Product(ProductB(..))
+import Data.Barbie.Internal.ProductC(ProductBC(..))
 import Data.Barbie.Internal.Traversable(TraversableB(..))
 
 import Data.Data (Data(..))
@@ -62,4 +62,4 @@ instance FunctorB Unit
 instance TraversableB Unit
 instance ProductB Unit
 instance ConstraintsB Unit
-instance ProofB Unit
+instance ProductBC Unit

@@ -25,9 +25,9 @@ module Data.Barbie.Internal
   , Internal.TagSelf, Internal.Self, Internal.Other
 
     -- * Proof
-  , Internal.gbproofDefault
-  , Internal.GProofB(..)
-  , Internal.CanDeriveProofB
+  , Internal.gbdictsDefault
+  , Internal.GProductBC(..)
+  , Internal.CanDeriveProductBC
 
     -- * Bare values
   , Internal.gbcoverDefault
@@ -45,7 +45,7 @@ import qualified Data.Barbie.Internal.Bare as Internal
 import qualified Data.Barbie.Internal.Constraints as Internal
 import qualified Data.Barbie.Internal.Functor as Internal
 import qualified Data.Barbie.Internal.Product as Internal
-import qualified Data.Barbie.Internal.ProofB as Internal
+import qualified Data.Barbie.Internal.ProductC as Internal
 import qualified Data.Barbie.Internal.Traversable as Internal
 
 import Data.Generics.GenericN (GenericN, Rec(..), RepN)

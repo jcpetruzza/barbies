@@ -135,21 +135,21 @@ main
             , Constraints.lawAddDictPrj @(CompositeRecordW Covered)
             ]
 
-        , testGroup "bproof projection"
-            [ Constraints.lawProofEquivPrj @Record0
-            , Constraints.lawProofEquivPrj @Record1
-            , Constraints.lawProofEquivPrj @Record3
-            , Constraints.lawProofEquivPrj @CompositeRecord
+        , testGroup "bdicts projection"
+            [ Constraints.lawDictsEquivPrj @Record0
+            , Constraints.lawDictsEquivPrj @Record1
+            , Constraints.lawDictsEquivPrj @Record3
+            , Constraints.lawDictsEquivPrj @CompositeRecord
 
-            , Constraints.lawProofEquivPrj @Record1S
-            , Constraints.lawProofEquivPrj @Record3S
+            , Constraints.lawDictsEquivPrj @Record1S
+            , Constraints.lawDictsEquivPrj @Record3S
 
-            , Constraints.lawProofEquivPrj @(Record1W Covered)
-            , Constraints.lawProofEquivPrj @(Record3W Covered)
-            , Constraints.lawProofEquivPrj @(CompositeRecordW Covered)
+            , Constraints.lawDictsEquivPrj @(Record1W Covered)
+            , Constraints.lawDictsEquivPrj @(Record3W Covered)
+            , Constraints.lawDictsEquivPrj @(CompositeRecordW Covered)
 
-            , Constraints.lawProofEquivPrj @(Record1WS Covered)
-            , Constraints.lawProofEquivPrj @(Record3WS Covered)
+            , Constraints.lawDictsEquivPrj @(Record1WS Covered)
+            , Constraints.lawDictsEquivPrj @(Record3WS Covered)
             ]
 
         , testGroup "Bare laws"

@@ -6,7 +6,7 @@ module Spec.Wrapper (
 
 where
 
-import Data.Barbie (AllBF, Barbie(..), ProofB)
+import Data.Barbie (AllBF, Barbie(..), ProductBC)
 
 import Data.Semigroup (Semigroup, (<>))
 
@@ -16,7 +16,7 @@ import Test.Tasty.QuickCheck(Arbitrary(..), testProperty)
 lawsMonoid
   :: forall b
   .  ( Arbitrary (b []), Eq (b []), Show (b [])
-     , ProofB b
+     , ProductBC b
      , AllBF Semigroup [] b
      , AllBF Monoid [] b
      )

@@ -45,7 +45,7 @@ instance FunctorB Record0
 instance TraversableB Record0
 instance ProductB Record0
 instance ConstraintsB Record0
-instance ProofB Record0
+instance ProductBC Record0
 
 instance Arbitrary (Record0 f) where arbitrary = pure Record0
 
@@ -59,7 +59,7 @@ instance FunctorB Record1
 instance TraversableB Record1
 instance ProductB Record1
 instance ConstraintsB Record1
-instance ProofB Record1
+instance ProductBC Record1
 
 deriving instance AllBF Show f Record1 => Show (Record1 f)
 deriving instance AllBF Eq   f Record1 => Eq   (Record1 f)
@@ -77,7 +77,7 @@ instance FunctorB Record1S
 instance TraversableB Record1S
 instance ProductB Record1S
 instance ConstraintsB Record1S
-instance ProofB Record1S
+instance ProductBC Record1S
 
 deriving instance AllBF Show f Record1S => Show (Record1S f)
 deriving instance AllBF Eq   f Record1S => Eq   (Record1S f)
@@ -99,7 +99,7 @@ instance FunctorB Record3
 instance TraversableB Record3
 instance ProductB Record3
 instance ConstraintsB Record3
-instance ProofB Record3
+instance ProductBC Record3
 
 deriving instance AllBF Show f Record3 => Show (Record3 f)
 deriving instance AllBF Eq   f Record3 => Eq   (Record3 f)
@@ -120,7 +120,7 @@ instance FunctorB Record3S
 instance TraversableB Record3S
 instance ProductB Record3S
 instance ConstraintsB Record3S
-instance ProofB Record3S
+instance ProductBC Record3S
 
 deriving instance AllBF Show f Record3S => Show (Record3S f)
 deriving instance AllBF Eq   f Record3S => Eq   (Record3S f)
@@ -185,7 +185,7 @@ instance FunctorB CompositeRecord
 instance TraversableB CompositeRecord
 instance ProductB CompositeRecord
 instance ConstraintsB CompositeRecord
-instance ProofB CompositeRecord
+instance ProductBC CompositeRecord
 
 deriving instance AllBF Show f CompositeRecord => Show (CompositeRecord f)
 deriving instance AllBF Eq   f CompositeRecord => Eq   (CompositeRecord f)
@@ -223,7 +223,7 @@ instance FunctorB InfRec
 instance TraversableB InfRec
 instance ProductB InfRec
 instance ConstraintsB InfRec
-instance ProofB InfRec
+instance ProductBC InfRec
 
 deriving instance AllBF Show f InfRec => Show (InfRec f)
 deriving instance AllBF Eq   f InfRec => Eq   (InfRec f)

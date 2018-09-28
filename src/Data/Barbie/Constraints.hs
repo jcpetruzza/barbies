@@ -29,7 +29,7 @@ module Data.Barbie.Constraints
 
     -- * Retrieving dictionaries
   , ConstraintsB(..)
-  , ProofB(..)
+  , ProductBC(..)
 
   , AllBF
   , ClassF
@@ -38,10 +38,11 @@ module Data.Barbie.Constraints
     -- * Deprecated
   , ConstraintsOf
   , adjProof
+  , ProofB
   )
 
 where
 
 import Data.Barbie.Internal.Constraints
 import Data.Barbie.Internal.Dicts
-import Data.Barbie.Internal.ProofB
+import Data.Barbie.Internal.ProductC

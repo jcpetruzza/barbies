@@ -43,7 +43,7 @@ instance TraversableB (Record1W Covered)
 instance ProductB (Record1W Covered)
 instance ConstraintsB (Record1W Bare)
 instance ConstraintsB (Record1W Covered)
-instance ProofB (Record1W Covered)
+instance ProductBC (Record1W Covered)
 instance BareB Record1W
 
 
@@ -67,7 +67,7 @@ instance TraversableB (Record1WS Covered)
 instance ProductB (Record1WS Covered)
 instance ConstraintsB (Record1WS Bare)
 instance ConstraintsB (Record1WS Covered)
-instance ProofB (Record1WS Covered)
+instance ProductBC (Record1WS Covered)
 instance BareB Record1WS
 
 
@@ -94,7 +94,7 @@ instance TraversableB (Record3W Covered)
 instance ProductB (Record3W Covered)
 instance ConstraintsB (Record3W Bare)
 instance ConstraintsB (Record3W Covered)
-instance ProofB (Record3W Covered)
+instance ProductBC (Record3W Covered)
 
 instance BareB Record3W
 
@@ -122,7 +122,7 @@ instance TraversableB (Record3WS Covered)
 instance ProductB (Record3WS Covered)
 instance ConstraintsB (Record3WS Bare)
 instance ConstraintsB (Record3WS Covered)
-instance ProofB (Record3WS Covered)
+instance ProductBC (Record3WS Covered)
 instance BareB Record3WS
 
 deriving instance AllB  Show   (Record3WS Bare)    => Show (Record3WS Bare f)
@@ -185,7 +185,7 @@ instance TraversableB (CompositeRecordW Covered)
 instance ProductB (CompositeRecordW Covered)
 instance ConstraintsB (CompositeRecordW Bare)
 instance ConstraintsB (CompositeRecordW Covered)
-instance ProofB (CompositeRecordW Covered)
+instance ProductBC (CompositeRecordW Covered)
 instance BareB CompositeRecordW
 
 deriving instance AllB  Show   (CompositeRecordW Bare)    => Show (CompositeRecordW Bare f)
@@ -235,7 +235,7 @@ instance TraversableB (InfRecW Covered)
 instance ProductB (InfRecW Covered)
 instance ConstraintsB (InfRecW Bare)
 instance ConstraintsB (InfRecW Covered)
-instance ProofB (InfRecW Covered)
+instance ProductBC (InfRecW Covered)
 instance BareB InfRecW
 
 deriving instance AllB  Show   (InfRecW Bare)    => Show (InfRecW Bare f)

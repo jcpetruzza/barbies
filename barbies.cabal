@@ -39,7 +39,7 @@ library
       Data.Barbie.Internal.Functor
       Data.Barbie.Internal.Instances
       Data.Barbie.Internal.Product
-      Data.Barbie.Internal.ProofB
+      Data.Barbie.Internal.ProductC
       Data.Barbie.Internal.Traversable
       Data.Barbie.Internal.Wear
       Data.Barbie.Trivial
@@ -114,3 +114,4 @@ test-suite barbies-test
     ScopedTypeVariables
     StandaloneDeriving
     TypeApplications
+    TypeOperators

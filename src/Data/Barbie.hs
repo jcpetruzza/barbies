@@ -30,7 +30,7 @@
 --       }
 --   deriving
 --     ( 'GHC.Generics.Generic'
---     , 'FunctorB', 'TraversableB', 'ProductB', 'ConstraintsB', 'ProofB'
+--     , 'FunctorB', 'TraversableB', 'ProductB', 'ConstraintsB', 'ProductBC'
 --     )
 --
 -- deriving instance 'AllBF' 'Show' f Barbie => 'Show' (Barbie f)
@@ -66,7 +66,9 @@ module Data.Barbie
     -- * Constraints and instance dictionaries
   , ConstraintsB(AllB, baddDicts)
   , AllBF
-  , ProofB(bproof)
+
+    -- * Products and constaints
+  , ProductBC(bdicts)
     -- ** Utility functions
   , buniqC
   , bmempty
@@ -84,6 +86,8 @@ module Data.Barbie
     -- * Deprecations
   , Deprecated.ConstraintsOf
   , Deprecated.adjProof
+  , Deprecated.ProofB
+  , Deprecated.bproof
   )
 
 where
@@ -93,12 +97,13 @@ import qualified Data.Barbie.Internal.Constraints as Deprecated
 
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Instances(Barbie(..))
-import Data.Barbie.Internal.ProofB(ProofB(..), buniqC, bmempty)
 import Data.Barbie.Internal.Product
   ( ProductB(..)
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
   , (/*/), (/*)
   )
+import Data.Barbie.Internal.ProductC(ProductBC(..), buniqC, bmempty)
+import qualified Data.Barbie.Internal.ProductC as Deprecated
 import Data.Barbie.Internal.Traversable
   ( TraversableB(..)
   , bsequence, bsequence'
