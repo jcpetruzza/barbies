@@ -272,3 +272,51 @@ deriving instance (Eq   (f Int), Eq   (Record3W Covered f), Eq   (Sum3W Covered 
 
 instance (Arbitrary (f Int), Arbitrary (f Bool), Arbitrary (f Char)) => Arbitrary (NestedFW Covered f) where
   arbitrary = NestedFW <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
+
+-----------------------------------------------------
+-- Parametric barbies
+-----------------------------------------------------
+
+data ParBW b t (f :: * -> *)
+  = ParBW (b t f)
+  deriving (Generic, Typeable)
+
+instance FunctorB (b t) => FunctorB (ParBW b t)
+instance TraversableB (b t) => TraversableB (ParBW b t)
+instance ProductB (b t) => ProductB (ParBW b t)
+instance BareB b => BareB (ParBW b)
+
+-- XXX GHC currently rejects deriving this one since it
+-- gets stuck on the TagSelf type family and can't see this
+-- is an "Other" case. It looks like a bug to me, since it
+-- seems to have enough information to decide that it is the
+-- `Other` case that should be picked (or in any case, I don't
+-- quite see why this is not an issue when `b` doesn't have the
+-- extra type parameter.
+instance ConstraintsB (b t) => ConstraintsB (ParBW b t) where
+  type AllB c (ParBW b t) = AllB c (b t)
+  baddDicts (ParBW btf) = ParBW (baddDicts btf)
+
+-- XXX SEE NOTE ON ConstraintsB
+instance ProductBC (b t) => ProductBC (ParBW b t) where
+  bdicts = ParBW bdicts
+
+data ParBHW h b t (f :: * -> *)
+  = ParBHW (h (b t f))
+  deriving (Generic, Typeable)
+
+instance (Functor h, FunctorB (b t)) => FunctorB (ParBHW h b t)
+instance (Traversable h, TraversableB (b t)) => TraversableB (ParBHW h b t)
+instance (Functor h, BareB b) => BareB (ParBHW h b)
+
+data ParXW a t f
+  = ParXW (Wear t f a)
+  deriving (Generic, Typeable)
+
+instance FunctorB (ParXW a Bare)
+instance FunctorB (ParXW a Covered)
+instance TraversableB (ParXW a Covered)
+instance ProductB (ParXW a Covered)
+instance ConstraintsB (ParXW a Covered)
+instance ProductBC (ParXW a Covered)
