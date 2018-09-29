@@ -1,6 +1,6 @@
 # Changelog for barbies
 
-## 0.2.0.0
+## 1.0.0.0
   - Replaced `ConstraintsOf` in `ConstraintsB` by `AllB`, which allows
     constraints to be given on `a` instead of on `f a`. The `ClassF`
     class lets us specify constraints on `f a` by doing `AllB (ClassF c f) b`.
