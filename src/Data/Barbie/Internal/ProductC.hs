@@ -39,7 +39,7 @@ import Data.Generics.GenericN
 --
 --  For technical reasons, 'buniqC' is not currently provided
 --  as a method of this class and is instead defined in terms
---  'bdicts', which is similar to 'baddDict' but can produce the
+--  'bdicts', which is similar to 'baddDicts' but can produce the
 --  instance dictionaries out-of-the-blue. 'bdicts' could also be
 --  defined in terms of 'buniqC', so they are essentially equivalent.
 --
