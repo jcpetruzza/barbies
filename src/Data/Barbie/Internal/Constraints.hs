@@ -1,6 +1,6 @@
-{-# LANGUAGE AllowAmbiguousTypes   #-}
-{-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE UndecidableInstances  #-}
+{-# LANGUAGE AllowAmbiguousTypes  #-}
+{-# LANGUAGE TypeFamilies         #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.Constraints
   ( ConstraintsB(..)
   , AllBF
@@ -19,11 +19,14 @@ module Data.Barbie.Internal.Constraints
 
 where
 
-import Data.Barbie.Internal.Dicts(ClassF, Dict(..))
-import Data.Barbie.Internal.Functor(FunctorB(..))
+import Data.Barbie.Internal.Dicts   (ClassF, Dict (..))
+import Data.Barbie.Internal.Functor (FunctorB (..))
 
-import Data.Functor.Product(Product(..))
-import Data.Kind(Constraint)
+import Data.Functor.Const   (Const (..))
+import Data.Functor.Product (Product (..))
+import Data.Functor.Sum     (Sum (..))
+import Data.Kind            (Constraint)
+import Data.Proxy           (Proxy (..))
 
 import Data.Generics.GenericN
 
@@ -312,3 +315,33 @@ type family TagSelf (b :: (* -> *) -> *) (repbf :: * -> *) :: * -> * where
 
   TagSelf b V1
     = V1
+
+
+-- --------------------------------
+-- Instances for base types
+-- --------------------------------
+
+instance ConstraintsB Proxy where
+  type AllB c Proxy = ()
+
+  baddDicts _ = Proxy
+  {-# INLINE baddDicts #-}
+
+instance (ConstraintsB a, ConstraintsB b) => ConstraintsB (Product a b) where
+  type AllB c (Product a b) = (AllB c a, AllB c b)
+
+  baddDicts (Pair x y) = Pair (baddDicts x) (baddDicts y)
+  {-# INLINE baddDicts #-}
+
+instance (ConstraintsB a, ConstraintsB b) => ConstraintsB (Sum a b) where
+  type AllB c (Sum a b) = (AllB c a, AllB c b)
+
+  baddDicts (InL x) = InL (baddDicts x)
+  baddDicts (InR x) = InR (baddDicts x)
+  {-# INLINE baddDicts #-}
+
+instance ConstraintsB (Const a) where
+  type AllB c (Const a) = ()
+
+  baddDicts (Const x) = Const x
+  {-# INLINE baddDicts #-}
