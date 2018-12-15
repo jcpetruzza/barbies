@@ -18,6 +18,7 @@ import Data.Barbie.Internal.Functor (FunctorB (..))
 import Data.Functor.Const   (Const (..))
 import Data.Functor.Prod
 import Data.Functor.Product (Product (..))
+import Data.Monoid          ((<>))
 import Data.Proxy           (Proxy (..))
 
 import Data.Generics.GenericN
