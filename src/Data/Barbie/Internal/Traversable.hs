@@ -2,7 +2,7 @@
 -- |
 -- Module      :  Data.Barbie.Internal.Traversable
 ----------------------------------------------------------------------------
-{-# LANGUAGE TypeFamilies       #-}
+{-# LANGUAGE TypeFamilies #-}
 module Data.Barbie.Internal.Traversable
   ( TraversableB(..)
   , btraverse_
@@ -17,14 +17,16 @@ module Data.Barbie.Internal.Traversable
 
 where
 
-import Data.Barbie.Internal.Functor (FunctorB(..))
+import Data.Barbie.Internal.Functor (FunctorB (..))
 
-import Data.Functor (void)
-import Data.Functor.Compose (Compose(..))
-import Data.Functor.Const (Const(..))
-import Data.Functor.Identity (Identity(..))
+import Data.Functor           (void)
+import Data.Functor.Compose   (Compose (..))
+import Data.Functor.Const     (Const (..))
+import Data.Functor.Identity  (Identity (..))
+import Data.Functor.Product   (Product (..))
+import Data.Functor.Sum       (Sum (..))
 import Data.Generics.GenericN
-
+import Data.Proxy             (Proxy (..))
 
 -- | Barbie-types that can be traversed from left to right. Instances should
 --   satisfy the following laws:
@@ -206,3 +208,23 @@ execWr
 tell :: Monoid w => w -> Wr w ()
 tell w
   = St (\s -> ((), s `mappend` w))
+
+
+-- Instances for base types
+
+instance TraversableB Proxy where
+  btraverse _ _ = pure Proxy
+  {-# INLINE btraverse #-}
+
+instance (TraversableB a, TraversableB b) => TraversableB (Product a b) where
+  btraverse f (Pair x y) = Pair <$> btraverse f x <*> btraverse f y
+  {-# INLINE btraverse #-}
+
+instance (TraversableB a, TraversableB b) => TraversableB (Sum a b) where
+  btraverse f (InL x) = InL <$> btraverse f x
+  btraverse f (InR x) = InR <$> btraverse f x
+  {-# INLINE btraverse #-}
+
+instance TraversableB (Const a) where
+  btraverse _ (Const x) = pure (Const x)
+  {-# INLINE btraverse #-}
