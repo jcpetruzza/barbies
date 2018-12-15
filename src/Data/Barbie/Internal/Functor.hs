@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies        #-}
+{-# LANGUAGE TypeFamilies #-}
 module Data.Barbie.Internal.Functor
   ( FunctorB(..)
 
@@ -9,7 +9,11 @@ module Data.Barbie.Internal.Functor
 
 where
 
+import Data.Functor.Const     (Const (..))
+import Data.Functor.Product   (Product (..))
+import Data.Functor.Sum       (Sum (..))
 import Data.Generics.GenericN
+import Data.Proxy             (Proxy (..))
 
 -- | Barbie-types that can be mapped over. Instances of 'FunctorB' should
 --   satisfy the following laws:
@@ -118,3 +122,21 @@ instance
 instance GFunctorB f g (Rec x x) (Rec x x) where
   gbmap _ = id
   {-# INLINE gbmap #-}
+
+
+-- --------------------------------
+-- Instances for base types
+-- --------------------------------
+
+instance FunctorB Proxy where
+  bmap _ _ = Proxy
+
+instance (FunctorB a, FunctorB b) => FunctorB (Product a b) where
+  bmap f (Pair x y) = Pair (bmap f x) (bmap f y)
+
+instance (FunctorB a, FunctorB b) => FunctorB (Sum a b) where
+  bmap f (InL x) = InL (bmap f x)
+  bmap f (InR x) = InR (bmap f x)
+
+instance FunctorB (Const x) where
+  bmap _ (Const x) = Const x
