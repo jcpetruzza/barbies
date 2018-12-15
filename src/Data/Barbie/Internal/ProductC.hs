@@ -1,6 +1,6 @@
-{-# LANGUAGE AllowAmbiguousTypes   #-}
-{-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE UndecidableInstances  #-}
+{-# LANGUAGE AllowAmbiguousTypes  #-}
+{-# LANGUAGE TypeFamilies         #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.ProductC
   ( ProductBC(..)
   , buniqC
@@ -19,11 +19,15 @@ module Data.Barbie.Internal.ProductC
 where
 
 import Data.Barbie.Internal.Constraints
-import Data.Barbie.Internal.Dicts(ClassF, Dict(..), requiringDict)
-import Data.Barbie.Internal.Functor(bmap)
-import Data.Barbie.Internal.Product(ProductB(..))
+import Data.Barbie.Internal.Dicts       (ClassF, Dict (..), requiringDict)
+import Data.Barbie.Internal.Functor     (bmap)
+import Data.Barbie.Internal.Product     (ProductB (..))
 
 import Data.Generics.GenericN
+
+import Data.Functor.Const   (Const (..))
+import Data.Functor.Product (Product (..))
+import Data.Proxy           (Proxy (..))
 
 -- | Every type @b@ that is an instance of both 'ProductB' and
 --   'ConstraintsB' can be made an instance of 'ProductBC'
@@ -152,3 +156,20 @@ instance
                     (Rec       (b (P0 (Dict c)))
                                (b'    (Dict c))) where
   gbdicts = Rec $ K1 $ bdicts @b'
+
+
+-- --------------------------------
+-- Instances for base types
+-- --------------------------------
+
+instance ProductBC Proxy where
+  bdicts = Proxy
+  {-# INLINE bdicts #-}
+
+instance (ProductBC a, ProductBC b) => ProductBC (Product a b) where
+  bdicts = Pair bdicts bdicts
+  {-# INLINE bdicts #-}
+
+instance Monoid a => ProductBC (Const a) where
+  bdicts = Const mempty
+  {-# INLINE bdicts #-}
