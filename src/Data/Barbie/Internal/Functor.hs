@@ -130,13 +130,17 @@ instance GFunctorB f g (Rec x x) (Rec x x) where
 
 instance FunctorB Proxy where
   bmap _ _ = Proxy
+  {-# INLINE bmap #-}
 
 instance (FunctorB a, FunctorB b) => FunctorB (Product a b) where
   bmap f (Pair x y) = Pair (bmap f x) (bmap f y)
+  {-# INLINE bmap #-}
 
 instance (FunctorB a, FunctorB b) => FunctorB (Sum a b) where
   bmap f (InL x) = InL (bmap f x)
   bmap f (InR x) = InR (bmap f x)
+  {-# INLINE bmap #-}
 
 instance FunctorB (Const x) where
   bmap _ (Const x) = Const x
+  {-# INLINE bmap #-}
