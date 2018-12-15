@@ -13,10 +13,12 @@ module Data.Barbie.Internal.Product
 
 where
 
-import Data.Barbie.Internal.Functor(FunctorB(..))
+import Data.Barbie.Internal.Functor (FunctorB (..))
 
-import Data.Functor.Product (Product(..))
+import Data.Functor.Const   (Const (..))
 import Data.Functor.Prod
+import Data.Functor.Product (Product (..))
+import Data.Proxy           (Proxy (..))
 
 import Data.Generics.GenericN
 
@@ -237,3 +239,29 @@ instance
 
   gbuniq x = Rec (K1 (buniq x))
   {-# INLINE gbuniq #-}
+
+
+-- --------------------------------
+-- Instances for base types
+-- --------------------------------
+
+instance ProductB Proxy where
+  bprod _ _ = Proxy
+  {-# INLINE bprod #-}
+
+  buniq _ = Proxy
+  {-# INLINE buniq #-}
+
+instance (ProductB a, ProductB b) => ProductB (Product a b) where
+  bprod (Pair ll lr) (Pair rl rr) = Pair (bprod ll rl) (bprod lr rr)
+  {-# INLINE bprod #-}
+
+  buniq x = Pair (buniq x) (buniq x)
+  {-# INLINE buniq #-}
+
+instance Monoid a => ProductB (Const a) where
+  bprod (Const x) (Const y) = Const (x <> y)
+  {-# INLINE bprod #-}
+
+  buniq _ = Const mempty
+  {-# INLINE buniq #-}
