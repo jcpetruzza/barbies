@@ -15,10 +15,8 @@ where
 
 import Data.Barbie.Internal.Functor (FunctorB (..))
 
-import Data.Functor.Const   (Const (..))
 import Data.Functor.Prod
 import Data.Functor.Product (Product (..))
-import Data.Monoid          ((<>))
 import Data.Proxy           (Proxy (..))
 
 import Data.Generics.GenericN
@@ -258,11 +256,4 @@ instance (ProductB a, ProductB b) => ProductB (Product a b) where
   {-# INLINE bprod #-}
 
   buniq x = Pair (buniq x) (buniq x)
-  {-# INLINE buniq #-}
-
-instance Monoid a => ProductB (Const a) where
-  bprod (Const x) (Const y) = Const (x <> y)
-  {-# INLINE bprod #-}
-
-  buniq _ = Const mempty
   {-# INLINE buniq #-}

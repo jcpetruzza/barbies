@@ -25,7 +25,6 @@ import Data.Barbie.Internal.Product     (ProductB (..))
 
 import Data.Generics.GenericN
 
-import Data.Functor.Const   (Const (..))
 import Data.Functor.Product (Product (..))
 import Data.Proxy           (Proxy (..))
 
@@ -168,8 +167,4 @@ instance ProductBC Proxy where
 
 instance (ProductBC a, ProductBC b) => ProductBC (Product a b) where
   bdicts = Pair bdicts bdicts
-  {-# INLINE bdicts #-}
-
-instance Monoid a => ProductBC (Const a) where
-  bdicts = Const mempty
   {-# INLINE bdicts #-}
