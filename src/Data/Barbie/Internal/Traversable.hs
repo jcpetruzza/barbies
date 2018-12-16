@@ -2,6 +2,7 @@
 -- |
 -- Module      :  Data.Barbie.Internal.Traversable
 ----------------------------------------------------------------------------
+{-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
 module Data.Barbie.Internal.Traversable
   ( TraversableB(..)
@@ -25,6 +26,7 @@ import Data.Functor.Const     (Const (..))
 import Data.Functor.Identity  (Identity (..))
 import Data.Functor.Product   (Product (..))
 import Data.Functor.Sum       (Sum (..))
+import Data.Kind              (Type)
 import Data.Generics.GenericN
 import Data.Proxy             (Proxy (..))
 
@@ -39,7 +41,7 @@ import Data.Proxy             (Proxy (..))
 --
 -- There is a default 'btraverse' implementation for 'Generic' types, so
 -- instances can derived automatically.
-class FunctorB b => TraversableB b where
+class FunctorB b => TraversableB (b :: (k -> Type) -> Type) where
   btraverse :: Applicative t => (forall a . f a -> t (g a)) -> b f -> t (b g)
 
   default btraverse

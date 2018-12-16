@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE UndecidableInstances       #-}
 module Data.Barbie.Internal.Instances ( Barbie(..) )
@@ -12,10 +13,11 @@ import Data.Barbie.Internal.Traversable
 import Data.Barbie.Internal.Product
 import Data.Barbie.Internal.ProductC
 
+import Data.Kind (Type)
 import Data.Semigroup (Semigroup, (<>))
 
 -- | A wrapper for Barbie-types, providing useful instances.
-newtype Barbie b (f :: * -> *)
+newtype Barbie (b :: (k -> Type) -> Type) f
   = Barbie { getBarbie :: b f }
   deriving (FunctorB, ProductB, ProductBC)
 

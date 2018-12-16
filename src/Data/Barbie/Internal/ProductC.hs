@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes  #-}
+{-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.ProductC
@@ -22,6 +23,7 @@ import Data.Barbie.Internal.Constraints
 import Data.Barbie.Internal.Dicts       (ClassF, Dict (..), requiringDict)
 import Data.Barbie.Internal.Functor     (bmap)
 import Data.Barbie.Internal.Product     (ProductB (..))
+import Data.Kind                        (Type)
 
 import Data.Generics.GenericN
 
@@ -54,7 +56,7 @@ import Data.Proxy           (Proxy (..))
 --
 -- There is a default implementation for 'Generic' types, so
 -- instances can derived automatically.
-class (ConstraintsB b, ProductB b) => ProductBC b where
+class (ConstraintsB b, ProductB b) => ProductBC (b :: (k -> Type) -> Type) where
   bdicts :: AllB c b => b (Dict c)
 
   default bdicts :: (CanDeriveProductBC c b, AllB c b) => b (Dict c)
@@ -145,7 +147,7 @@ instance
   ) => GProductBC c (Rec (Self b (P0 X)) (b X))
                     (Rec      (b (P0 (Dict c)))
                               (b     (Dict c))) where
-  gbdicts = Rec $ K1 $ bdicts @b
+  gbdicts = Rec $ K1 $ bdicts @_ @b
 
 instance
   ( SameOrParam b b'
@@ -154,7 +156,7 @@ instance
   ) => GProductBC c (Rec (Other b (P0 X)) (b' X))
                     (Rec       (b (P0 (Dict c)))
                                (b'    (Dict c))) where
-  gbdicts = Rec $ K1 $ bdicts @b'
+  gbdicts = Rec $ K1 $ bdicts @_ @b'
 
 
 -- --------------------------------

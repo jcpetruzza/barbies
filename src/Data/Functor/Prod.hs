@@ -42,11 +42,12 @@ where
 import Control.Applicative(Alternative(..))
 import Data.Functor.Product(Product(..))
 import Data.Functor.Classes(Eq1(..), Ord1(..), Show1(..))
+import Data.Kind (Type)
 
 import qualified Data.Functor.Classes as FC
 
 -- | Product of n functors.
-data Prod :: [* -> *] -> * -> * where
+data Prod :: [k -> Type] -> k -> Type where
   Unit :: Prod '[] a
   Cons :: (f a) -> Prod fs a -> Prod (f ': fs) a
 

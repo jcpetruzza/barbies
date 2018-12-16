@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes  #-}
+{-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.Product
@@ -17,6 +18,7 @@ import Data.Barbie.Internal.Functor (FunctorB (..))
 
 import Data.Functor.Prod
 import Data.Functor.Product (Product (..))
+import Data.Kind            (Type)
 import Data.Proxy           (Proxy (..))
 
 import Data.Generics.GenericN
@@ -60,7 +62,7 @@ import Data.Generics.GenericN
 --
 -- There is a default implementation of 'bprod' and 'buniq' for 'Generic' types,
 -- so instances can derived automatically.
-class FunctorB b => ProductB b where
+class FunctorB b => ProductB (b :: (k -> Type) -> Type) where
   bprod :: b f -> b g -> b (f `Product` g)
 
   buniq :: (forall a . f a) -> b f
@@ -166,7 +168,7 @@ gbuniqDefault x
   = toN (gbuniq @f @f @_ @(RepN (b f)) @(RepN (b (f `Product` f))) x)
 {-# INLINE gbuniqDefault #-}
 
-class GProductB (f :: * -> *) (g :: * -> *) repbf repbg repbfg where
+class GProductB (f :: k -> *) (g :: k -> *) repbf repbg repbfg where
   gbprod :: repbf x -> repbg x -> repbfg x
 
   gbuniq :: (forall a . f a) -> repbf x
