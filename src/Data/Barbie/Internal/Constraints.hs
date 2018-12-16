@@ -1,5 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes  #-}
 {-# LANGUAGE TypeFamilies         #-}
+{-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.Constraints
   ( ConstraintsB(..)
@@ -62,7 +63,7 @@ import Data.Generics.GenericN
 -- derive instance 'Generic' (T f)
 -- instance 'ConstraintsB' T
 -- @
-class FunctorB b => ConstraintsB b where
+class FunctorB b => ConstraintsB (b :: (k -> *) -> *) where
   -- | @'AllB' c b@ should contain a constraint @c a@ for each
   --   @a@ occurring under an @f@ in @b f@. E.g.:
   --
@@ -71,7 +72,7 @@ class FunctorB b => ConstraintsB b where
   -- @
   --
   -- For requiring constraints of the form @c (f a)@, use 'AllBF'.
-  type AllB (c :: * -> Constraint) b :: Constraint
+  type AllB (c :: k -> Constraint) b :: Constraint
   type AllB c b = GAllB c (GAllBRep b)
 
   baddDicts :: forall c f.  AllB c b => b f -> b (Dict c `Product` f)
@@ -141,9 +142,9 @@ gbaddDictsDefault
 {-# INLINE gbaddDictsDefault #-}
 
 class GAllBC (repbf :: * -> *) where
-  type GAllB (c :: * -> Constraint) repbf :: Constraint
+  type GAllB (c :: k -> Constraint) repbf :: Constraint
 
-class GAllBC repbx => GConstraintsB c (f :: * -> *) repbx repbf repbdf where
+class GAllBC repbx => GConstraintsB c (f :: k -> *) repbx repbf repbdf where
   gbaddDicts :: GAllB c repbx => repbf x -> repbdf x
 
 
@@ -278,8 +279,8 @@ instance GConstraintsB c f (Rec a a)
 --
 -- ============================================================================
 
-data Self  (b :: (* -> *) -> *) (f :: * -> *)
-data Other (b :: (* -> *) -> *) (f :: * -> *)
+data Self  (b :: (k -> *) -> *) (f :: k -> *)
+data Other (b :: (k -> *) -> *) (f :: k -> *)
 
 -- | We use type-families to generically compute @'AllB' c b@. Intuitively, if
 --   @b' f@ occurs inside @b f@, then we should just add @AllB b' c@ to
@@ -291,7 +292,7 @@ data Other (b :: (* -> *) -> *) (f :: * -> *)
 --   family to inspect @RepN (b f)@ and distinguish recursive usages from
 --   non-recursive ones, tagging them with different types, so we can distinguish
 --   them in the instances.
-type family TagSelf (b :: (* -> *) -> *) (repbf :: * -> *) :: * -> * where
+type family TagSelf (b :: (k -> *) -> *) (repbf :: * -> *) :: * -> * where
   TagSelf b (M1 mt m s)
     = M1 mt m (TagSelf b s)
 
@@ -304,7 +305,7 @@ type family TagSelf (b :: (* -> *) -> *) (repbf :: * -> *) :: * -> * where
   TagSelf b (Rec (b f) (b g))
     = Rec (Self b f) (b g)
 
-  TagSelf b (Rec (b' f) (b'' (g :: * -> *)))
+  TagSelf (b :: (k -> *) -> *) (Rec (b' f) ((b'' :: (k -> *) -> *) g))
     = Rec (Other b' f) (b'' g)
 
   TagSelf b (Rec p a)

@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs                   #-}
+{-# LANGUAGE PolyKinds               #-}
 {-# LANGUAGE TypeFamilies            #-}
 {-# LANGUAGE UndecidableInstances    #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
@@ -12,7 +13,7 @@ module Data.Barbie.Internal.Dicts
 
 where
 
-import Data.Functor.Classes(Show1(..))
+import Data.Functor.Classes (Show1(..))
 
 
 -- | @'Dict' c a@ is evidence that there exists an instance of @c a@.
@@ -41,7 +42,7 @@ requiringDict r = \Dict -> r
 --   equivalent to @c (f a)@. However, we have
 --
 -- @
--- 'ClassF c f :: * -> 'Constraint'
+-- 'ClassF c f :: k -> 'Constraint'
 -- @
 --
 -- This is useful since it allows to define constraint-constructors like

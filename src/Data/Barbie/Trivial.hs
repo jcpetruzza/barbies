@@ -1,3 +1,4 @@
+{-# LANGUAGE PolyKinds #-}
 module Data.Barbie.Trivial
   ( Void
   , Unit (..)
@@ -12,6 +13,7 @@ import Data.Barbie.Internal.ProductC(ProductBC(..))
 import Data.Barbie.Internal.Traversable(TraversableB(..))
 
 import Data.Data (Data(..))
+import Data.Kind (Type)
 import Data.Semigroup (Semigroup(..))
 import Data.Typeable (Typeable)
 import GHC.Generics (Generic)
@@ -22,7 +24,7 @@ import GHC.Generics (Generic)
 ---------------------------------------------------
 
 -- | Uninhabited barbie type.
-data Void (f :: * -> *)
+data Void (f :: k -> Type)
   deriving (Generic, Typeable)
 
 instance Eq   (Void f) where
@@ -44,7 +46,7 @@ instance ConstraintsB Void
 
 
 -- | A barbie type without structure.
-data Unit (f :: * -> *)
+data Unit (f :: k -> Type)
   = Unit
   deriving
     ( Data, Generic, Typeable

@@ -20,6 +20,8 @@ module Barbies
   , InfRec(..)
 
   , NestedF(..)
+
+  , HKB(..)
   )
 
 where
@@ -282,3 +284,21 @@ instance TraversableB (ParX a)
 instance ProductB (ParX a)
 instance ConstraintsB (ParX a)
 instance ProductBC (ParX a)
+
+
+-----------------------------------------------------
+-- Higher-kinded barbies
+-----------------------------------------------------
+
+data HKB b
+  = HKB
+      { hkb1 :: b Maybe
+      , khb2 :: b ([])
+      }
+  deriving (Generic, Typeable)
+
+instance FunctorB HKB
+instance TraversableB HKB
+instance ProductB HKB
+instance ConstraintsB HKB
+instance ProductBC HKB

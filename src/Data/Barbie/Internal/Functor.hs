@@ -1,3 +1,4 @@
+{-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
 module Data.Barbie.Internal.Functor
   ( FunctorB(..)
@@ -14,6 +15,7 @@ import Data.Functor.Product   (Product (..))
 import Data.Functor.Sum       (Sum (..))
 import Data.Generics.GenericN
 import Data.Proxy             (Proxy (..))
+import Data.Kind              (Type)
 
 -- | Barbie-types that can be mapped over. Instances of 'FunctorB' should
 --   satisfy the following laws:
@@ -25,7 +27,7 @@ import Data.Proxy             (Proxy (..))
 --
 -- There is a default 'bmap' implementation for 'Generic' types, so
 -- instances can derived automatically.
-class FunctorB b where
+class FunctorB (b :: (k -> Type) -> Type) where
   bmap :: (forall a . f a -> g a) -> b f -> b g
 
   default bmap

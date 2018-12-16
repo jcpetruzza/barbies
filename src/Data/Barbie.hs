@@ -2,7 +2,7 @@
 -- |
 -- Module      :  Data.Barbie
 --
--- A common Haskell idiom is to parameterise a datatype by a type @* -> *@,
+-- A common Haskell idiom is to parameterise a datatype by a type @k -> *@,
 -- typically a functor or a GADT. These are like outfits of a Barbie,
 -- that turn her into a different doll. E.g.
 --
@@ -41,6 +41,20 @@
 -- and it may feel like a second-class record type, where one needs to
 -- unpack values in each field. "Data.Barbie.Bare" offers a way to have
 -- bare versions of a barbie-type.
+--
+-- Notice that all classes in this package are poly-kinded. Intuitively,
+-- a barbie is a type parameterised by a functor, and because a barbies is
+-- a type of functor, a type parameterised by a barbie is a (higher-kinded)
+-- barbie too:
+--
+-- @
+-- data Catalog b
+--   = Catalog (b 'Identity') (b 'Maybe')
+--   deriving
+--     ('GHC.Generics.Generic'
+--     , 'FunctorB', 'TraversableB', 'ProductB', 'ConstraintsB', 'ProductBC'
+--     )
+-- @
 
 
 ----------------------------------------------------------------------------
