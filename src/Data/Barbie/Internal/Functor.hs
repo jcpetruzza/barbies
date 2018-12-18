@@ -10,6 +10,7 @@ module Data.Barbie.Internal.Functor
 
 where
 
+import Data.Functor.Compose   (Compose (..))
 import Data.Functor.Const     (Const (..))
 import Data.Functor.Product   (Product (..))
 import Data.Functor.Sum       (Sum (..))
@@ -145,4 +146,8 @@ instance (FunctorB a, FunctorB b) => FunctorB (Sum a b) where
 
 instance FunctorB (Const x) where
   bmap _ (Const x) = Const x
+  {-# INLINE bmap #-}
+
+instance (Functor f, FunctorB b) => FunctorB (f `Compose` b) where
+  bmap h (Compose x) = Compose (bmap h <$> x)
   {-# INLINE bmap #-}

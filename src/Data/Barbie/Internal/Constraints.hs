@@ -23,6 +23,7 @@ where
 import Data.Barbie.Internal.Dicts   (ClassF, Dict (..))
 import Data.Barbie.Internal.Functor (FunctorB (..))
 
+import Data.Functor.Compose (Compose (..))
 import Data.Functor.Const   (Const (..))
 import Data.Functor.Product (Product (..))
 import Data.Functor.Sum     (Sum (..))
@@ -345,4 +346,11 @@ instance ConstraintsB (Const a) where
   type AllB c (Const a) = ()
 
   baddDicts (Const x) = Const x
+  {-# INLINE baddDicts #-}
+
+instance (Functor f, ConstraintsB b) => ConstraintsB (f `Compose` b) where
+  type AllB c (f `Compose` b) = AllB c b
+
+  baddDicts (Compose x)
+    = Compose (baddDicts <$> x)
   {-# INLINE baddDicts #-}

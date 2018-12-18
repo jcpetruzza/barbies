@@ -230,3 +230,8 @@ instance (TraversableB a, TraversableB b) => TraversableB (Sum a b) where
 instance TraversableB (Const a) where
   btraverse _ (Const x) = pure (Const x)
   {-# INLINE btraverse #-}
+
+instance (Traversable f, TraversableB b) => TraversableB (f `Compose` b) where
+  btraverse h (Compose x)
+    = Compose <$> traverse (btraverse h) x
+  {-# INLINE btraverse #-}
