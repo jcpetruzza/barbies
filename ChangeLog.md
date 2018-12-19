@@ -1,5 +1,13 @@
 # Changelog for barbies
 
+## 1.1.0.0
+  - Make all classes poly-kinded (#7): a barbie can now be any type 
+    parameterised by a type `(k -> Type)`. In particular, a (higher-kinded)
+    barbie is a type parameterised by a barbie. Thanks to Ole Krüger.
+
+  - Add instances for functor transformers: `Proxy`, `Const`, `Product`, `Sum`
+    and `Compose` (Ole Krüger).
+
 ## 1.0.0.0
   - Replaced `ConstraintsOf` in `ConstraintsB` by `AllB`, which allows
     constraints to be given on `a` instead of on `f a`. The `ClassF`
