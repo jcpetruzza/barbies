@@ -11,9 +11,10 @@ import qualified Spec.Wrapper as Wrapper
 import Barbies
 import BarbiesW
 
-import Data.Barbie (bfoldMap)
+import Data.Barbie (bfoldMap, bmapC, buniqC)
 import Data.Barbie.Bare(Covered)
 import Data.Functor.Const(Const(..))
+import Data.Functor.Identity(Identity(..))
 
 main :: IO ()
 main
@@ -181,4 +182,17 @@ main
                 let b = Record3 (Const "tic") (Const "tac") (Const "toe")
                 bfoldMap getConst b @?= "tictactoe"
             ]
+        , testGroup
+          "bmapC"
+          [ testCase "Record1" $
+                bmapC @Num (fmap (+1)) (Record1 (Identity 0))
+                    @?= Record1 (Identity 1)
+          ]
+        , testGroup
+          "buniqC"
+          [ testCase "Record1" $
+                buniqC @Num (Identity (fromIntegral (42 :: Int)))
+                    @?= Record1 (Identity 42)
+          ]
         ]
+
