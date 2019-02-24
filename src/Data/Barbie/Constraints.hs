@@ -30,6 +30,7 @@ module Data.Barbie.Constraints
     -- * Retrieving dictionaries
   , ConstraintsB(..)
   , ProductBC(..)
+  , bmapC
 
   , AllBF
   , ClassF

@@ -4,6 +4,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.Constraints
   ( ConstraintsB(..)
+  , bmapC
   , AllBF
 
   , CanDeriveConstraintsB
@@ -20,7 +21,7 @@ module Data.Barbie.Internal.Constraints
 
 where
 
-import Data.Barbie.Internal.Dicts   (ClassF, Dict (..))
+import Data.Barbie.Internal.Dicts   (ClassF, Dict (..), requiringDict)
 import Data.Barbie.Internal.Functor (FunctorB (..))
 
 import Data.Functor.Compose (Compose (..))
@@ -85,6 +86,29 @@ class FunctorB b => ConstraintsB (b :: (k -> *) -> *) where
        )
     => b f -> b (Dict c `Product` f)
   baddDicts = gbaddDictsDefault
+
+
+-- | Like 'bmap' but a constraint is allowed to be required on
+--   each element of @b@
+--
+-- E.g. If all fields of 'b' are 'Show'able then you 
+-- could store each shown value in it's slot using 'Const':
+--
+-- > showFields :: (AllB Show b, ConstraintsB b) => b Identity -> b (Const String)
+-- > showFields = bmapC @Show showField
+-- >   where
+-- >     showField :: forall a. Show a => Identity a -> Const String a
+-- >     showField (Identity a) = Const (show a)
+bmapC :: forall c b f g.
+      (AllB c b, ConstraintsB b)
+      => (forall a. c a => f a -> g a)
+      -> b f
+      -> b g
+bmapC f bf = bmap go (baddDicts bf)
+  where
+    go :: forall a. (Dict c `Product` f) a -> g a
+    go (d `Pair` fa) = requiringDict (f fa) d
+
 
 -- | Similar to 'AllB' but will put the functor argument @f@
 --   between the constraint @c@ and the type @a@. For example:
