@@ -1,5 +1,8 @@
 # Changelog for barbies
 
+## 1.1.1.0
+  - Add `bmapC` (Chris Penner).
+
 ## 1.1.0.0
   - Make all classes poly-kinded (#7): a barbie can now be any type 
     parameterised by a type `(k -> Type)`. In particular, a (higher-kinded)
