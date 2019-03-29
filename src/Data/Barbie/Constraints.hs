@@ -31,6 +31,7 @@ module Data.Barbie.Constraints
   , ConstraintsB(..)
   , ProductBC(..)
   , bmapC
+  , btraverseC
 
   , AllBF
   , ClassF

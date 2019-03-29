@@ -82,6 +82,7 @@ module Data.Barbie
   , AllBF
     -- ** Utility functions
   , bmapC
+  , btraverseC
 
     -- * Products and constaints
   , ProductBC(bdicts)
@@ -108,7 +109,7 @@ module Data.Barbie
 
 where
 
-import Data.Barbie.Internal.Constraints(ConstraintsB(..), AllBF, bmapC)
+import           Data.Barbie.Internal.Constraints (AllBF, ConstraintsB (..), bmapC, btraverseC)
 import qualified Data.Barbie.Internal.Constraints as Deprecated
 
 import Data.Barbie.Internal.Functor(FunctorB(..))

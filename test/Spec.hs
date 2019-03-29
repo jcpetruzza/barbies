@@ -11,10 +11,11 @@ import qualified Spec.Wrapper as Wrapper
 import Barbies
 import BarbiesW
 
-import Data.Barbie (bfoldMap, bmapC, buniqC)
-import Data.Barbie.Bare(Covered)
-import Data.Functor.Const(Const(..))
-import Data.Functor.Identity(Identity(..))
+import Data.Barbie           (bfoldMap, bmapC, btraverseC, buniqC)
+import Data.Barbie.Bare      (Covered)
+import Data.Functor.Const    (Const (..))
+import Data.Functor.Identity (Identity (..))
+import Data.Monoid           (Sum (..))
 
 main :: IO ()
 main
@@ -187,6 +188,12 @@ main
           [ testCase "Record1" $
                 bmapC @Num (fmap (+1)) (Record1 (Identity 0))
                     @?= Record1 (Identity 1)
+          ]
+        , testGroup
+          "btraverseC"
+          [ testCase "Record1" $
+                btraverseC @Num (\inner -> (Sum @Int 1, fmap (+ 1) inner)) (Record1 (Identity 0))
+                    @?= (Sum 1, Record1 (Identity 1))
           ]
         , testGroup
           "buniqC"

@@ -5,6 +5,7 @@
 module Data.Barbie.Internal.Constraints
   ( ConstraintsB(..)
   , bmapC
+  , btraverseC
   , AllBF
 
   , CanDeriveConstraintsB
@@ -21,8 +22,9 @@ module Data.Barbie.Internal.Constraints
 
 where
 
-import Data.Barbie.Internal.Dicts   (ClassF, Dict (..), requiringDict)
-import Data.Barbie.Internal.Functor (FunctorB (..))
+import Data.Barbie.Internal.Dicts       (ClassF, Dict (..), requiringDict)
+import Data.Barbie.Internal.Functor     (FunctorB (..))
+import Data.Barbie.Internal.Traversable (TraversableB (..))
 
 import Data.Functor.Compose (Compose (..))
 import Data.Functor.Const   (Const (..))
@@ -109,6 +111,14 @@ bmapC f bf = bmap go (baddDicts bf)
     go :: forall a. (Dict c `Product` f) a -> g a
     go (d `Pair` fa) = requiringDict (f fa) d
 
+-- | Like 'btraverse' but with a constraint all elements of @b@.
+btraverseC
+  :: forall c b f g h
+  .  (TraversableB b, ConstraintsB b, AllB c b, Applicative g)
+  => (forall a. c a => f a -> g (h a))
+  -> b f
+  -> g (b h)
+btraverseC f b = btraverse (\(Pair (Dict :: Dict c a) x) -> f x) (baddDicts b)
 
 -- | Similar to 'AllB' but will put the functor argument @f@
 --   between the constraint @c@ and the type @a@. For example:
