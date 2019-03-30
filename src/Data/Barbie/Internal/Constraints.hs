@@ -111,7 +111,7 @@ bmapC f bf = bmap go (baddDicts bf)
     go :: forall a. (Dict c `Product` f) a -> g a
     go (d `Pair` fa) = requiringDict (f fa) d
 
--- | Like 'btraverse' but with a constraint all elements of @b@.
+-- | Like 'btraverse' but with a constraint on the elements of @b@.
 btraverseC
   :: forall c b f g h
   .  (TraversableB b, ConstraintsB b, AllB c b, Applicative g)
