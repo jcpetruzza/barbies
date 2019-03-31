@@ -1,5 +1,8 @@
 # Changelog for barbies
 
+## 1.1.2.1
+  - Uploaded 1.1.2.0 was broken (missing `btraverseC`)
+
 ## 1.1.2.0
   - Add `traverseC` (Ole Krüger).
   - Fix typo in ProductB laws (thanks to Ben Radford).
