@@ -1,5 +1,9 @@
 # Changelog for barbies
 
+## 1.1.2.0
+  - Add `traverseC` (Ole Krüger).
+  - Fix typo in ProductB laws (thanks to Ben Radford).
+
 ## 1.1.1.0
   - Add `bmapC` (Chris Penner).
 
