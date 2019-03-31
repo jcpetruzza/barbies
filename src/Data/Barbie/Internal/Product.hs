@@ -27,8 +27,8 @@ import Data.Generics.GenericN
 -- | Barbie-types that can form products, subject to the laws:
 --
 -- @
--- 'bmap' (\\('Pair' a _) -> a) . 'uncurry' . 'bprod' = 'fst'
--- 'bmap' (\\('Pair' _ b) -> b) . 'uncurry' . 'bprod' = 'snd'
+-- 'bmap' (\\('Pair' a _) -> a) . 'uncurry' 'bprod' = 'fst'
+-- 'bmap' (\\('Pair' _ b) -> b) . 'uncurry' 'bprod' = 'snd'
 -- @
 --
 -- Notice that because of the laws, having an internal product structure is not
