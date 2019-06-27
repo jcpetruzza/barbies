@@ -1,9 +1,12 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeFamilies         #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Barbie.Internal.Wear
   ( Wear, Bare, Covered
   )
 
 where
+
+import GHC.TypeLits (ErrorMessage (..), TypeError)
 
 data Bare
 data Covered
@@ -31,3 +34,8 @@ data Covered
 type family Wear t f a where
   Wear Bare    f a = a
   Wear Covered f a = f a
+  Wear t       _ _ = TypeError (     'Text "`Wear` should only be used with "
+                               ':<>: 'Text "`Bare` or `Covered`."
+                               ':$$: 'Text "`" ':<>: 'ShowType t ':<>: 'Text "`"
+                               ':<>: 'Text " is not allowed in this context."
+                               )
