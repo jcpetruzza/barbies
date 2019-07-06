@@ -1,5 +1,9 @@
 # Changelog for barbies
 
+## 1.1.3.0
+  - `Wear` will raise a `TypeError` instead of getting
+    stuck (Alex Peitsinis).
+
 ## 1.1.2.1
   - Uploaded 1.1.2.0 was broken (missing `btraverseC`)
 
