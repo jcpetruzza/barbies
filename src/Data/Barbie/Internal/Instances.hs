@@ -16,6 +16,8 @@ import Data.Barbie.Internal.ProductC
 import Data.Kind (Type)
 import Data.Semigroup (Semigroup, (<>))
 
+import Prelude hiding (Semigroup, (<>))  -- ghc < 8.2
+
 -- | A wrapper for Barbie-types, providing useful instances.
 newtype Barbie (b :: (k -> Type) -> Type) f
   = Barbie { getBarbie :: b f }
