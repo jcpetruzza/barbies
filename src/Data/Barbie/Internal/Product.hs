@@ -160,18 +160,18 @@ gbprodDefault
   .  CanDeriveProductB b f g
   => b f -> b g -> b (f `Product` g)
 gbprodDefault l r
-  = toN $ gbprod @f @g (fromN l) (fromN r)
+  = toN $ gbprod (Proxy @f) (Proxy @g) (fromN l) (fromN r)
 {-# INLINE gbprodDefault #-}
 
 gbuniqDefault:: forall b f . CanDeriveProductB b f f => (forall a . f a) -> b f
 gbuniqDefault x
-  = toN (gbuniq @f @f @_ @(RepN (b f)) @(RepN (b (f `Product` f))) x)
+  = toN $ gbuniq (Proxy @f) (Proxy @(RepN (b f))) (Proxy @(RepN (b (f `Product` f)))) x
 {-# INLINE gbuniqDefault #-}
 
 class GProductB (f :: k -> *) (g :: k -> *) repbf repbg repbfg where
-  gbprod :: repbf x -> repbg x -> repbfg x
+  gbprod :: Proxy f -> Proxy g -> repbf x -> repbg x -> repbfg x
 
-  gbuniq :: (forall a . f a) -> repbf x
+  gbuniq :: (f ~ g, repbf ~ repbg) => Proxy f -> Proxy repbf -> Proxy repbfg -> (forall a . f a) -> repbf x
 
 -- ----------------------------------
 -- Trivial cases
@@ -180,18 +180,18 @@ class GProductB (f :: k -> *) (g :: k -> *) repbf repbg repbfg where
 instance GProductB f g repf repg repfg => GProductB f g (M1 i c repf)
                                                         (M1 i c repg)
                                                         (M1 i c repfg) where
-  gbprod (M1 l) (M1 r) = M1 (gbprod @f @g l r)
+  gbprod pf pg (M1 l) (M1 r) = M1 (gbprod pf pg l r)
   {-# INLINE gbprod #-}
 
-  gbuniq x = M1 (gbuniq @f @g @repf @repg @repfg x)
+  gbuniq pf _ _ x = M1 (gbuniq pf (Proxy @repf) (Proxy @repfg) x)
   {-# INLINE gbuniq #-}
 
 
 instance GProductB f g U1 U1 U1 where
-  gbprod U1 U1 = U1
+  gbprod _ _ U1 U1 = U1
   {-# INLINE gbprod #-}
 
-  gbuniq _ = U1
+  gbuniq _ _ _ _ = U1
   {-# INLINE gbuniq #-}
 
 instance
@@ -200,16 +200,15 @@ instance
   ) => GProductB f g (lf  :*: rf)
                      (lg  :*: rg)
                      (lfg :*: rfg) where
-  gbprod (l1 :*: l2) (r1 :*: r2)
+  gbprod pf pg (l1 :*: l2) (r1 :*: r2)
     = (l1 `lprod` r1) :*: (l2 `rprod` r2)
     where
-      lprod = gbprod @f @g
-      rprod = gbprod @f @g
+      lprod = gbprod pf pg
+      rprod = gbprod pf pg
   {-# INLINE gbprod #-}
 
-  gbuniq x = (gbuniq @f @g @lf @lg @lfg x :*: gbuniq @f @g @rf @rg @rfg x)
+  gbuniq pf _ _ x = (gbuniq pf (Proxy @lf) (Proxy @lfg) x :*: gbuniq pf (Proxy @rf) (Proxy @rfg) x)
   {-# INLINE gbuniq #-}
-
 
 -- --------------------------------
 -- The interesting cases
@@ -220,11 +219,11 @@ type P0 = Param 0
 instance GProductB f g (Rec (P0 f a) (f a))
                        (Rec (P0 g a) (g a))
                        (Rec (P0 (f `Product` g) a) ((f `Product` g) a)) where
-  gbprod (Rec (K1 fa)) (Rec (K1 ga))
+  gbprod _ _ (Rec (K1 fa)) (Rec (K1 ga))
     = Rec (K1 (Pair fa ga))
   {-# INLINE gbprod #-}
 
-  gbuniq x = Rec (K1 x)
+  gbuniq _ _ _ x = Rec (K1 x)
   {-# INLINE gbuniq #-}
 
 
@@ -234,11 +233,11 @@ instance
   ) => GProductB f g (Rec (b (P0 f)) (b' f))
                      (Rec (b (P0 g)) (b' g))
                      (Rec (b (P0 (f `Product` g))) (b' (f `Product` g))) where
-  gbprod (Rec (K1 bf)) (Rec (K1 bg))
+  gbprod _ _ (Rec (K1 bf)) (Rec (K1 bg))
     = Rec (K1 (bf `bprod` bg))
   {-# INLINE gbprod #-}
 
-  gbuniq x = Rec (K1 (buniq x))
+  gbuniq _ _ _ x = Rec (K1 (buniq x))
   {-# INLINE gbuniq #-}
 
 

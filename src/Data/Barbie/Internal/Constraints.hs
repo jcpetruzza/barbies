@@ -179,7 +179,7 @@ gbaddDictsDefault
 class GAllBC (repbf :: * -> *) where
   type GAllB (c :: k -> Constraint) repbf :: Constraint
 
-class GAllBC repbx => GConstraintsB c (f :: k -> *) repbx repbf repbdf where
+class GAllBC repbx => GConstraintsB c f repbx repbf repbdf where
   gbaddDicts :: GAllB c repbx => repbf x -> repbdf x
 
 
