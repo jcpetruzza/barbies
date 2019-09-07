@@ -1,0 +1,9 @@
+resolver: lts-14.4
+compiler: ghc-8.8.1 # no lts for ghc 8.8.1 yet
+
+packages:
+- .
+
+extra-deps:
+- Cabal-3.0.0.0
+- optparse-applicative-0.15.0.0
