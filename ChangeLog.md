@@ -1,5 +1,8 @@
 # Changelog for barbies
 
+## ...
+  - Builds with ghc 8.8
+
 ## 1.1.3.0
   - `Wear` will raise a `TypeError` instead of getting
     stuck (Alex Peitsinis).
