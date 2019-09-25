@@ -1,7 +1,8 @@
 # Changelog for barbies
 
 ## ...
-  - Builds with ghc 8.8
+  - Builds with ghc 8.8.
+  - Deprecate `Data.Functor.Prod`, `(/*)` and `(/*/)`.
 
 ## 1.1.3.0
   - `Wear` will raise a `TypeError` instead of getting
@@ -18,7 +19,7 @@
   - Add `bmapC` (Chris Penner).
 
 ## 1.1.0.0
-  - Make all classes poly-kinded (#7): a barbie can now be any type 
+  - Make all classes poly-kinded (#7): a barbie can now be any type
     parameterised by a type `(k -> Type)`. In particular, a (higher-kinded)
     barbie is a type parameterised by a barbie. Thanks to Ole Krüger.
 

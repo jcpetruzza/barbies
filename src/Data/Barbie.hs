@@ -55,9 +55,8 @@
 --     , 'FunctorB', 'TraversableB', 'ProductB', 'ConstraintsB', 'ProductBC'
 --     )
 -- @
-
-
 ----------------------------------------------------------------------------
+{-# OPTIONS_GHC -Wno-deprecations #-}
 module Data.Barbie
   (
     -- * Functor
@@ -74,8 +73,6 @@ module Data.Barbie
   , ProductB(buniq, bprod)
     -- ** Utility functions
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
-    -- ** Applicative-like interface
-  , (/*/), (/*)
 
     -- * Constraints and instance dictionaries
   , ConstraintsB(AllB, baddDicts)
@@ -94,8 +91,8 @@ module Data.Barbie
   , Barbie(..)
 
     -- * Trivial Barbies
-  , Void
-  , Unit (..)
+  , Trivial.Void
+  , Trivial.Unit (..)
 
     -- * Generic derivations
   , Rec(..)
@@ -105,6 +102,7 @@ module Data.Barbie
   , Deprecated.adjProof
   , Deprecated.ProofB
   , Deprecated.bproof
+  , (/*/), (/*)
   )
 
 where
@@ -117,7 +115,6 @@ import Data.Barbie.Internal.Instances(Barbie(..))
 import Data.Barbie.Internal.Product
   ( ProductB(..)
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
-  , (/*/), (/*)
   )
 import Data.Barbie.Internal.ProductC(ProductBC(..), buniqC, bmempty)
 import qualified Data.Barbie.Internal.ProductC as Deprecated
@@ -126,5 +123,37 @@ import Data.Barbie.Internal.Traversable
   , bsequence, bsequence'
   , bfoldMap, btraverse_
   )
-import Data.Barbie.Trivial(Void, Unit(..))
+import qualified Data.Barbie.Trivial as Trivial
+
+import Data.Functor.Product (Product(Pair))
+import Data.Functor.Prod (Prod(..), oneTuple, prod)
 import Data.Generics.GenericN (Rec(..))
+
+
+{-# DEPRECATED (/*/), (/*) "Use bzipWith2, bzipWith3, etc" #-}
+
+-- | Like 'bprod', but returns a binary 'Prod', instead of 'Product', which
+--   composes better.
+--
+--   See '/*/' for usage.
+(/*/)
+  :: ProductB b => b f -> b g -> b (Prod '[f, g])
+l /*/ r
+  = bmap (\(Pair f g) -> Cons f (Cons g Unit)) (l `bprod` r)
+infixr 4 /*/
+
+-- | Similar to '/*/' but one of the sides is already a @'Prod' fs@.
+--
+--   Note that '/*', '/*/' and 'uncurryn' are meant to be used together:
+--   '/*' and '/*/' combine @b f1, b f2...b fn@ into a single product that
+--   can then be consumed by using `uncurryn` on an n-ary function. E.g.
+--
+-- @
+-- f :: f a -> g a -> h a -> i a
+--
+-- 'bmap' ('uncurryn' f) (bf '/*' bg '/*/' bh)
+-- @
+(/*) :: ProductB b => b f -> b (Prod fs) -> b (Prod (f ': fs))
+l /* r =
+  bmap (\(Pair f fs) -> oneTuple f `prod` fs) (l `bprod` r)
+infixr 4 /*

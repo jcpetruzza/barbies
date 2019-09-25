@@ -19,7 +19,6 @@ import Data.Bifunctor (first)
 import Data.Bitraversable (bitraverse)
 import Data.Coerce (coerce)
 import Data.Functor.Const
-import Data.Functor.Prod (uncurryn)
 import GHC.Generics (Generic)
 
 -- | Wrapper for container-Barbies.
@@ -50,7 +49,7 @@ instance ProductB b => Applicative (Container b) where
       = Container $ buniq (Const a)
 
     l <*> r
-      = Container $ bmap (uncurryn appConst) (getContainer l /*/ getContainer r)
+      = Container $ bzipWith appConst (getContainer l) (getContainer r)
       where
         appConst :: Const (a -> a') x -> Const a x -> Const a' x
         appConst (Const f) (Const a)

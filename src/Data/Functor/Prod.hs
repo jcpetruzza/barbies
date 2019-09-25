@@ -19,7 +19,8 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 module Data.Functor.Prod
-  ( -- * n-tuples of functors.
+ {-# DEPRECATED "The module is no longer part of the main api and will be removed " #-}
+ ( -- * n-tuples of functors.
     Prod(Unit, Cons)
   , zeroTuple
   , oneTuple
