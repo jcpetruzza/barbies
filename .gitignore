@@ -1,3 +1,5 @@
 .stack-work/
 *~
 *.kak.*
+
+stack*yaml.lock
