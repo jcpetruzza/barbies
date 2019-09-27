@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass       #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Barbies
+module TestBarbies
   ( Void
 
   , Record0(..)

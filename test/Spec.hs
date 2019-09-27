@@ -8,11 +8,11 @@ import qualified Spec.Product as Product
 import qualified Spec.Traversable as Traversable
 import qualified Spec.Wrapper as Wrapper
 
-import Barbies
-import BarbiesW
+import TestBarbies
+import TestBarbiesW
 
+import Barbies.Bare(Covered)
 import Data.Functor.Barbie(bfoldMap, bmapC, btraverseC, buniqC)
-import Data.Barbie.Bare      (Covered)
 import Data.Functor.Const    (Const (..))
 import Data.Functor.Identity (Identity (..))
 import Data.Monoid           (Sum (..))

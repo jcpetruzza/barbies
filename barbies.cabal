@@ -25,6 +25,7 @@ library
 
   exposed-modules:
       Data.Functor.Barbie
+      Barbies.Bare
 
       -- Deprecated modules
       Data.Barbie

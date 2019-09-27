@@ -39,7 +39,7 @@
 --
 -- Sometimes one wants to use @Barbie 'Data.Functor.Identity.Identity'@
 -- and it may feel like a second-class record type, where one needs to
--- unpack values in each field. "Data.Barbie.Bare" offers a way to have
+-- unpack values in each field. "Barbies.Bare" offers a way to have
 -- bare versions of a barbie-type.
 --
 -- Notice that all classes in this package are poly-kinded. Intuitively,

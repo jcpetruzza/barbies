@@ -8,8 +8,8 @@ import qualified Spec.Product as Product
 import qualified Spec.Traversable as Traversable
 import qualified Spec.Wrapper as Wrapper
 
-import Barbies
-import BarbiesW
+import TestBarbies
+import TestBarbiesW
 
 import Data.Barbie           (bfoldMap, bmapC, btraverseC, buniqC)
 import Data.Barbie.Bare      (Covered)
@@ -202,4 +202,3 @@ main
                     @?= Record1 (Identity 42)
           ]
         ]
-

@@ -3,7 +3,7 @@
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module BarbiesW
+module TestBarbiesW
   ( Record1W(..)
   , Record3W(..)
 
@@ -22,7 +22,7 @@ module BarbiesW
 where
 
 import Data.Functor.Barbie
-import Data.Barbie.Bare
+import Barbies.Bare
 
 import Data.Typeable
 import GHC.Generics
