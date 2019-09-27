@@ -6,7 +6,7 @@ module Spec.Wrapper (
 
 where
 
-import Data.Barbie (AllBF, Barbie(..), ProductBC)
+import Data.Functor.Barbie (AllBF, Barbie(..), ProductBC)
 
 import Data.Semigroup (Semigroup, (<>))
 

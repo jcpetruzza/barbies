@@ -24,6 +24,9 @@ source-repository head
 library
 
   exposed-modules:
+      Data.Functor.Barbie
+
+      -- Deprecated modules
       Data.Barbie
       Data.Barbie.Bare
       Data.Barbie.Constraints

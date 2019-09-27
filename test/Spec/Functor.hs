@@ -5,7 +5,7 @@ where
 
 import Clothes (F, H, FG(..), GH(..), NatTransf(..))
 
-import Data.Barbie (FunctorB(..))
+import Data.Functor.Barbie (FunctorB(..))
 
 import Data.Typeable (Typeable, typeRep, Proxy(..))
 

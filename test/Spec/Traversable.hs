@@ -5,7 +5,7 @@ where
 
 import Clothes (F, G, H, FG(..), GH(..), NatTransf(..))
 
-import Data.Barbie (TraversableB(..))
+import Data.Functor.Barbie (TraversableB(..))
 
 import Data.Functor.Compose (Compose(..))
 import Data.Functor.Identity (Identity(..))

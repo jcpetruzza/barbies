@@ -4,6 +4,7 @@
   - Builds with ghc 8.8.
   - Remove functions deprecated on release 1.0
   - Deprecate `Data.Functor.Prod`, `(/*)` and `(/*/)`.
+  - Deprecate `Data.Barbie`, in favor of `Data.Functor.Barbie`.
 
 ## 1.1.3.0
   - `Wear` will raise a `TypeError` instead of getting

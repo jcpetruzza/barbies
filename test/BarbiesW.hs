@@ -21,7 +21,7 @@ module BarbiesW
 
 where
 
-import Data.Barbie
+import Data.Functor.Barbie
 import Data.Barbie.Bare
 
 import Data.Typeable

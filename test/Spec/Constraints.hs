@@ -7,7 +7,7 @@ module Spec.Constraints
 where
 
 import Clothes(F)
-import Data.Barbie(bmap, ConstraintsB(..), AllBF, ProductBC(..))
+import Data.Functor.Barbie(bmap, ConstraintsB(..), AllBF, ProductBC(..))
 import Data.Barbie.Constraints(ClassF, Dict)
 
 import Data.Functor.Product (Product(Pair))

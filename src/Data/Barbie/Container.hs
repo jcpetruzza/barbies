@@ -14,7 +14,7 @@ module Data.Barbie.Container
 
 where
 
-import Data.Barbie
+import Data.Functor.Barbie
 import Data.Bifunctor (first)
 import Data.Bitraversable (bitraverse)
 import Data.Coerce (coerce)
@@ -54,5 +54,3 @@ instance ProductB b => Applicative (Container b) where
         appConst :: Const (a -> a') x -> Const a x -> Const a' x
         appConst (Const f) (Const a)
           = Const (f a)
-
-

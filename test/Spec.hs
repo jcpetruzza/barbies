@@ -11,7 +11,7 @@ import qualified Spec.Wrapper as Wrapper
 import Barbies
 import BarbiesW
 
-import Data.Barbie           (bfoldMap, bmapC, btraverseC, buniqC)
+import Data.Functor.Barbie(bfoldMap, bmapC, btraverseC, buniqC)
 import Data.Barbie.Bare      (Covered)
 import Data.Functor.Const    (Const (..))
 import Data.Functor.Identity (Identity (..))
@@ -202,4 +202,3 @@ main
                     @?= Record1 (Identity 42)
           ]
         ]
-

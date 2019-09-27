@@ -26,7 +26,7 @@ module Barbies
 
 where
 
-import Data.Barbie
+import Data.Functor.Barbie
 
 import Data.Typeable
 import GHC.Generics

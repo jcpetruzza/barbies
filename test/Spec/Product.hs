@@ -5,7 +5,7 @@ where
 
 import Clothes(F, G)
 
-import Data.Barbie(FunctorB(..), ProductB(..))
+import Data.Functor.Barbie(FunctorB(..), ProductB(..))
 
 import Data.Functor.Product(Product(Pair))
 import Data.Typeable(Typeable, Proxy(..), typeRep)
