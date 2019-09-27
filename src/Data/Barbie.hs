@@ -98,17 +98,12 @@ module Data.Barbie
   , Rec(..)
 
     -- * Deprecations
-  , Deprecated.ConstraintsOf
-  , Deprecated.adjProof
-  , Deprecated.ProofB
-  , Deprecated.bproof
   , (/*/), (/*)
   )
 
 where
 
 import           Data.Barbie.Internal.Constraints (AllBF, ConstraintsB (..), bmapC, btraverseC)
-import qualified Data.Barbie.Internal.Constraints as Deprecated
 
 import Data.Barbie.Internal.Functor(FunctorB(..))
 import Data.Barbie.Internal.Instances(Barbie(..))
@@ -117,7 +112,6 @@ import Data.Barbie.Internal.Product
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
   )
 import Data.Barbie.Internal.ProductC(ProductBC(..), buniqC, bmempty)
-import qualified Data.Barbie.Internal.ProductC as Deprecated
 import Data.Barbie.Internal.Traversable
   ( TraversableB(..)
   , bsequence, bsequence'

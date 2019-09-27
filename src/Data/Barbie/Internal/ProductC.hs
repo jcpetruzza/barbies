@@ -11,10 +11,6 @@ module Data.Barbie.Internal.ProductC
   , GAllB
   , GProductBC(..)
   , gbdictsDefault
-
-    -- DEPRECATED STUFF
-  , ProofB
-  , bproof
   )
 
 where
@@ -80,15 +76,6 @@ buniqC x
 bmempty :: forall f b . (AllBF Monoid f b, ProductBC b) => b f
 bmempty
   = buniqC @(ClassF Monoid f) mempty
-
-
-{-# DEPRECATED bproof "Renamed to bdicts" #-}
-bproof :: forall b c . (ProductBC b, AllB c b) => b (Dict c)
-bproof = bdicts
-
-{-# DEPRECATED ProofB "Class was renamed to ProductBC" #-}
-type ProofB b = ProductBC b
-
 
 -- ===============================================================
 --  Generic derivations

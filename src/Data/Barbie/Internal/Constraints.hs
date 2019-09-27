@@ -14,10 +14,6 @@ module Data.Barbie.Internal.Constraints
   , TagSelf, Self, Other
   , GConstraintsB(..)
   , gbaddDictsDefault
-
-    -- DEPRECATED STUFF
-  , adjProof
-  , ConstraintsOf
   )
 
 where
@@ -93,7 +89,7 @@ class FunctorB b => ConstraintsB (b :: (k -> *) -> *) where
 -- | Like 'bmap' but a constraint is allowed to be required on
 --   each element of @b@
 --
--- E.g. If all fields of 'b' are 'Show'able then you 
+-- E.g. If all fields of 'b' are 'Show'able then you
 -- could store each shown value in it's slot using 'Const':
 --
 -- > showFields :: (AllB Show b, ConstraintsB b) => b Identity -> b (Const String)
@@ -128,15 +124,6 @@ btraverseC f b = btraverse (\(Pair (Dict :: Dict c a) x) -> f x) (baddDicts b)
 --   'AllBF' 'Show' f Barbie ~ ('Show' (f 'String'), 'Show' (f 'Int'))
 --   @
 type AllBF c f b = AllB (ClassF c f) b
-
-
-{-# DEPRECATED ConstraintsOf "Renamed to AllBF (now based on AllB)" #-}
-type ConstraintsOf c f b = AllBF c f b
-
-{-# DEPRECATED adjProof "Renamed to baddDicts" #-}
-adjProof
-  :: forall b c f.  (ConstraintsB b, AllB c b) => b f -> b (Dict c `Product` f)
-adjProof = baddDicts
 
 
 -- | The representation used for the generic computation of the @'AllB' c b@

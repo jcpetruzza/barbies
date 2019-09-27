@@ -2,6 +2,7 @@
 
 ## ...
   - Builds with ghc 8.8.
+  - Remove functions deprecated on release 1.0
   - Deprecate `Data.Functor.Prod`, `(/*)` and `(/*/)`.
 
 ## 1.1.3.0
