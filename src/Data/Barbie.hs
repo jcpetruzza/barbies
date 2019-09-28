@@ -60,7 +60,7 @@ import Barbies.Internal.Traversable
   , bsequence, bsequence'
   , bfoldMap, btraverse_
   )
-import qualified Data.Barbie.Trivial as Trivial
+import qualified Barbies.Internal.Trivial as Trivial
 
 import Data.Functor.Product (Product(Pair))
 import Data.Functor.Prod (Prod(..), oneTuple, prod)

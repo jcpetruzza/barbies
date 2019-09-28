@@ -1,5 +1,5 @@
 {-# LANGUAGE PolyKinds #-}
-module Data.Barbie.Trivial
+module Barbies.Internal.Trivial
   ( Void
   , Unit (..)
   )

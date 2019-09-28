@@ -46,8 +46,8 @@ library
       Barbies.Internal.Product
       Barbies.Internal.ProductC
       Barbies.Internal.Traversable
+      Barbies.Internal.Trivial
       Barbies.Internal.Wear
-      Data.Barbie.Trivial
 
       Data.Generics.GenericN
 

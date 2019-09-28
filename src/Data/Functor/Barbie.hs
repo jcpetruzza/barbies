@@ -131,6 +131,6 @@ import Barbies.Internal.Traversable
   , bsequence, bsequence'
   , bfoldMap, btraverse_
   )
-import qualified Data.Barbie.Trivial as Trivial
+import qualified Barbies.Internal.Trivial as Trivial
 
 import Data.Generics.GenericN(Rec(..))
