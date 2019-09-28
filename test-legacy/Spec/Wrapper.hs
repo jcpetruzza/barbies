@@ -6,6 +6,8 @@ module Spec.Wrapper (
 
 where
 
+import Prelude hiding (Semigroup, (<>))
+
 import Data.Barbie (AllBF, Barbie(..), ProductBC)
 
 import Data.Semigroup (Semigroup, (<>))
