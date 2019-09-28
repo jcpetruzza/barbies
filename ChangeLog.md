@@ -6,6 +6,7 @@
   - Deprecate `Data.Functor.Prod`, `(/*)` and `(/*/)`.
   - Deprecate `Data.Barbie`, in favor of `Data.Functor.Barbie`.
   - Deprecate `Data.Barbie.Bare`, in favor of `Barbies.Bare`.
+  - Deprecate `Data.Barbie.Constraints`, in favor of `Barbies.Constraints`.
 
 ## 1.1.3.0
   - `Wear` will raise a `TypeError` instead of getting

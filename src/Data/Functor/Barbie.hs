@@ -74,15 +74,33 @@ module Data.Functor.Barbie
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
 
     -- * Constraints and instance dictionaries
-  , ConstraintsB(AllB, baddDicts)
+    -- | Consider the following function:
+    --
+    -- @
+    -- showIt :: 'Show' a => 'Maybe' a -> 'Data.Functor.Const' 'String' a
+    -- showIt = 'Data.Functor.Const' . 'show'
+    -- @
+    --
+    -- We would then like to be able to do:
+    --
+    -- @
+    -- 'Data.Barbie.bmap' 'showIt' :: 'Data.Functor.Barbie.FunctorB' b => b 'Maybe' -> b ('Data.Functor.Const' 'String')
+    -- @
+    --
+    -- This however doesn't work because of the @('Show' a)@ constraint in the
+    -- the type of @showIt@.
+    --
+    -- The 'ConstraintsB' class let us overcome this problem.
+
+  , ConstraintsB(..)
   , AllBF
+
+    -- ** Products and constaints
+  , ProductBC(bdicts)
+
     -- ** Utility functions
   , bmapC
   , btraverseC
-
-    -- * Products and constaints
-  , ProductBC(bdicts)
-    -- ** Utility functions
   , buniqC
   , bmempty
 

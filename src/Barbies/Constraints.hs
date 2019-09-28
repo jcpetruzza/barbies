@@ -1,0 +1,21 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module:  Barbies.Constraints
+--
+-- Support for operating on Barbie-types with constrained functions.
+----------------------------------------------------------------------------
+module Barbies.Constraints
+  ( -- * Instance dictionaries
+    Dict(..)
+  , requiringDict
+
+    -- * Getting constraints
+  , AllBF
+  , ClassF
+  , ClassFG
+  )
+
+where
+
+import Barbies.Internal.Constraints
+import Barbies.Internal.Dicts
