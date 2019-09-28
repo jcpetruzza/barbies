@@ -24,6 +24,7 @@ source-repository head
 library
 
   exposed-modules:
+      Barbies
       Barbies.Bare
       Barbies.Constraints
       Barbies.Internal
@@ -34,12 +35,12 @@ library
       Data.Barbie
       Data.Barbie.Bare
       Data.Barbie.Constraints
-      Data.Barbie.Container
       Data.Functor.Prod
 
   other-modules:
       Barbies.Internal.Bare
       Barbies.Internal.Constraints
+      Barbies.Internal.Container
       Barbies.Internal.Dicts
       Barbies.Internal.Functor
       Barbies.Internal.Instances
