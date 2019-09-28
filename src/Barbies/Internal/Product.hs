@@ -2,7 +2,7 @@
 {-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Data.Barbie.Internal.Product
+module Barbies.Internal.Product
   ( ProductB(buniq, bprod)
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
 
@@ -13,7 +13,7 @@ module Data.Barbie.Internal.Product
 
 where
 
-import Data.Barbie.Internal.Functor (FunctorB (..))
+import Barbies.Internal.Functor (FunctorB (..))
 
 import Data.Functor.Product (Product (..))
 import Data.Kind            (Type)

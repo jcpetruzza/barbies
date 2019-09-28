@@ -1,10 +1,6 @@
------------------------------------------------------------------------------
--- |
--- Module      :  Data.Barbie.Internal.Traversable
-----------------------------------------------------------------------------
 {-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
-module Data.Barbie.Internal.Traversable
+module Barbies.Internal.Traversable
   ( TraversableB(..)
   , btraverse_
   , bsequence
@@ -18,7 +14,7 @@ module Data.Barbie.Internal.Traversable
 
 where
 
-import Data.Barbie.Internal.Functor (FunctorB (..))
+import Barbies.Internal.Functor(FunctorB (..))
 
 import Data.Functor           (void)
 import Data.Functor.Compose   (Compose (..))
@@ -77,7 +73,7 @@ bfoldMap f
 
 
 -- | @'CanDeriveTraversableB' B f g@ is in practice a predicate about @B@ only.
---   It is analogous to 'Data.Barbie.Internal.Functor.CanDeriveFunctorB', so it
+--   It is analogous to 'Barbies.Internal.Functor.CanDeriveFunctorB', so it
 --   essentially requires the following to hold, for any arbitrary @f@:
 --
 --     * There is an instance of @'Generic' (B f)@.

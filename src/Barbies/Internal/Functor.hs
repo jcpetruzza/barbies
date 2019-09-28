@@ -1,6 +1,6 @@
 {-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
-module Data.Barbie.Internal.Functor
+module Barbies.Internal.Functor
   ( FunctorB(..)
 
   , GFunctorB(..)

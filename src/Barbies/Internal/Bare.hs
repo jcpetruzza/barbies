@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeFamilies       #-}
-module Data.Barbie.Internal.Bare
+module Barbies.Internal.Bare
   ( Wear, Bare, Covered
   , BareB(..)
   , bstripFrom, bcoverWith
@@ -13,8 +13,8 @@ module Data.Barbie.Internal.Bare
 
 where
 
-import Data.Barbie.Internal.Functor (FunctorB(..))
-import Data.Barbie.Internal.Wear(Bare, Covered, Wear)
+import Barbies.Internal.Functor (FunctorB(..))
+import Barbies.Internal.Wear(Bare, Covered, Wear)
 import Data.Functor.Identity (Identity(..))
 
 import Data.Coerce (coerce)

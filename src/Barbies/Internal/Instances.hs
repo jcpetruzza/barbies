@@ -2,16 +2,16 @@
 {-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE UndecidableInstances       #-}
-module Data.Barbie.Internal.Instances ( Barbie(..) )
+module Barbies.Internal.Instances ( Barbie(..) )
 
 where
 
-import Data.Barbie.Internal.Constraints
-import Data.Barbie.Internal.Dicts
-import Data.Barbie.Internal.Functor
-import Data.Barbie.Internal.Traversable
-import Data.Barbie.Internal.Product
-import Data.Barbie.Internal.ProductC
+import Barbies.Internal.Constraints
+import Barbies.Internal.Dicts
+import Barbies.Internal.Functor
+import Barbies.Internal.Traversable
+import Barbies.Internal.Product
+import Barbies.Internal.ProductC
 
 import Data.Kind (Type)
 import Data.Semigroup (Semigroup, (<>))

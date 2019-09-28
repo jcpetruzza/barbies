@@ -2,7 +2,7 @@
 {-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Data.Barbie.Internal.ProductC
+module Barbies.Internal.ProductC
   ( ProductBC(..)
   , buniqC
   , bmempty
@@ -15,16 +15,16 @@ module Data.Barbie.Internal.ProductC
 
 where
 
-import Data.Barbie.Internal.Constraints
-import Data.Barbie.Internal.Dicts       (ClassF, Dict (..), requiringDict)
-import Data.Barbie.Internal.Functor     (bmap)
-import Data.Barbie.Internal.Product     (ProductB (..))
-import Data.Kind                        (Type)
+import Barbies.Internal.Constraints
+import Barbies.Internal.Dicts(ClassF, Dict (..), requiringDict)
+import Barbies.Internal.Functor(bmap)
+import Barbies.Internal.Product(ProductB (..))
+import Data.Kind(Type)
 
 import Data.Generics.GenericN
 
 import Data.Functor.Product (Product (..))
-import Data.Proxy           (Proxy (..))
+import Data.Proxy(Proxy (..))
 
 -- | Every type @b@ that is an instance of both 'ProductB' and
 --   'ConstraintsB' can be made an instance of 'ProductBC'

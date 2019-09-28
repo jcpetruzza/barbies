@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Data.Barbie.Internal.Wear
+module Barbies.Internal.Wear
   ( Wear, Bare, Covered
   )
 

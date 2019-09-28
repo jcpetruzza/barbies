@@ -3,7 +3,7 @@
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Test.BarbiesW
+module TestBarbiesW
   ( Record1W(..)
   , Record3W(..)
 

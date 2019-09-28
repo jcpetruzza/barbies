@@ -3,7 +3,7 @@
 {-# LANGUAGE TypeFamilies            #-}
 {-# LANGUAGE UndecidableInstances    #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
-module Data.Barbie.Internal.Dicts
+module Barbies.Internal.Dicts
   ( Dict(..)
   , requiringDict
 

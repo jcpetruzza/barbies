@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Data.Barbie.Internal.Constraints
+module Barbies.Internal.Constraints
   ( ConstraintsB(..)
   , bmapC
   , btraverseC
@@ -18,9 +18,9 @@ module Data.Barbie.Internal.Constraints
 
 where
 
-import Data.Barbie.Internal.Dicts       (ClassF, Dict (..), requiringDict)
-import Data.Barbie.Internal.Functor     (FunctorB (..))
-import Data.Barbie.Internal.Traversable (TraversableB (..))
+import Barbies.Internal.Dicts(ClassF, Dict (..), requiringDict)
+import Barbies.Internal.Functor(FunctorB (..))
+import Barbies.Internal.Traversable(TraversableB (..))
 
 import Data.Functor.Compose (Compose (..))
 import Data.Functor.Const   (Const (..))

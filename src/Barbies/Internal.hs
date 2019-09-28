@@ -1,4 +1,4 @@
-module Data.Barbie.Internal
+module Barbies.Internal
   ( -- * Functor
     Internal.gbmapDefault
   , Internal.GFunctorB(..)
@@ -41,11 +41,11 @@ module Data.Barbie.Internal
 
 where
 
-import qualified Data.Barbie.Internal.Bare as Internal
-import qualified Data.Barbie.Internal.Constraints as Internal
-import qualified Data.Barbie.Internal.Functor as Internal
-import qualified Data.Barbie.Internal.Product as Internal
-import qualified Data.Barbie.Internal.ProductC as Internal
-import qualified Data.Barbie.Internal.Traversable as Internal
+import qualified Barbies.Internal.Bare as Internal
+import qualified Barbies.Internal.Constraints as Internal
+import qualified Barbies.Internal.Functor as Internal
+import qualified Barbies.Internal.Product as Internal
+import qualified Barbies.Internal.ProductC as Internal
+import qualified Barbies.Internal.Traversable as Internal
 
 import Data.Generics.GenericN (GenericN, Rec(..), RepN)

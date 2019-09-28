@@ -24,28 +24,28 @@ source-repository head
 library
 
   exposed-modules:
-      Data.Functor.Barbie
       Barbies.Bare
+      Barbies.Internal
+
+      Data.Functor.Barbie
 
       -- Deprecated modules
       Data.Barbie
       Data.Barbie.Bare
       Data.Barbie.Constraints
       Data.Barbie.Container
-      Data.Barbie.Internal
       Data.Functor.Prod
 
-
   other-modules:
-      Data.Barbie.Internal.Bare
-      Data.Barbie.Internal.Constraints
-      Data.Barbie.Internal.Dicts
-      Data.Barbie.Internal.Functor
-      Data.Barbie.Internal.Instances
-      Data.Barbie.Internal.Product
-      Data.Barbie.Internal.ProductC
-      Data.Barbie.Internal.Traversable
-      Data.Barbie.Internal.Wear
+      Barbies.Internal.Bare
+      Barbies.Internal.Constraints
+      Barbies.Internal.Dicts
+      Barbies.Internal.Functor
+      Barbies.Internal.Instances
+      Barbies.Internal.Product
+      Barbies.Internal.ProductC
+      Barbies.Internal.Traversable
+      Barbies.Internal.Wear
       Data.Barbie.Trivial
 
       Data.Generics.GenericN
@@ -85,8 +85,8 @@ test-suite barbies-test
   main-is: Spec.hs
 
   other-modules:
-      Barbies
-      BarbiesW
+      TestBarbies
+      TestBarbiesW
       Clothes
       Spec.Bare
       Spec.Constraints
@@ -129,8 +129,8 @@ test-suite barbies-test-legacy
   main-is: Spec.hs
 
   other-modules:
-      Barbies
-      BarbiesW
+      TestBarbies
+      TestBarbiesW
       Clothes
       Spec.Bare
       Spec.Constraints

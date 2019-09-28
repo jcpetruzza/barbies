@@ -6,11 +6,11 @@ module Data.Barbie.Trivial
 
 where
 
-import Data.Barbie.Internal.Constraints(ConstraintsB(..))
-import Data.Barbie.Internal.Functor(FunctorB(..))
-import Data.Barbie.Internal.Product(ProductB(..))
-import Data.Barbie.Internal.ProductC(ProductBC(..))
-import Data.Barbie.Internal.Traversable(TraversableB(..))
+import Barbies.Internal.Constraints(ConstraintsB(..))
+import Barbies.Internal.Functor(FunctorB(..))
+import Barbies.Internal.Product(ProductB(..))
+import Barbies.Internal.ProductC(ProductBC(..))
+import Barbies.Internal.Traversable(TraversableB(..))
 
 import Data.Data (Data(..))
 import Data.Kind (Type)

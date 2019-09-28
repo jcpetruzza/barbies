@@ -40,6 +40,6 @@ module Data.Barbie.Constraints
 
 where
 
-import Data.Barbie.Internal.Constraints
-import Data.Barbie.Internal.Dicts
-import Data.Barbie.Internal.ProductC
+import Barbies.Internal.Constraints
+import Barbies.Internal.Dicts
+import Barbies.Internal.ProductC
