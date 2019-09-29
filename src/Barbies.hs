@@ -65,11 +65,14 @@ module Barbies
      -- | Wrappers for Barbies that look like containers, providing the
      --   expected instances for container types.
 
-   , Container(..)
-   , ErrorContainer(..)
+   , Containers.Container(..)
+   , Containers.ErrorContainer(..)
 
-    -- * Wrapper
-   , Instances.Barbie(..)
+    -- * Wrappers
+
+    -- | This can be use with deriving via to automate derivation of instances
+    --   for Barbie-types.
+   , Wrappers.Barbie(..)
 
     -- * Trivial Barbies
   , Trivial.Void
@@ -77,8 +80,8 @@ module Barbies
 
    ) where
 
-import Barbies.Internal.Container(Container(..), ErrorContainer(..))
+import Barbies.Internal.Containers as Containers
 
 import Data.Functor.Barbie
-import qualified Barbies.Internal.Instances as Instances
+import qualified Barbies.Internal.Wrappers as Wrappers
 import qualified Barbies.Internal.Trivial as Trivial

@@ -2,9 +2,9 @@
 {-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE UndecidableInstances       #-}
-module Barbies.Internal.Instances ( Barbie(..) )
-
-where
+module Barbies.Internal.Wrappers
+  ( Barbie(..)
+  ) where
 
 import Barbies.Internal.Constraints
 import Barbies.Internal.Dicts

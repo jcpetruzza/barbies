@@ -40,15 +40,15 @@ library
   other-modules:
       Barbies.Internal.Bare
       Barbies.Internal.Constraints
-      Barbies.Internal.Container
+      Barbies.Internal.Containers
       Barbies.Internal.Dicts
       Barbies.Internal.Functor
-      Barbies.Internal.Instances
       Barbies.Internal.Product
       Barbies.Internal.ProductC
       Barbies.Internal.Traversable
       Barbies.Internal.Trivial
       Barbies.Internal.Wear
+      Barbies.Internal.Wrappers
 
       Data.Generics.GenericN
 

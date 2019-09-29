@@ -1,5 +1,5 @@
 {-# LANGUAGE UndecidableInstances #-}
-module Barbies.Internal.Container
+module Barbies.Internal.Containers
   (
     Container(..)
   , ErrorContainer(..)
