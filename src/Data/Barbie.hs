@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wno-deprecations #-}
 module Data.Barbie
-  {-# DEPRECATED "Use Data.Functor.Barbie instead" #-}
+  {-# DEPRECATED "Use Data.Functor.Barbie or Barbies instead" #-}
   (
     -- * Functor
     FunctorB(bmap)

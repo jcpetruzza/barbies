@@ -67,8 +67,12 @@ module Barbies
 
    , Container(..)
    , ErrorContainer(..)
+
+    -- * Wrapper
+   , Barbie(..)
    ) where
 
 import Barbies.Internal.Container(Container(..), ErrorContainer(..))
 
 import Data.Functor.Barbie
+import Barbies.Internal.Instances(Barbie(..))

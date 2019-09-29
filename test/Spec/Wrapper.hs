@@ -8,7 +8,8 @@ where
 
 import Prelude hiding (Semigroup, (<>))
 
-import Data.Functor.Barbie (AllBF, Barbie(..), ProductBC)
+import Barbies (Barbie(..))
+import Data.Functor.Barbie (AllBF, ProductBC)
 
 import Data.Semigroup (Semigroup, (<>))
 

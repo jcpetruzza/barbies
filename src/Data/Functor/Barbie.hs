@@ -52,14 +52,11 @@ module Data.Functor.Barbie
   , buniqC
   , bmempty
 
-    -- * Wrapper
-  , Barbie(..)
-
     -- * Trivial Barbies
   , Trivial.Void
   , Trivial.Unit (..)
 
-    -- * Generic derivations
+    -- * Support for generic derivations
   , Rec(..)
   )
 
@@ -68,7 +65,6 @@ where
 import Barbies.Internal.Constraints(AllBF, ConstraintsB (..), bmapC, btraverseC)
 
 import Barbies.Internal.Functor(FunctorB(..))
-import Barbies.Internal.Instances(Barbie(..))
 import Barbies.Internal.Product
   ( ProductB(..)
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
