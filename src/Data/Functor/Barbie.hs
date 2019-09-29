@@ -52,10 +52,6 @@ module Data.Functor.Barbie
   , buniqC
   , bmempty
 
-    -- * Trivial Barbies
-  , Trivial.Void
-  , Trivial.Unit (..)
-
     -- * Support for generic derivations
   , Rec(..)
   )
@@ -75,6 +71,5 @@ import Barbies.Internal.Traversable
   , bsequence, bsequence'
   , bfoldMap, btraverse_
   )
-import qualified Barbies.Internal.Trivial as Trivial
 
 import Data.Generics.GenericN(Rec(..))

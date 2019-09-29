@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
 module TestBarbies
-  ( Void
+  ( Barbies.Void
 
   , Record0(..)
   , Record1(..)
@@ -26,6 +26,7 @@ module TestBarbies
 
 where
 
+import qualified Barbies
 import Data.Functor.Barbie
 
 import Data.Typeable

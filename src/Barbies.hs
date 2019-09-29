@@ -69,10 +69,16 @@ module Barbies
    , ErrorContainer(..)
 
     -- * Wrapper
-   , Barbie(..)
+   , Instances.Barbie(..)
+
+    -- * Trivial Barbies
+  , Trivial.Void
+  , Trivial.Unit (..)
+
    ) where
 
 import Barbies.Internal.Container(Container(..), ErrorContainer(..))
 
 import Data.Functor.Barbie
-import Barbies.Internal.Instances(Barbie(..))
+import qualified Barbies.Internal.Instances as Instances
+import qualified Barbies.Internal.Trivial as Trivial
