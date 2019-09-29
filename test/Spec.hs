@@ -4,7 +4,7 @@ import Test.Tasty.HUnit (testCase, (@?=))
 import qualified Spec.Bare as Bare
 import qualified Spec.Constraints as Constraints
 import qualified Spec.Functor as Functor
-import qualified Spec.Product as Product
+import qualified Spec.Applicative as Applicative
 import qualified Spec.Traversable as Traversable
 import qualified Spec.Wrapper as Wrapper
 
@@ -12,7 +12,7 @@ import TestBarbies
 import TestBarbiesW
 
 import Barbies.Bare(Covered)
-import Data.Functor.Barbie(bfoldMap, bmapC, btraverseC, buniqC)
+import Data.Functor.Barbie(bfoldMap, bmapC, btraverseC, bpureC)
 import Data.Functor.Const    (Const (..))
 import Data.Functor.Identity (Identity (..))
 import Data.Monoid           (Sum (..))
@@ -77,38 +77,38 @@ main
             , Traversable.laws @(CompositeRecordW Covered)
             ]
 
-        , testGroup "Product Laws"
-            [ Product.laws @Record0
-            , Product.laws @Record1
-            , Product.laws @Record3
-            , Product.laws @CompositeRecord
+        , testGroup "Product Laws of derived applicatives"
+            [ Applicative.productLaws @Record0
+            , Applicative.productLaws @Record1
+            , Applicative.productLaws @Record3
+            , Applicative.productLaws @CompositeRecord
 
-            , Product.laws @Record1S
-            , Product.laws @Record3S
+            , Applicative.productLaws @Record1S
+            , Applicative.productLaws @Record3S
 
-            , Product.laws @(Record1W Covered)
-            , Product.laws @(Record3W Covered)
-            , Product.laws @(CompositeRecordW Covered)
+            , Applicative.productLaws @(Record1W Covered)
+            , Applicative.productLaws @(Record3W Covered)
+            , Applicative.productLaws @(CompositeRecordW Covered)
 
-            , Product.laws @(Record1WS Covered)
-            , Product.laws @(Record3WS Covered)
+            , Applicative.productLaws @(Record1WS Covered)
+            , Applicative.productLaws @(Record3WS Covered)
             ]
 
         , testGroup "Uniq Laws"
-            [ Product.uniqLaws @Record0
-            , Product.uniqLaws @Record1
-            , Product.uniqLaws @Record3
-            , Product.uniqLaws @CompositeRecord
+            [ Applicative.uniqLaws @Record0
+            , Applicative.uniqLaws @Record1
+            , Applicative.uniqLaws @Record3
+            , Applicative.uniqLaws @CompositeRecord
 
-            , Product.uniqLaws @Record1S
-            , Product.uniqLaws @Record3S
+            , Applicative.uniqLaws @Record1S
+            , Applicative.uniqLaws @Record3S
 
-            , Product.uniqLaws @(Record1W Covered)
-            , Product.uniqLaws @(Record3W Covered)
-            , Product.uniqLaws @(CompositeRecordW Covered)
+            , Applicative.uniqLaws @(Record1W Covered)
+            , Applicative.uniqLaws @(Record3W Covered)
+            , Applicative.uniqLaws @(CompositeRecordW Covered)
 
-            , Product.uniqLaws @(Record1WS Covered)
-            , Product.uniqLaws @(Record3WS Covered)
+            , Applicative.uniqLaws @(Record1WS Covered)
+            , Applicative.uniqLaws @(Record3WS Covered)
             ]
 
         , testGroup "adDict projection"
@@ -196,9 +196,9 @@ main
                     @?= (Sum 1, Record1 (Identity 1))
           ]
         , testGroup
-          "buniqC"
+          "bpureC"
           [ testCase "Record1" $
-                buniqC @Num (Identity (fromIntegral (42 :: Int)))
+                bpureC @Num (Identity (fromIntegral (42 :: Int)))
                     @?= Record1 (Identity 42)
           ]
         ]

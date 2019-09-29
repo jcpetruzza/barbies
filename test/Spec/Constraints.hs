@@ -8,7 +8,7 @@ where
 
 import Clothes(F)
 import Barbies.Constraints(ClassF, Dict)
-import Data.Functor.Barbie(bmap, ConstraintsB(..), AllBF, ProductBC(..))
+import Data.Functor.Barbie(bmap, bdicts, ApplicativeB, ConstraintsB(..), AllBF)
 
 import Data.Functor.Product (Product(Pair))
 import Data.Typeable(Typeable, Proxy(..), typeRep)
@@ -35,7 +35,7 @@ lawAddDictPrj
 
 lawDictsEquivPrj
   :: forall b
-  . ( ProductBC b, AllBF Show F b
+  . ( ApplicativeB b, ConstraintsB b, AllBF Show F b
     , Eq (b (Dict (ClassF Show F)))
     , Show (b F), Show (b (Dict (ClassF Show F)))
     , Arbitrary (b F)

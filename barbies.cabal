@@ -38,19 +38,22 @@ library
       Data.Functor.Prod
 
   other-modules:
+      Barbies.Internal.Applicative
       Barbies.Internal.Bare
       Barbies.Internal.Constraints
       Barbies.Internal.Containers
       Barbies.Internal.Dicts
       Barbies.Internal.Functor
-      Barbies.Internal.Product
-      Barbies.Internal.ProductC
       Barbies.Internal.Traversable
       Barbies.Internal.Trivial
       Barbies.Internal.Wear
       Barbies.Internal.Wrappers
 
       Data.Generics.GenericN
+
+      -- To be removed
+      Data.Barbie.Internal.Product
+      Data.Barbie.Internal.ProductC
 
   hs-source-dirs:
       src
@@ -90,11 +93,11 @@ test-suite barbies-test
       TestBarbies
       TestBarbiesW
       Clothes
+      Spec.Applicative
       Spec.Bare
       Spec.Constraints
       Spec.Functor
       Spec.Traversable
-      Spec.Product
       Spec.Wrapper
 
   hs-source-dirs:

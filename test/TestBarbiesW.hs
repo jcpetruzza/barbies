@@ -40,10 +40,9 @@ data Record1W t f
 instance FunctorB (Record1W Bare)
 instance FunctorB (Record1W Covered)
 instance TraversableB (Record1W Covered)
-instance ProductB (Record1W Covered)
+instance ApplicativeB (Record1W Covered)
 instance ConstraintsB (Record1W Bare)
 instance ConstraintsB (Record1W Covered)
-instance ProductBC (Record1W Covered)
 instance BareB Record1W
 
 
@@ -64,10 +63,9 @@ data Record1WS t f
 instance FunctorB (Record1WS Bare)
 instance FunctorB (Record1WS Covered)
 instance TraversableB (Record1WS Covered)
-instance ProductB (Record1WS Covered)
+instance ApplicativeB (Record1WS Covered)
 instance ConstraintsB (Record1WS Bare)
 instance ConstraintsB (Record1WS Covered)
-instance ProductBC (Record1WS Covered)
 instance BareB Record1WS
 
 
@@ -91,10 +89,9 @@ data Record3W t f
 instance FunctorB (Record3W Bare)
 instance FunctorB (Record3W Covered)
 instance TraversableB (Record3W Covered)
-instance ProductB (Record3W Covered)
+instance ApplicativeB (Record3W Covered)
 instance ConstraintsB (Record3W Bare)
 instance ConstraintsB (Record3W Covered)
-instance ProductBC (Record3W Covered)
 
 instance BareB Record3W
 
@@ -119,10 +116,9 @@ data Record3WS t f
 instance FunctorB (Record3WS Bare)
 instance FunctorB (Record3WS Covered)
 instance TraversableB (Record3WS Covered)
-instance ProductB (Record3WS Covered)
+instance ApplicativeB (Record3WS Covered)
 instance ConstraintsB (Record3WS Bare)
 instance ConstraintsB (Record3WS Covered)
-instance ProductBC (Record3WS Covered)
 instance BareB Record3WS
 
 deriving instance AllB  Show   (Record3WS Bare)    => Show (Record3WS Bare f)
@@ -182,10 +178,9 @@ data CompositeRecordW t f
 instance FunctorB (CompositeRecordW Bare)
 instance FunctorB (CompositeRecordW Covered)
 instance TraversableB (CompositeRecordW Covered)
-instance ProductB (CompositeRecordW Covered)
+instance ApplicativeB (CompositeRecordW Covered)
 instance ConstraintsB (CompositeRecordW Bare)
 instance ConstraintsB (CompositeRecordW Covered)
-instance ProductBC (CompositeRecordW Covered)
 instance BareB CompositeRecordW
 
 deriving instance AllB  Show   (CompositeRecordW Bare)    => Show (CompositeRecordW Bare f)
@@ -232,10 +227,9 @@ data InfRecW t f
 instance FunctorB (InfRecW Bare)
 instance FunctorB (InfRecW Covered)
 instance TraversableB (InfRecW Covered)
-instance ProductB (InfRecW Covered)
+instance ApplicativeB (InfRecW Covered)
 instance ConstraintsB (InfRecW Bare)
 instance ConstraintsB (InfRecW Covered)
-instance ProductBC (InfRecW Covered)
 instance BareB InfRecW
 
 deriving instance AllB  Show   (InfRecW Bare)    => Show (InfRecW Bare f)
@@ -284,7 +278,7 @@ data ParBW b t (f :: * -> *)
 
 instance FunctorB (b t) => FunctorB (ParBW b t)
 instance TraversableB (b t) => TraversableB (ParBW b t)
-instance ProductB (b t) => ProductB (ParBW b t)
+instance ApplicativeB (b t) => ApplicativeB (ParBW b t)
 instance BareB b => BareB (ParBW b)
 
 -- XXX GHC currently rejects deriving this one since it
@@ -298,9 +292,6 @@ instance ConstraintsB (b t) => ConstraintsB (ParBW b t) where
   type AllB c (ParBW b t) = AllB c (b t)
   baddDicts (ParBW btf) = ParBW (baddDicts btf)
 
--- XXX SEE NOTE ON ConstraintsB
-instance ProductBC (b t) => ProductBC (ParBW b t) where
-  bdicts = ParBW bdicts
 
 data ParBHW h b t (f :: * -> *)
   = ParBHW (h (b t f))
@@ -317,6 +308,5 @@ data ParXW a t f
 instance FunctorB (ParXW a Bare)
 instance FunctorB (ParXW a Covered)
 instance TraversableB (ParXW a Covered)
-instance ProductB (ParXW a Covered)
+instance ApplicativeB (ParXW a Covered)
 instance ConstraintsB (ParXW a Covered)
-instance ProductBC (ParXW a Covered)

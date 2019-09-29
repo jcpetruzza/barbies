@@ -2,18 +2,19 @@
 {-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Barbies.Internal.Product
+{-# OPTIONS_GHC -Wno-orphans -Wno-deprecations #-}
+module Data.Barbie.Internal.Product
   ( ProductB(buniq, bprod)
-  , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
-
   , CanDeriveProductB
-  , GProductB(..)
   , gbprodDefault, gbuniqDefault
   )
 
 where
 
-import Barbies.Internal.Functor (FunctorB (..))
+import Barbies.Internal.Functor (FunctorB)
+import Barbies.Internal.Trivial (Unit)
+import Barbies.Internal.Wrappers (Barbie(..))
+import qualified Barbies.Internal.Applicative as App
 
 import Data.Functor.Product (Product (..))
 import Data.Kind            (Type)
@@ -22,45 +23,9 @@ import Data.Proxy           (Proxy (..))
 import Data.Generics.GenericN
 
 
--- | Barbie-types that can form products, subject to the laws:
---
--- @
--- 'bmap' (\\('Pair' a _) -> a) . 'uncurry' 'bprod' = 'fst'
--- 'bmap' (\\('Pair' _ b) -> b) . 'uncurry' 'bprod' = 'snd'
--- @
---
--- Notice that because of the laws, having an internal product structure is not
--- enough to have a lawful instance. E.g.
---
--- @
--- data Ok  f = Ok {o1 :: f 'String', o2 :: f 'Int'}
--- data Bad f = Bad{b1 :: f 'String', hiddenFromArg: 'Int'} -- no lawful instance
--- @
---
--- Intuitively, the laws for this class require that `b` hides no structure
--- from its argument @f@. Because of this, if we are given any:
---
--- @
--- x :: forall a . f a
--- @
---
--- then this determines a unique value of type @b f@, witnessed by the 'buniq'
--- method.
--- For example:
---
--- @
--- 'buniq' x = Ok {o1 = x, o2 = x}
--- @
---
--- Formally, 'buniq' should satisfy:
---
--- @
--- 'const' ('buniq' x) = 'bmap' ('const' x)
--- @
---
--- There is a default implementation of 'bprod' and 'buniq' for 'Generic' types,
--- so instances can derived automatically.
-class FunctorB b => ProductB (b :: (k -> Type) -> Type) where
+{-# DEPRECATED ProductB "Use ApplicativeB" #-}
+{-# DEPRECATED buniq "Use bpure" #-}
+class App.ApplicativeB b => ProductB (b :: (k -> Type) -> Type) where
   bprod :: b f -> b g -> b (f `Product` g)
 
   buniq :: (forall a . f a) -> b f
@@ -72,48 +37,7 @@ class FunctorB b => ProductB (b :: (k -> Type) -> Type) where
   buniq = gbuniqDefault
 
 
--- | An alias of 'bprod', since this is like a 'zip' for Barbie-types.
-bzip :: ProductB b => b f -> b g -> b (f `Product` g)
-bzip = bprod
 
--- | An equivalent of 'unzip' for Barbie-types.
-bunzip :: ProductB b => b (f `Product` g) -> (b f, b g)
-bunzip bfg = (bmap (\(Pair a _) -> a) bfg, bmap (\(Pair _ b) -> b) bfg)
-
--- | An equivalent of 'Data.List.zipWith' for Barbie-types.
-bzipWith :: ProductB b => (forall a. f a -> g a -> h a) -> b f -> b g -> b h
-bzipWith f bf bg
-  = bmap (\(Pair fa ga) -> f fa ga) (bf `bprod` bg)
-
--- | An equivalent of 'Data.List.zipWith3' for Barbie-types.
-bzipWith3
-  :: ProductB b
-  => (forall a. f a -> g a -> h a -> i a)
-  -> b f -> b g -> b h -> b i
-bzipWith3 f bf bg bh
-  = bmap (\(Pair (Pair fa ga) ha) -> f fa ga ha)
-         (bf `bprod` bg `bprod` bh)
-
-
--- | An equivalent of 'Data.List.zipWith4' for Barbie-types.
-bzipWith4
-  :: ProductB b
-  => (forall a. f a -> g a -> h a -> i a -> j a)
-  -> b f -> b g -> b h -> b i -> b j
-bzipWith4 f bf bg bh bi
-  = bmap (\(Pair (Pair (Pair fa ga) ha) ia) -> f fa ga ha ia)
-         (bf `bprod` bg `bprod` bh `bprod` bi)
-
-
--- | @'CanDeriveProductB' B f g@ is in practice a predicate about @B@ only.
---   Intuitively, it says that the following holds, for any arbitrary @f@:
---
---     * There is an instance of @'Generic' (B f)@.
---
---     * @B@ has only one constructor (that is, it is not a sum-type).
---
---     * Every field of @B f@ is of the form @f a@, for some type @a@.
---       In other words, @B@ has no "hidden" structure.
 type CanDeriveProductB b f g
   = ( GenericN (b f)
     , GenericN (b g)
@@ -121,6 +45,15 @@ type CanDeriveProductB b f g
     , GProductB f g (RepN (b f)) (RepN (b g)) (RepN (b (f `Product` g)))
     )
 
+instance {-# OVERLAPPABLE #-} (ProductB b, FunctorB b) => App.ApplicativeB b where
+  bpure = Data.Barbie.Internal.Product.buniq
+  bprod = Data.Barbie.Internal.Product.bprod
+
+instance ProductB Unit where
+
+instance ProductB b => ProductB (Barbie b) where
+    buniq x = Barbie (buniq x)
+    bprod (Barbie l) (Barbie r) = Barbie (bprod l r)
 
 -- ======================================
 -- Generic derivation of instances

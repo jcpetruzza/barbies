@@ -14,8 +14,13 @@ module Data.Barbie
 
     -- * Product
   , ProductB(buniq, bprod)
+
     -- ** Utility functions
-  , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
+  , App.bzip
+  , App.bunzip
+  , App.bzipWith
+  , App.bzipWith3
+  , App.bzipWith4
 
     -- * Constraints and instance dictionaries
   , ConstraintsB(AllB, baddDicts)
@@ -46,15 +51,15 @@ module Data.Barbie
 
 where
 
-import Barbies.Internal.Constraints (AllBF, ConstraintsB (..), bmapC, btraverseC)
+import Barbies.Internal.Constraints (AllBF, ConstraintsB (..), bmapC, btraverseC, bmempty)
 
 import Barbies.Internal.Functor(FunctorB(..))
 import Barbies.Internal.Wrappers(Barbie(..))
-import Barbies.Internal.Product
-  ( ProductB(..)
-  , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
-  )
-import Barbies.Internal.ProductC(ProductBC(..), buniqC, bmempty)
+import qualified Barbies.Internal.Applicative as App
+
+import Data.Barbie.Internal.Product(ProductB(..))
+import Data.Barbie.Internal.ProductC(ProductBC(..), buniqC)
+
 import Barbies.Internal.Traversable
   ( TraversableB(..)
   , bsequence, bsequence'

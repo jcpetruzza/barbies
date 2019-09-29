@@ -2,10 +2,10 @@
 {-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Barbies.Internal.ProductC
+{-# OPTIONS_GHC -Wno-deprecations #-}
+module Data.Barbie.Internal.ProductC
   ( ProductBC(..)
   , buniqC
-  , bmempty
 
   , CanDeriveProductBC
   , GAllB
@@ -15,67 +15,43 @@ module Barbies.Internal.ProductC
 
 where
 
-import Barbies.Internal.Constraints
-import Barbies.Internal.Dicts(ClassF, Dict (..), requiringDict)
-import Barbies.Internal.Functor(bmap)
-import Barbies.Internal.Product(ProductB (..))
-import Data.Kind(Type)
+import Barbies.Internal.Constraints(ConstraintsB(..), GAllB, GAllBRep, Self, Other, X)
+import Barbies.Internal.Dicts(Dict (..), requiringDict)
+import Barbies.Internal.Functor(FunctorB(bmap))
+import Barbies.Internal.Trivial(Unit(..))
+import Barbies.Internal.Wrappers(Barbie(..))
 
+import Data.Barbie.Internal.Product(ProductB(..))
 import Data.Generics.GenericN
 
 import Data.Functor.Product (Product (..))
+import Data.Kind(Type)
 import Data.Proxy(Proxy (..))
 
--- | Every type @b@ that is an instance of both 'ProductB' and
---   'ConstraintsB' can be made an instance of 'ProductBC'
---   as well.
---
---   Intuitively, in addition to 'buniq' from 'ProductB', one
---   can define 'buniqC' that takes into account constraints:
---
--- @
--- 'buniq' :: (forall a . f a) -> b f
--- 'buniqC' :: 'AllB' c b => (forall a . c a => f a) -> b f
--- @
---
---  For technical reasons, 'buniqC' is not currently provided
---  as a method of this class and is instead defined in terms
---  'bdicts', which is similar to 'baddDicts' but can produce the
---  instance dictionaries out-of-the-blue. 'bdicts' could also be
---  defined in terms of 'buniqC', so they are essentially equivalent.
---
--- @
--- 'bdicts' :: forall c b . 'AllB' c b => b ('Dict' c)
--- 'bdicts' = 'buniqC' ('Dict' @c)
--- @
---
---
--- There is a default implementation for 'Generic' types, so
--- instances can derived automatically.
 class (ConstraintsB b, ProductB b) => ProductBC (b :: (k -> Type) -> Type) where
   bdicts :: AllB c b => b (Dict c)
 
   default bdicts :: (CanDeriveProductBC c b, AllB c b) => b (Dict c)
   bdicts = gbdictsDefault
 
--- | Every type that admits a generic instance of 'ProductB' and
---   'ConstraintsB', has a generic instance of 'ProductBC' as well.
+
 type CanDeriveProductBC c b
   = ( GenericN (b (Dict c))
     , AllB c b ~ GAllB c (GAllBRep b)
     , GProductBC c (GAllBRep b) (RepN (b (Dict c)))
     )
 
--- | Like 'buniq' but a constraint is allowed to be required on
---   each element of @b@.
+{-# DEPRECATED buniqC "Use bpureC instead" #-}
 buniqC :: forall c f b . (AllB c b, ProductBC b) => (forall a . c a => f a) -> b f
 buniqC x
   = bmap (requiringDict @c x) bdicts
 
--- | Builds a @b f@, by applying 'mempty' on every field of @b@.
-bmempty :: forall f b . (AllBF Monoid f b, ProductBC b) => b f
-bmempty
-  = buniqC @(ClassF Monoid f) mempty
+instance ProductBC b => ProductBC (Barbie b) where
+  bdicts = Barbie bdicts
+
+instance ProductBC Unit where
+  bdicts = Unit
+
 
 -- ===============================================================
 --  Generic derivations

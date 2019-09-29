@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Data.Functor.Barbie
+-- Module:  Data.Functor.Barbie
 --
--- TBP
+-- Functors from indexed-types to types.
 ----------------------------------------------------------------------------
 module Data.Functor.Barbie
   (
@@ -16,10 +16,14 @@ module Data.Functor.Barbie
   , bfoldMap
   , bsequence, bsequence'
 
-    -- * Product
-  , ProductB(buniq, bprod)
+    -- * Applicative
+  , Appl.ApplicativeB(bpure, bprod)
     -- ** Utility functions
-  , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
+  , Appl.bzip
+  , Appl.bunzip
+  , Appl.bzipWith
+  , Appl.bzipWith3
+  , Appl.bzipWith4
 
     -- * Constraints and instance dictionaries
     -- | Consider the following function:
@@ -32,25 +36,23 @@ module Data.Functor.Barbie
     -- We would then like to be able to do:
     --
     -- @
-    -- 'Data.Barbie.bmap' 'showIt' :: 'Data.Functor.Barbie.FunctorB' b => b 'Maybe' -> b ('Data.Functor.Const' 'String')
+    -- 'Data.Functor.Barbie.bmap' 'showIt' :: 'Data.Functor.Barbie.FunctorB' b => b 'Maybe' -> b ('Data.Functor.Const' 'String')
     -- @
     --
     -- This however doesn't work because of the @('Show' a)@ constraint in the
     -- the type of @showIt@.
     --
-    -- The 'ConstraintsB' class let us overcome this problem.
+    -- The 'Cons.ConstraintsB' class let us overcome this problem.
 
-  , ConstraintsB(..)
-  , AllBF
-
-    -- ** Products and constaints
-  , ProductBC(bdicts)
+  , Cons.ConstraintsB(..)
+  , Cons.AllBF
 
     -- ** Utility functions
-  , bmapC
-  , btraverseC
-  , buniqC
-  , bmempty
+  , Cons.bdicts
+  , Cons.bmapC
+  , Cons.btraverseC
+  , Cons.bpureC
+  , Cons.bmempty
 
     -- * Support for generic derivations
   , Rec(..)
@@ -58,14 +60,11 @@ module Data.Functor.Barbie
 
 where
 
-import Barbies.Internal.Constraints(AllBF, ConstraintsB (..), bmapC, btraverseC)
+import qualified Barbies.Internal.Constraints as Cons
 
 import Barbies.Internal.Functor(FunctorB(..))
-import Barbies.Internal.Product
-  ( ProductB(..)
-  , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
-  )
-import Barbies.Internal.ProductC(ProductBC(..), buniqC, bmempty)
+import qualified Barbies.Internal.Applicative as Appl
+
 import Barbies.Internal.Traversable
   ( TraversableB(..)
   , bsequence, bsequence'

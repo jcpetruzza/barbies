@@ -46,9 +46,8 @@ data Record0 (f :: * -> *)
 
 instance FunctorB Record0
 instance TraversableB Record0
-instance ProductB Record0
+instance ApplicativeB Record0
 instance ConstraintsB Record0
-instance ProductBC Record0
 
 instance Arbitrary (Record0 f) where arbitrary = pure Record0
 
@@ -60,9 +59,8 @@ data Record1 f
 
 instance FunctorB Record1
 instance TraversableB Record1
-instance ProductB Record1
+instance ApplicativeB Record1
 instance ConstraintsB Record1
-instance ProductBC Record1
 
 deriving instance AllBF Show f Record1 => Show (Record1 f)
 deriving instance AllBF Eq   f Record1 => Eq   (Record1 f)
@@ -78,9 +76,8 @@ data Record1S f
 
 instance FunctorB Record1S
 instance TraversableB Record1S
-instance ProductB Record1S
+instance ApplicativeB Record1S
 instance ConstraintsB Record1S
-instance ProductBC Record1S
 
 deriving instance AllBF Show f Record1S => Show (Record1S f)
 deriving instance AllBF Eq   f Record1S => Eq   (Record1S f)
@@ -100,9 +97,8 @@ data Record3 f
 
 instance FunctorB Record3
 instance TraversableB Record3
-instance ProductB Record3
+instance ApplicativeB Record3
 instance ConstraintsB Record3
-instance ProductBC Record3
 
 deriving instance AllBF Show f Record3 => Show (Record3 f)
 deriving instance AllBF Eq   f Record3 => Eq   (Record3 f)
@@ -121,9 +117,8 @@ data Record3S f
 
 instance FunctorB Record3S
 instance TraversableB Record3S
-instance ProductB Record3S
+instance ApplicativeB Record3S
 instance ConstraintsB Record3S
-instance ProductBC Record3S
 
 deriving instance AllBF Show f Record3S => Show (Record3S f)
 deriving instance AllBF Eq   f Record3S => Eq   (Record3S f)
@@ -186,9 +181,8 @@ data CompositeRecord f
 
 instance FunctorB CompositeRecord
 instance TraversableB CompositeRecord
-instance ProductB CompositeRecord
+instance ApplicativeB CompositeRecord
 instance ConstraintsB CompositeRecord
-instance ProductBC CompositeRecord
 
 deriving instance AllBF Show f CompositeRecord => Show (CompositeRecord f)
 deriving instance AllBF Eq   f CompositeRecord => Eq   (CompositeRecord f)
@@ -224,9 +218,8 @@ data InfRec f
 
 instance FunctorB InfRec
 instance TraversableB InfRec
-instance ProductB InfRec
+instance ApplicativeB InfRec
 instance ConstraintsB InfRec
-instance ProductBC InfRec
 
 deriving instance AllBF Show f InfRec => Show (InfRec f)
 deriving instance AllBF Eq   f InfRec => Eq   (InfRec f)
@@ -265,9 +258,8 @@ data ParB b (f :: * -> *)
 
 instance FunctorB b => FunctorB (ParB b)
 instance TraversableB b => TraversableB (ParB b)
-instance ProductB b => ProductB (ParB b)
+instance ApplicativeB b => ApplicativeB (ParB b)
 instance ConstraintsB b => ConstraintsB (ParB b)
-instance ProductBC b => ProductBC (ParB b)
 
 data ParBH h b (f :: * -> *)
   = ParBH (h (b f))
@@ -282,9 +274,8 @@ data ParX a f
 
 instance FunctorB (ParX a)
 instance TraversableB (ParX a)
-instance ProductB (ParX a)
+instance ApplicativeB (ParX a)
 instance ConstraintsB (ParX a)
-instance ProductBC (ParX a)
 
 
 -----------------------------------------------------
@@ -300,6 +291,5 @@ data HKB b
 
 instance FunctorB HKB
 instance TraversableB HKB
-instance ProductB HKB
+instance ApplicativeB HKB
 instance ConstraintsB HKB
-instance ProductBC HKB

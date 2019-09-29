@@ -1,6 +1,6 @@
 # Changelog for barbies
 
-## ...
+## 2.0.0.0
   - Builds with ghc 8.8.
   - Remove functions deprecated on release 1.0
   - Deprecate `Data.Functor.Prod`, `(/*)` and `(/*/)`.
@@ -10,6 +10,9 @@
   - Create a `Barbies` module, to contain wrappers, basic docs, etc.
     `Data.Functor.Barbie` contains only functor-related stuff.
   - Add a `ErrorContainer` wrapper, similar to `Container` but for `Either e`.
+  - Replace `ProductB` by `ApplicativeB`, with more lax laws
+  - Remove `ProductBC`, since `bdicts` can now be defined in terms of `ApplicativeB`
+    and `ConstraintsB`.
 
 ## 1.1.3.0
   - `Wear` will raise a `TypeError` instead of getting

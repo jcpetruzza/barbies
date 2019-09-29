@@ -8,8 +8,7 @@ where
 
 import Prelude hiding (Semigroup, (<>))
 
-import Barbies (Barbie(..))
-import Data.Functor.Barbie (AllBF, ProductBC)
+import Barbies (AllBF, ApplicativeB, Barbie(..), ConstraintsB)
 
 import Data.Semigroup (Semigroup, (<>))
 
@@ -19,7 +18,8 @@ import Test.Tasty.QuickCheck(Arbitrary(..), testProperty)
 lawsMonoid
   :: forall b
   .  ( Arbitrary (b []), Eq (b []), Show (b [])
-     , ProductBC b
+     , ApplicativeB b
+     , ConstraintsB b
      , AllBF Semigroup [] b
      , AllBF Monoid [] b
      )

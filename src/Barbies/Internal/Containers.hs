@@ -16,7 +16,7 @@ import GHC.Generics (Generic)
 
 -- {{ Container ---------------------------------------------------------------
 
--- | Wrapper for Barbies that act as containers of @a@
+-- | Wrapper for barbies that act as containers of @a@
 --   by wearing @('Const' a)@.
 newtype Container b a
   = Container { getContainer :: b (Const a) }
@@ -40,9 +40,9 @@ instance TraversableB b => Traversable (Container b) where
     traverse f
       = fmap Container . btraverse (bitraverse f pure) . getContainer
 
-instance ProductB b => Applicative (Container b) where
+instance ApplicativeB b => Applicative (Container b) where
     pure a
-      = Container $ buniq (Const a)
+      = Container $ bpure (Const a)
 
     l <*> r
       = Container $ bzipWith appConst (getContainer l) (getContainer r)
@@ -56,7 +56,7 @@ instance ProductB b => Applicative (Container b) where
 
 -- {{ ErrorContainer ----------------------------------------------------------
 
--- | Wrapper for Barbies that act as containers of @e@
+-- | Wrapper for barbies that act as containers of @e@
 --   by wearing @'Either' e@.
 newtype ErrorContainer b e
   = ErrorContainer { getErrorContainer :: b (Either e) }

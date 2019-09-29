@@ -9,11 +9,11 @@ module Barbies.Internal
   , Internal.GTraversableB(..)
   , Internal.CanDeriveTraversableB
 
-    -- * Product
-  , Internal.gbuniqDefault
+    -- * Applicative
+  , Internal.gbpureDefault
   , Internal.gbprodDefault
-  , Internal.GProductB(..)
-  , Internal.CanDeriveProductB
+  , Internal.GApplicativeB(..)
+  , Internal.CanDeriveApplicativeB
 
     -- * Constraints
   , Internal.gbaddDictsDefault
@@ -23,11 +23,6 @@ module Barbies.Internal
   , Internal.GAllBRep
   , Internal.X
   , Internal.TagSelf, Internal.Self, Internal.Other
-
-    -- * Proof
-  , Internal.gbdictsDefault
-  , Internal.GProductBC(..)
-  , Internal.CanDeriveProductBC
 
     -- * Bare values
   , Internal.gbcoverDefault
@@ -41,11 +36,10 @@ module Barbies.Internal
 
 where
 
+import qualified Barbies.Internal.Applicative as Internal
 import qualified Barbies.Internal.Bare as Internal
 import qualified Barbies.Internal.Constraints as Internal
 import qualified Barbies.Internal.Functor as Internal
-import qualified Barbies.Internal.Product as Internal
-import qualified Barbies.Internal.ProductC as Internal
 import qualified Barbies.Internal.Traversable as Internal
 
 import Data.Generics.GenericN (GenericN, Rec(..), RepN)

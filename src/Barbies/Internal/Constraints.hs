@@ -7,6 +7,10 @@ module Barbies.Internal.Constraints
   , bmapC
   , btraverseC
   , AllBF
+  , bdicts
+  , bpureC
+  , bmempty
+
 
   , CanDeriveConstraintsB
   , GAllBC(..)
@@ -18,6 +22,7 @@ module Barbies.Internal.Constraints
 
 where
 
+import Barbies.Internal.Applicative(ApplicativeB(..))
 import Barbies.Internal.Dicts(ClassF, Dict (..), requiringDict)
 import Barbies.Internal.Functor(FunctorB (..))
 import Barbies.Internal.Traversable(TraversableB (..))
@@ -124,6 +129,31 @@ btraverseC f b = btraverse (\(Pair (Dict :: Dict c a) x) -> f x) (baddDicts b)
 --   'AllBF' 'Show' f Barbie ~ ('Show' (f 'String'), 'Show' (f 'Int'))
 --   @
 type AllBF c f b = AllB (ClassF c f) b
+
+
+-- | Similar to 'baddDicts' but can produce the instance dictionaries
+--   "out of the blue".
+bdicts :: forall c b . (ConstraintsB b, ApplicativeB b,  AllB c b) => b (Dict c)
+bdicts = bmap (\(Pair c _) -> c) $ baddDicts $ bpure Proxy
+
+
+-- | Like 'bpure' but a constraint is allowed to be required on
+--   each element of @b@.
+bpureC
+  :: forall c f b .
+   ( AllB c b
+   , ConstraintsB b
+   , ApplicativeB b
+   )
+  => (forall a . c a => f a)
+  -> b f
+bpureC x
+  = bmap (requiringDict @c x) bdicts
+
+-- | Builds a @b f@, by applying 'mempty' on every field of @b@.
+bmempty :: forall f b . (AllBF Monoid f b, ConstraintsB b, ApplicativeB b) => b f
+bmempty
+  = bpureC @(ClassF Monoid f) mempty
 
 
 -- | The representation used for the generic computation of the @'AllB' c b@

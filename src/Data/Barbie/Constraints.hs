@@ -19,4 +19,4 @@ where
 
 import Barbies.Internal.Constraints
 import Barbies.Internal.Dicts
-import Barbies.Internal.ProductC
+import Data.Barbie.Internal.ProductC

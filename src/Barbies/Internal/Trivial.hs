@@ -6,10 +6,9 @@ module Barbies.Internal.Trivial
 
 where
 
+import Barbies.Internal.Applicative(ApplicativeB(..))
 import Barbies.Internal.Constraints(ConstraintsB(..))
 import Barbies.Internal.Functor(FunctorB(..))
-import Barbies.Internal.Product(ProductB(..))
-import Barbies.Internal.ProductC(ProductBC(..))
 import Barbies.Internal.Traversable(TraversableB(..))
 
 import Data.Data (Data(..))
@@ -63,6 +62,5 @@ instance Monoid (Unit f) where
 
 instance FunctorB Unit
 instance TraversableB Unit
-instance ProductB Unit
+instance ApplicativeB Unit
 instance ConstraintsB Unit
-instance ProductBC Unit
