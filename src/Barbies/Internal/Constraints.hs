@@ -13,7 +13,7 @@ module Barbies.Internal.Constraints
 
 
   , CanDeriveConstraintsB
-  , GAllBC(..)
+  , GAllB
   , GAllBRep, X
   , TagSelf, Self, Other
   , GConstraintsB(..)
@@ -31,7 +31,7 @@ import Data.Functor.Compose (Compose (..))
 import Data.Functor.Const   (Const (..))
 import Data.Functor.Product (Product (..))
 import Data.Functor.Sum     (Sum (..))
-import Data.Kind            (Constraint)
+import Data.Kind            (Constraint, Type)
 import Data.Proxy           (Proxy (..))
 
 import Data.Generics.GenericN
@@ -193,19 +193,17 @@ gbaddDictsDefault
   = toN . gbaddDicts @c @f @(GAllBRep b) . fromN
 {-# INLINE gbaddDictsDefault #-}
 
-class GAllBC (repbf :: * -> *) where
-  type GAllB (c :: k -> Constraint) repbf :: Constraint
 
-class GAllBC repbx => GConstraintsB c f repbx repbf repbdf where
+class GConstraintsB c f repbx repbf repbdf where
   gbaddDicts :: GAllB c repbx => repbf x -> repbdf x
 
+type family GAllB (c :: k -> Constraint) (repbf :: Type -> Type) :: Constraint
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-instance GAllBC repbf => GAllBC (M1 i k repbf) where
-  type GAllB c (M1 i k repbf) = GAllB c repbf
+type instance GAllB c (M1 i k repbf) = GAllB c repbf
 
 instance
   GConstraintsB c f repbx repbf repbdf
@@ -217,24 +215,21 @@ instance
 
 
 
-instance GAllBC V1 where
-  type GAllB c V1 = ()
+type instance GAllB c V1 = ()
 
 instance GConstraintsB c f V1 V1 V1 where
   gbaddDicts _ = undefined
 
 
 
-instance GAllBC U1 where
-  type GAllB c U1 = ()
+type instance GAllB c U1 = ()
 
 instance GConstraintsB c f U1 U1 U1 where
   gbaddDicts = id
   {-# INLINE gbaddDicts #-}
 
 
-instance (GAllBC l, GAllBC r) => GAllBC (l :*: r) where
-  type GAllB c (l :*: r) = (GAllB c l, GAllB c r)
+type instance GAllB c (l :*: r) = (GAllB c l, GAllB c r)
 
 instance
   ( GConstraintsB c f lx lf ldf
@@ -247,8 +242,7 @@ instance
   {-# INLINE gbaddDicts #-}
 
 
-instance (GAllBC l, GAllBC r) => GAllBC (l :+: r) where
-  type GAllB c (l :+: r) = (GAllB c l, GAllB c r)
+type instance GAllB c (l :+: r) = (GAllB c l, GAllB c r)
 
 instance
   ( GConstraintsB c f lx lf ldf
@@ -269,8 +263,7 @@ instance
 type P0 = Param 0
 
 
-instance GAllBC (Rec (P0 X a) (X a)) where
-  type GAllB c (Rec (P0 X a) (X a)) = c a
+type instance GAllB c (Rec (P0 X a) (X a)) = c a
 
 instance GConstraintsB c f (Rec (P0 X a) (X a))
                            (Rec (P0 f a) (f a))
@@ -282,8 +275,7 @@ instance GConstraintsB c f (Rec (P0 X a) (X a))
 
 
 
-instance GAllBC (Rec (Self b (P0 X)) (b X)) where
-   type GAllB c (Rec (Self b (P0 X)) (b X)) = ()
+type instance GAllB c (Rec (Self b (P0 X)) (b X)) = ()
 
 instance
   ( ConstraintsB b
@@ -296,11 +288,8 @@ instance
     = Rec . K1 . baddDicts . unK1 . unRec
   {-# INLINE gbaddDicts #-}
 
-instance
-  ( ConstraintsB b'
-  , SameOrParam b b'
-  ) => GAllBC (Rec (Other b (P0 X)) (b' X)) where
-  type GAllB c (Rec (Other b (P0 X)) (b' X)) = AllB c b'
+
+type instance GAllB c (Rec (Other b (P0 X)) (b' X)) = AllB c b'
 
 instance
   ( SameOrParam b b'
@@ -316,8 +305,7 @@ instance
 
 
 
-instance GAllBC (Rec a a) where
-  type GAllB c (Rec a a) = ()
+type instance GAllB c (Rec a a) = ()
 
 instance GConstraintsB c f (Rec a a)
                            (Rec a a)

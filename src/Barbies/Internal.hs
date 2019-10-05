@@ -19,7 +19,7 @@ module Barbies.Internal
   , Internal.gbaddDictsDefault
   , Internal.GConstraintsB(..)
   , Internal.CanDeriveConstraintsB
-  , Internal.GAllBC(..)
+  , Internal.GAllB
   , Internal.GAllBRep
   , Internal.X
   , Internal.TagSelf, Internal.Self, Internal.Other
