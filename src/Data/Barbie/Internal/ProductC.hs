@@ -8,16 +8,17 @@ module Data.Barbie.Internal.ProductC
   , buniqC
 
   , CanDeriveProductBC
-  , GAllB
+  , GAll
   , GProductBC(..)
   , gbdictsDefault
   )
 
 where
 
-import Barbies.Internal.Constraints(ConstraintsB(..), GAllB, GAllBRep, Self, Other, X)
+import Barbies.Generics.Constraints(GAll, GAllRep, Self, Other, X)
+import Barbies.Internal.ConstraintsB(ConstraintsB(..))
 import Barbies.Internal.Dicts(Dict (..), requiringDict)
-import Barbies.Internal.Functor(FunctorB(bmap))
+import Barbies.Internal.FunctorB(FunctorB(bmap))
 import Barbies.Internal.Trivial(Unit(..))
 import Barbies.Internal.Wrappers(Barbie(..))
 
@@ -37,8 +38,8 @@ class (ConstraintsB b, ProductB b) => ProductBC (b :: (k -> Type) -> Type) where
 
 type CanDeriveProductBC c b
   = ( GenericN (b (Dict c))
-    , AllB c b ~ GAllB 0 c (GAllBRep b)
-    , GProductBC c (GAllBRep b) (RepN (b (Dict c)))
+    , AllB c b ~ GAll 0 c (GAllRep b)
+    , GProductBC c (GAllRep b) (RepN (b (Dict c)))
     )
 
 {-# DEPRECATED buniqC "Use bpureC instead" #-}
@@ -65,12 +66,12 @@ gbdictsDefault
      )
   => b (Dict c)
 gbdictsDefault
-  = toN $ gbdicts @c @(GAllBRep b)
+  = toN $ gbdicts @c @(GAllRep b)
 {-# INLINE gbdictsDefault #-}
 
 
 class GProductBC c repbx repbd where
-  gbdicts :: GAllB 0 c repbx => repbd x
+  gbdicts :: GAll 0 c repbx => repbd x
 
 -- ----------------------------------
 -- Trivial cases

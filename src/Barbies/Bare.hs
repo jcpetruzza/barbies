@@ -46,7 +46,7 @@ module Barbies.Bare
 
   ) where
 
-import Barbies.Internal.Bare
+import Barbies.Internal.BareB
   ( Wear, Bare, Covered
   , BareB(..)
   , bstripFrom, bcoverWith

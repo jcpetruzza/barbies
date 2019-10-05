@@ -2,7 +2,8 @@
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Barbies.Internal.Constraints
+{-# OPTIONS_GHC -Wno-orphans #-}
+module Barbies.Internal.ConstraintsB
   ( ConstraintsB(..)
   , bmapC
   , btraverseC
@@ -11,29 +12,24 @@ module Barbies.Internal.Constraints
   , bpureC
   , bmempty
 
-
   , CanDeriveConstraintsB
-  , GAllB
-  , GAllBRep, X
-  , TagSelf, Self, Other
-  , GConstraintsB(..)
   , gbaddDictsDefault
   )
 
 where
 
-import Barbies.Internal.Applicative(ApplicativeB(..))
+import Barbies.Generics.Constraints(GConstraints(..), GAll, GAllRep, Self, Other, X)
+import Barbies.Internal.ApplicativeB(ApplicativeB(..))
 import Barbies.Internal.Dicts(ClassF, Dict (..), requiringDict)
-import Barbies.Internal.Functor(FunctorB (..))
-import Barbies.Internal.Traversable(TraversableB (..))
+import Barbies.Internal.FunctorB(FunctorB (..))
+import Barbies.Internal.TraversableB(TraversableB (..))
 
 import Data.Functor.Compose (Compose (..))
 import Data.Functor.Const   (Const (..))
 import Data.Functor.Product (Product (..))
 import Data.Functor.Sum     (Sum (..))
-import Data.Kind            (Constraint, Type)
+import Data.Kind            (Constraint)
 import Data.Proxy           (Proxy (..))
-import GHC.TypeLits         (Nat)
 
 import Data.Generics.GenericN
 
@@ -79,7 +75,7 @@ class FunctorB b => ConstraintsB (b :: (k -> *) -> *) where
   --
   -- For requiring constraints of the form @c (f a)@, use 'AllBF'.
   type AllB (c :: k -> Constraint) b :: Constraint
-  type AllB c b = GAllB 0 c (GAllBRep b)
+  type AllB c b = GAll 0 c (GAllRep b)
 
   baddDicts :: forall c f.  AllB c b => b f -> b (Dict c `Product` f)
 
@@ -157,12 +153,6 @@ bmempty
   = bpureC @(ClassF Monoid f) mempty
 
 
--- | The representation used for the generic computation of the @'AllB' c b@
---   constraints. Here 'X' is an arbitrary constant since the actual
---   argument to @b@ is irrelevant.
-type GAllBRep b = TagSelf b (RepN (b X))
-data X a
-
 -- | @'CanDeriveConstraintsB' B f g@ is in practice a predicate about @B@ only.
 --   Intuitively, it says that the following holds, for any arbitrary @f@:
 --
@@ -174,8 +164,8 @@ data X a
 type CanDeriveConstraintsB c b f
   = ( GenericN (b f)
     , GenericN (b (Dict c `Product` f))
-    , AllB c b ~ GAllB 0 c (GAllBRep b)
-    , GConstraintsB 0 c f (GAllBRep b) (RepN (b f)) (RepN (b (Dict c `Product` f)))
+    , AllB c b ~ GAll 0 c (GAllRep b)
+    , GConstraints 0 c f (GAllRep b) (RepN (b f)) (RepN (b (Dict c `Product` f)))
     )
 
 
@@ -191,182 +181,44 @@ gbaddDictsDefault
     )
   => b f -> b (Dict c `Product` f)
 gbaddDictsDefault
-  = toN . gbaddDicts @0 @c @f @(GAllBRep b) . fromN
+  = toN . gaddDicts @0 @c @f @(GAllRep b) . fromN
 {-# INLINE gbaddDictsDefault #-}
 
 
-class GConstraintsB n c f repbx repbf repbdf where
-  gbaddDicts :: GAllB n c repbx => repbf x -> repbdf x
-
-type family GAllB (n :: Nat) (c :: k -> Constraint) (repbf :: Type -> Type) :: Constraint
-
--- ----------------------------------
--- Trivial cases
--- ----------------------------------
-
-type instance GAllB n c (M1 i k repbf) = GAllB n c repbf
-
-instance
-  GConstraintsB n c f repbx repbf repbdf
-    => GConstraintsB n c f (M1 i k repbx)
-                           (M1 i k repbf)
-                           (M1 i k repbdf)
-  where
-  gbaddDicts
-    = M1 . gbaddDicts @n @c @f @repbx . unM1
-  {-# INLINE gbaddDicts #-}
-
-
-
-type instance GAllB n c V1 = ()
-
-instance GConstraintsB n c f V1 V1 V1 where
-  gbaddDicts _ = undefined
-
-
-
-type instance GAllB n c U1 = ()
-
-instance GConstraintsB n c f U1 U1 U1 where
-  gbaddDicts = id
-  {-# INLINE gbaddDicts #-}
-
-
-type instance GAllB n c (l :*: r)
-  = (GAllB n c l, GAllB n c r)
-
-instance
-  ( GConstraintsB n c f lx lf ldf
-  , GConstraintsB n c f rx rf rdf
-  ) => GConstraintsB n c f (lx  :*: rx)
-                           (lf  :*: rf)
-                           (ldf :*: rdf)
-  where
-  gbaddDicts (l :*: r)
-    = (gbaddDicts @n @c @f @lx l) :*: (gbaddDicts @n @c @f @rx r)
-  {-# INLINE gbaddDicts #-}
-
-
-type instance GAllB n c (l :+: r) = (GAllB n c l, GAllB n c r)
-
-instance
-  ( GConstraintsB n c f lx lf ldf
-  , GConstraintsB n c f rx rf rdf
-  ) => GConstraintsB n c f (lx  :+: rx)
-                           (lf  :+: rf)
-                           (ldf :+: rdf)
-  where
-  gbaddDicts = \case
-    L1 l -> L1 (gbaddDicts @n @c @f @lx l)
-    R1 r -> R1 (gbaddDicts @n @c @f @rx r)
-  {-# INLINE gbaddDicts #-}
-
-
--- --------------------------------
--- The interesting cases
--- --------------------------------
+-- ------------------------------------------------------------
+-- Generic derivation: Special cases for ConstraintsB
+-- -----------------------------------------------------------
 
 type P = Param
 
 
-type instance GAllB n c (Rec (P n X a) (X a)) = c a
-
-instance GConstraintsB n c f (Rec (P n X a) (X a))
-                             (Rec (P n f a) (f a))
-                             (Rec (P n (Dict c `Product` f) a)
-                                      ((Dict c `Product` f) a))
-  where
-  gbaddDicts
-    = Rec . K1 . Pair Dict . unK1 . unRec
-  {-# INLINE gbaddDicts #-}
-
-
-
-type instance GAllB n c (Rec (Self b (P n X)) (b X)) = ()
-
 instance
   ( ConstraintsB b
   , AllB c b
-  ) => GConstraintsB 0 c f (Rec (Self b (P 0 X)) (b X))
-                           (Rec (b (P 0 f)) (b f))
-                           (Rec (b (P 0 (Dict c `Product` f)))
-                                (b      (Dict c `Product` f)))
+  ) => GConstraints 0 c f (Rec (Self b (P 0 X)) (b X))
+                          (Rec (b (P 0 f)) (b f))
+                          (Rec (b (P 0 (Dict c `Product` f)))
+                               (b      (Dict c `Product` f)))
   where
-  gbaddDicts
+  gaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec
-  {-# INLINE gbaddDicts #-}
+  {-# INLINE gaddDicts #-}
 
 
-type instance GAllB 0 c (Rec (Other b (P 0 X)) (b' X)) = AllB c b'
+type instance GAll 0 c (Rec (Other b (P 0 X)) (b' X)) = AllB c b'
 
 instance
   ( SameOrParam b b'
   , ConstraintsB b'
   , AllB c b'
-  ) => GConstraintsB 0 c f (Rec (Other b (P 0 X)) (b' X))
-                           (Rec (b (P 0 f)) (b' f))
-                           (Rec (b (P 0 (Dict c `Product` f)))
-                                (b'     (Dict c `Product` f)))
+  ) => GConstraints 0 c f (Rec (Other b (P 0 X)) (b' X))
+                          (Rec (b (P 0 f)) (b' f))
+                          (Rec (b (P 0 (Dict c `Product` f)))
+                               (b'     (Dict c `Product` f)))
   where
-  gbaddDicts
+  gaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec
-  {-# INLINE gbaddDicts #-}
-
-
-
-type instance GAllB n c (Rec a a) = ()
-
-instance GConstraintsB n c f (Rec a a)
-                             (Rec a a)
-                             (Rec a a)
-  where
-  gbaddDicts = id
-  {-# INLINE gbaddDicts #-}
-
-
--- ============================================================================
--- ## Identifying recursive usages of the barbie-type ##
---
--- ============================================================================
-
-data Self  (b :: (k -> *) -> *) (f :: k -> *)
-data Other (b :: (k -> *) -> *) (f :: k -> *)
-
--- | We use type-families to generically compute @'AllB' c b@. Intuitively, if
---   @b' f@ occurs inside @b f@, then we should just add @AllB b' c@ to
---   @AllB b c@. The problem is that if @b@ is a recursive type, and @b'@ is @b@,
---   then ghc will choke and blow the stack (instead of computing a fixpoint).
---
---   So, we would like to behave differently when @b = b'@ and add @()@ instead
---   of `AllB b f` to break the recursion. Our trick will be to use a type
---   family to inspect @RepN (b f)@ and distinguish recursive usages from
---   non-recursive ones, tagging them with different types, so we can distinguish
---   them in the instances.
-type family TagSelf (b :: (k -> *) -> *) (repbf :: * -> *) :: * -> * where
-  TagSelf b (M1 mt m s)
-    = M1 mt m (TagSelf b s)
-
-  TagSelf b (l :+: r)
-    = TagSelf b l :+: TagSelf b r
-
-  TagSelf b (l :*: r)
-    = TagSelf b l :*: TagSelf b r
-
-  TagSelf b (Rec (b f) (b g))
-    = Rec (Self b f) (b g)
-
-  TagSelf (b :: (k -> *) -> *) (Rec (b' f) ((b'' :: (k -> *) -> *) g))
-    = Rec (Other b' f) (b'' g)
-
-  TagSelf b (Rec p a)
-    = Rec p a
-
-  TagSelf b U1
-    = U1
-
-  TagSelf b V1
-    = V1
-
+  {-# INLINE gaddDicts #-}
 
 -- --------------------------------
 -- Instances for base types

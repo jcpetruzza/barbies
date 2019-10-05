@@ -1,33 +1,33 @@
 module Barbies.Internal
   ( -- * Functor
     Internal.gbmapDefault
-  , Internal.GFunctorB(..)
+  , Generics.GFunctor(..)
   , Internal.CanDeriveFunctorB
 
     -- * Traversable
   , Internal.gbtraverseDefault
-  , Internal.GTraversableB(..)
+  , Generics.GTraversable(..)
   , Internal.CanDeriveTraversableB
 
     -- * Applicative
   , Internal.gbpureDefault
   , Internal.gbprodDefault
-  , Internal.GApplicativeB(..)
+  , Generics.GApplicative(..)
   , Internal.CanDeriveApplicativeB
 
     -- * Constraints
   , Internal.gbaddDictsDefault
-  , Internal.GConstraintsB(..)
+  , Generics.GConstraints(..)
   , Internal.CanDeriveConstraintsB
-  , Internal.GAllB
-  , Internal.GAllBRep
-  , Internal.X
-  , Internal.TagSelf, Internal.Self, Internal.Other
+  , Generics.GAll
+  , Generics.GAllRep
+  , Generics.X
+  , Generics.TagSelf, Generics.Self, Generics.Other
 
     -- * Bare values
   , Internal.gbcoverDefault
   , Internal.gbstripDefault
-  , Internal.GBareB(..)
+  , Generics.GBare(..)
   , Internal.CanDeriveBareB
 
     -- * Generic derivation support
@@ -36,10 +36,16 @@ module Barbies.Internal
 
 where
 
-import qualified Barbies.Internal.Applicative as Internal
-import qualified Barbies.Internal.Bare as Internal
-import qualified Barbies.Internal.Constraints as Internal
-import qualified Barbies.Internal.Functor as Internal
-import qualified Barbies.Internal.Traversable as Internal
+import qualified Barbies.Generics.Applicative as Generics
+import qualified Barbies.Generics.Bare as Generics
+import qualified Barbies.Generics.Constraints as Generics
+import qualified Barbies.Generics.Functor as Generics
+import qualified Barbies.Generics.Traversable as Generics
+
+import qualified Barbies.Internal.ApplicativeB as Internal
+import qualified Barbies.Internal.BareB as Internal
+import qualified Barbies.Internal.ConstraintsB as Internal
+import qualified Barbies.Internal.FunctorB as Internal
+import qualified Barbies.Internal.TraversableB as Internal
 
 import Data.Generics.GenericN (GenericN, Rec(..), RepN)

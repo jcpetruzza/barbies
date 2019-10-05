@@ -11,10 +11,10 @@ module Data.Barbie.Internal.Product
 
 where
 
-import Barbies.Internal.Functor (FunctorB)
+import Barbies.Internal.FunctorB (FunctorB)
 import Barbies.Internal.Trivial (Unit)
 import Barbies.Internal.Wrappers (Barbie(..))
-import qualified Barbies.Internal.Applicative as App
+import qualified Barbies.Internal.ApplicativeB as App
 
 import Data.Functor.Product (Product (..))
 import Data.Kind            (Type)

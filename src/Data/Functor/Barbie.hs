@@ -60,9 +60,9 @@ module Data.Functor.Barbie
 
 where
 
-import qualified Barbies.Internal.Constraints as Cons
-import qualified Barbies.Internal.Functor as Func
-import qualified Barbies.Internal.Applicative as Appl
-import qualified Barbies.Internal.Traversable as Trav
+import qualified Barbies.Internal.ApplicativeB as Appl
+import qualified Barbies.Internal.ConstraintsB as Cons
+import qualified Barbies.Internal.FunctorB as Func
+import qualified Barbies.Internal.TraversableB as Trav
 
 import qualified Data.Generics.GenericN as GenericN

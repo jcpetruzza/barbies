@@ -51,16 +51,16 @@ module Data.Barbie
 
 where
 
-import Barbies.Internal.Constraints (AllBF, ConstraintsB (..), bmapC, btraverseC, bmempty)
+import Barbies.Internal.ConstraintsB (AllBF, ConstraintsB (..), bmapC, btraverseC, bmempty)
 
-import Barbies.Internal.Functor(FunctorB(..))
+import Barbies.Internal.FunctorB(FunctorB(..))
 import Barbies.Internal.Wrappers(Barbie(..))
-import qualified Barbies.Internal.Applicative as App
+import qualified Barbies.Internal.ApplicativeB as App
 
 import Data.Barbie.Internal.Product(ProductB(..))
 import Data.Barbie.Internal.ProductC(ProductBC(..), buniqC)
 
-import Barbies.Internal.Traversable
+import Barbies.Internal.TraversableB
   ( TraversableB(..)
   , bsequence, bsequence'
   , bfoldMap, btraverse_

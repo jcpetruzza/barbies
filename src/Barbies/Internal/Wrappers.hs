@@ -6,11 +6,11 @@ module Barbies.Internal.Wrappers
   ( Barbie(..)
   ) where
 
-import Barbies.Internal.Applicative
-import Barbies.Internal.Constraints
+import Barbies.Internal.ApplicativeB
+import Barbies.Internal.ConstraintsB
 import Barbies.Internal.Dicts
-import Barbies.Internal.Functor
-import Barbies.Internal.Traversable
+import Barbies.Internal.FunctorB
+import Barbies.Internal.TraversableB
 
 import Data.Kind (Type)
 import Data.Semigroup (Semigroup, (<>))

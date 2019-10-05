@@ -1,6 +1,7 @@
 {-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
-module Barbies.Internal.Traversable
+{-# OPTIONS_GHC -Wno-orphans #-}
+module Barbies.Internal.TraversableB
   ( TraversableB(..)
   , btraverse_
   , bsequence
@@ -8,13 +9,13 @@ module Barbies.Internal.Traversable
   , bfoldMap
 
   , CanDeriveTraversableB
-  , GTraversableB(..)
   , gbtraverseDefault
   )
 
 where
 
-import Barbies.Internal.Functor(FunctorB (..))
+import Barbies.Generics.Traversable(GTraversable(..))
+import Barbies.Internal.FunctorB(FunctorB (..))
 
 import Data.Functor           (void)
 import Data.Functor.Compose   (Compose (..))
@@ -73,7 +74,7 @@ bfoldMap f
 
 
 -- | @'CanDeriveTraversableB' B f g@ is in practice a predicate about @B@ only.
---   It is analogous to 'Barbies.Internal.Functor.CanDeriveFunctorB', so it
+--   It is analogous to 'Barbies.Internal.FunctorB.CanDeriveFunctorB', so it
 --   essentially requires the following to hold, for any arbitrary @f@:
 --
 --     * There is an instance of @'Generic' (B f)@.
@@ -87,7 +88,7 @@ bfoldMap f
 type CanDeriveTraversableB b f g
   = ( GenericN (b f)
     , GenericN (b g)
-    , GTraversableB 0 f g (RepN (b f)) (RepN (b g))
+    , GTraversable 0 f g (RepN (b f)) (RepN (b g))
     )
 
 -- | Default implementation of 'btraverse' based on 'Generic'.
@@ -97,83 +98,42 @@ gbtraverseDefault
   => (forall a . f a -> t (g a))
   -> b f -> t (b g)
 gbtraverseDefault h
-  = fmap toN . gbtraverse (Proxy @0) h . fromN
+  = fmap toN . gtraverse (Proxy @0) h . fromN
 {-# INLINE gbtraverseDefault #-}
 
 
-class GTraversableB n f g repbf repbg where
-  gbtraverse
-    :: Applicative t
-    => Proxy n
-    -> (forall a . f a -> t (g a))
-    -> repbf x
-    -> t (repbg x)
-
--- ----------------------------------
--- Trivial cases
--- ----------------------------------
-
-instance GTraversableB n f g bf bg => GTraversableB n f g (M1 i c bf) (M1 i c bg) where
-  gbtraverse pn h = fmap M1 . gbtraverse pn h . unM1
-  {-# INLINE gbtraverse #-}
-
-instance GTraversableB n f g V1 V1 where
-  gbtraverse _ _ _ = undefined
-  {-# INLINE gbtraverse #-}
-
-instance GTraversableB n f g U1 U1 where
-  gbtraverse _ _ = pure
-  {-# INLINE gbtraverse #-}
-
-instance (GTraversableB n f g l l', GTraversableB n f g r r') => GTraversableB n f g (l :*: r) (l' :*: r') where
-  gbtraverse pn h (l :*: r)= (:*:) <$> gbtraverse pn h l <*> gbtraverse pn h r
-  {-# INLINE gbtraverse #-}
-
-instance (GTraversableB n f g l l', GTraversableB n f g r r') => GTraversableB n f g (l :+: r) (l' :+: r') where
-  gbtraverse pn h = \case
-    L1 l -> L1 <$> gbtraverse pn h l
-    R1 r -> R1 <$> gbtraverse pn h r
-  {-# INLINE gbtraverse #-}
-
--- --------------------------------
--- The interesting cases
--- --------------------------------
+-- ------------------------------------------------------------
+-- Generic derivation: Special cases for TraversableB
+-- -----------------------------------------------------------
 
 type P = Param
-
-instance GTraversableB n f g (Rec (P n f a) (f a))
-                             (Rec (P n g a) (g a)) where
-  gbtraverse _ h = fmap (Rec . K1) . h . unK1 . unRec
-  {-# INLINE gbtraverse #-}
 
 instance
   ( SameOrParam b b'
   , TraversableB b'
-  ) => GTraversableB 0 f g (Rec (b (P 0 f)) (b' f))
-                           (Rec (b (P 0 g)) (b' g)) where
-  gbtraverse _ h
+  ) => GTraversable 0 f g (Rec (b (P 0 f)) (b' f))
+                          (Rec (b (P 0 g)) (b' g))
+  where
+  gtraverse _ h
     = fmap (Rec . K1) . btraverse h . unK1 . unRec
-  {-# INLINE gbtraverse #-}
+  {-# INLINE gtraverse #-}
 
 instance
    ( SameOrParam h h'
    , SameOrParam b b'
    , Traversable h'
    , TraversableB b'
-   ) => GTraversableB 0 f g (Rec (h (b (P 0 f))) (h' (b' f)))
-                            (Rec (h (b (P 0 g))) (h' (b' g))) where
-  gbtraverse _ h
+   ) => GTraversable 0 f g (Rec (h (b (P 0 f))) (h' (b' f)))
+                           (Rec (h (b (P 0 g))) (h' (b' g)))
+  where
+  gtraverse _ h
     = fmap (Rec . K1) . traverse (btraverse h) . unK1 . unRec
-  {-# INLINE gbtraverse #-}
+  {-# INLINE gtraverse #-}
 
 
-instance GTraversableB n f g (Rec a a) (Rec a a) where
-  gbtraverse _ _ = pure
-  {-# INLINE gbtraverse #-}
-
-
-
+-- ---------------------------------------------------------------------
 -- We roll our own State/efficient-Writer monad, not to add dependencies
+-- ---------------------------------------------------------------------
 
 newtype St s a
   = St (s -> (a, s))
@@ -210,7 +170,9 @@ tell w
   = St (\s -> ((), s `mappend` w))
 
 
+-- -----------------------------------------------------------
 -- Instances for base types
+-- -----------------------------------------------------------
 
 instance TraversableB Proxy where
   btraverse _ _ = pure Proxy

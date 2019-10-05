@@ -38,13 +38,19 @@ library
       Data.Functor.Prod
 
   other-modules:
-      Barbies.Internal.Applicative
-      Barbies.Internal.Bare
-      Barbies.Internal.Constraints
+      Barbies.Generics.Applicative
+      Barbies.Generics.Bare
+      Barbies.Generics.Constraints
+      Barbies.Generics.Functor
+      Barbies.Generics.Traversable
+
+      Barbies.Internal.ApplicativeB
+      Barbies.Internal.BareB
+      Barbies.Internal.ConstraintsB
       Barbies.Internal.Containers
       Barbies.Internal.Dicts
-      Barbies.Internal.Functor
-      Barbies.Internal.Traversable
+      Barbies.Internal.FunctorB
+      Barbies.Internal.TraversableB
       Barbies.Internal.Trivial
       Barbies.Internal.Wear
       Barbies.Internal.Wrappers

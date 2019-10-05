@@ -1,19 +1,18 @@
-{-# LANGUAGE AllowAmbiguousTypes  #-}
-{-# LANGUAGE PolyKinds            #-}
-{-# LANGUAGE TypeFamilies         #-}
-{-# LANGUAGE UndecidableInstances #-}
-module Barbies.Internal.Applicative
+{-# LANGUAGE PolyKinds    #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+module Barbies.Internal.ApplicativeB
   ( ApplicativeB(bpure, bprod)
   , bzip, bunzip, bzipWith, bzipWith3, bzipWith4
 
   , CanDeriveApplicativeB
-  , GApplicativeB(..)
   , gbprodDefault, gbpureDefault
   )
 
 where
 
-import Barbies.Internal.Functor (FunctorB (..))
+import Barbies.Generics.Applicative(GApplicative(..))
+import Barbies.Internal.FunctorB (FunctorB (..))
 
 import Data.Functor.Const   (Const (..))
 import Data.Functor.Product (Product (..))
@@ -113,7 +112,7 @@ type CanDeriveApplicativeB b f g
   = ( GenericN (b f)
     , GenericN (b g)
     , GenericN (b (f `Product` g))
-    , GApplicativeB 0 f g (RepN (b f)) (RepN (b g)) (RepN (b (f `Product` g)))
+    , GApplicative 0 f g (RepN (b f)) (RepN (b g)) (RepN (b (f `Product` g)))
     )
 
 
@@ -127,109 +126,35 @@ gbprodDefault
   .  CanDeriveApplicativeB b f g
   => b f -> b g -> b (f `Product` g)
 gbprodDefault l r
-  = toN $ gbprod (Proxy @0) (Proxy @f) (Proxy @g) (fromN l) (fromN r)
+  = toN $ gprod (Proxy @0) (Proxy @f) (Proxy @g) (fromN l) (fromN r)
 {-# INLINE gbprodDefault #-}
 
 gbpureDefault:: forall b f . CanDeriveApplicativeB b f f => (forall a . f a) -> b f
 gbpureDefault x
-  = toN $ gbpure (Proxy @0) (Proxy @f) (Proxy @(RepN (b f))) (Proxy @(RepN (b (f `Product` f)))) x
+  = toN $ gpure (Proxy @0) (Proxy @f) (Proxy @(RepN (b f))) (Proxy @(RepN (b (f `Product` f)))) x
 {-# INLINE gbpureDefault #-}
 
-class GApplicativeB n (f :: k -> *) (g :: k -> *) repbf repbg repbfg where
-  gbprod
-    :: Proxy n
-    -> Proxy f
-    -> Proxy g
-    -> repbf x
-    -> repbg x
-    -> repbfg x
 
-  gbpure
-    :: (f ~ g, repbf ~ repbg)
-    => Proxy n
-    -> Proxy f
-    -> Proxy repbf
-    -> Proxy repbfg
-    -> (forall a . f a)
-    -> repbf x
-
--- ----------------------------------
--- Trivial cases
--- ----------------------------------
-
-instance
-  ( GApplicativeB n f g repf repg repfg
-  ) => GApplicativeB n f g (M1 i c repf)
-                           (M1 i c repg)
-                           (M1 i c repfg)
-  where
-  gbprod pn pf pg (M1 l) (M1 r)
-    = M1 (gbprod pn pf pg l r)
-  {-# INLINE gbprod #-}
-
-  gbpure pn pf _ _ x
-    = M1 (gbpure pn pf (Proxy @repf) (Proxy @repfg) x)
-  {-# INLINE gbpure #-}
-
-
-instance GApplicativeB n f g U1 U1 U1 where
-  gbprod _ _ _ U1 U1 = U1
-  {-# INLINE gbprod #-}
-
-  gbpure _ _ _ _ _ = U1
-  {-# INLINE gbpure #-}
-
-instance
-  ( GApplicativeB n f g lf lg lfg
-  , GApplicativeB n f g rf rg rfg
-  ) => GApplicativeB n f g (lf  :*: rf)
-                         (lg  :*: rg)
-                         (lfg :*: rfg) where
-  gbprod pn pf pg (l1 :*: l2) (r1 :*: r2)
-    = (l1 `lprod` r1) :*: (l2 `rprod` r2)
-    where
-      lprod = gbprod pn pf pg
-      rprod = gbprod pn pf pg
-  {-# INLINE gbprod #-}
-
-  gbpure pn pf _ _ x
-    =   gbpure pn pf (Proxy @lf) (Proxy @lfg) x
-    :*: gbpure pn pf (Proxy @rf) (Proxy @rfg) x
-  {-# INLINE gbpure #-}
-
--- --------------------------------
--- The interesting cases
--- --------------------------------
+-- ------------------------------------------------------------
+-- Generic derivation: Special cases for ApplicativeB
+-- -------------------------------------------------------------
 
 type P = Param
-
-instance GApplicativeB n f g (Rec (P n f a) (f a))
-                             (Rec (P n g a) (g a))
-                             (Rec (P n (f `Product` g) a) ((f `Product` g) a))
-  where
-  gbprod _ _ _ (Rec (K1 fa)) (Rec (K1 ga))
-    = Rec (K1 (Pair fa ga))
-  {-# INLINE gbprod #-}
-
-  gbpure _ _ _ _ x
-    = Rec (K1 x)
-  {-# INLINE gbpure #-}
-
 
 instance
   ( SameOrParam b b'
   , ApplicativeB b'
-  ) => GApplicativeB 0 f g (Rec (b (P 0 f)) (b' f))
-                           (Rec (b (P 0 g)) (b' g))
-                           (Rec (b (P 0 (f `Product` g))) (b' (f `Product` g)))
+  ) => GApplicative 0 f g (Rec (b (P 0 f)) (b' f))
+                          (Rec (b (P 0 g)) (b' g))
+                          (Rec (b (P 0 (f `Product` g))) (b' (f `Product` g)))
   where
-  gbprod _ _ _ (Rec (K1 bf)) (Rec (K1 bg))
+  gprod _ _ _ (Rec (K1 bf)) (Rec (K1 bg))
     = Rec (K1 (bf `bprod` bg))
-  {-# INLINE gbprod #-}
+  {-# INLINE gprod #-}
 
-  gbpure _ _ _ _ x
+  gpure _ _ _ _ x
     = Rec (K1 (bpure x))
-  {-# INLINE gbpure #-}
+  {-# INLINE gpure #-}
 
 
 -- --------------------------------
