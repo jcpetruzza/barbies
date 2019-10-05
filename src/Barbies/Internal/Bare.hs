@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies       #-}
+{-# LANGUAGE TypeFamilies #-}
 module Barbies.Internal.Bare
   ( Wear, Bare, Covered
   , BareB(..)
@@ -19,6 +19,8 @@ import Data.Functor.Identity (Identity(..))
 
 import Data.Coerce (coerce)
 import Data.Generics.GenericN
+import Data.Proxy (Proxy(..))
+import GHC.TypeLits (Nat)
 
 
 -- | Class of Barbie-types defined using 'Wear' and can therefore
@@ -55,105 +57,105 @@ bcoverWith f
 type CanDeriveBareB b
   = ( GenericN (b Bare Identity)
     , GenericN (b Covered Identity)
-    , GBareB (RepN (b Covered Identity)) (RepN (b Bare Identity))
+    , GBareB 0 (RepN (b Covered Identity)) (RepN (b Bare Identity))
     )
 
 -- | Default implementation of 'bstrip' based on 'Generic'.
 gbstripDefault :: CanDeriveBareB b => b Covered Identity -> b Bare Identity
 gbstripDefault
-  = toN . gbstrip . fromN
+  = toN . gbstrip (Proxy @0) . fromN
 {-# INLINE gbstripDefault #-}
 
 -- | Default implementation of 'bstrip' based on 'Generic'.
 gbcoverDefault :: CanDeriveBareB b => b Bare Identity -> b Covered Identity
 gbcoverDefault
-  = toN . gbcover . fromN
+  = toN . gbcover (Proxy @0) . fromN
 {-# INLINE gbcoverDefault #-}
 
 
-class GBareB repbi repbb where
-  gbstrip :: repbi x -> repbb x
-  gbcover :: repbb x -> repbi x
+class GBareB (n :: Nat) repbi repbb where
+  gbstrip :: Proxy n -> repbi x -> repbb x
+  gbcover :: Proxy n -> repbb x -> repbi x
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-instance GBareB repbi repbb => GBareB (M1 i k repbi) (M1 i k repbb) where
-  gbstrip = M1 . gbstrip . unM1
+instance GBareB n repbi repbb => GBareB n (M1 i k repbi) (M1 i k repbb) where
+  gbstrip pn = M1 . gbstrip pn . unM1
   {-# INLINE gbstrip #-}
 
-  gbcover = M1 . gbcover . unM1
+  gbcover pn = M1 . gbcover pn . unM1
   {-# INLINE gbcover #-}
 
 
-instance GBareB V1 V1 where
-  gbstrip _ = undefined
-  gbcover _ = undefined
+instance GBareB n V1 V1 where
+  gbstrip _ _ = undefined
+  gbcover _ _ = undefined
 
-instance GBareB U1 U1 where
-  gbstrip = id
+instance GBareB n U1 U1 where
+  gbstrip _ = id
   {-# INLINE gbstrip #-}
 
-  gbcover = id
+  gbcover _ = id
   {-# INLINE gbcover #-}
 
 
-instance (GBareB l l', GBareB r r') => GBareB (l :*: r) (l' :*: r') where
-  gbstrip (l :*: r) = (gbstrip l) :*: gbstrip r
+instance (GBareB n l l', GBareB n r r') => GBareB n (l :*: r) (l' :*: r') where
+  gbstrip pn (l :*: r) = (gbstrip pn l) :*: gbstrip pn r
   {-# INLINE gbstrip #-}
 
-  gbcover (l :*: r) = (gbcover l) :*: gbcover r
+  gbcover pn (l :*: r) = (gbcover pn l) :*: gbcover pn r
   {-# INLINE gbcover #-}
 
 
-instance (GBareB l l', GBareB r r') => GBareB (l :+: r) (l' :+: r') where
-  gbstrip = \case
-    L1 l -> L1 (gbstrip l)
-    R1 r -> R1 (gbstrip r)
+instance (GBareB n l l', GBareB n r r') => GBareB n (l :+: r) (l' :+: r') where
+  gbstrip pn = \case
+    L1 l -> L1 (gbstrip pn l)
+    R1 r -> R1 (gbstrip pn r)
   {-# INLINE gbstrip #-}
 
-  gbcover = \case
-    L1 l -> L1 (gbcover l)
-    R1 r -> R1 (gbcover r)
+  gbcover pn = \case
+    L1 l -> L1 (gbcover pn l)
+    R1 r -> R1 (gbcover pn r)
   {-# INLINE gbcover #-}
 
 -- -- --------------------------------
 -- -- The interesting cases
 -- -- --------------------------------
 
-type P = Param 0
+type P = Param
 
-instance GBareB (Rec (P Identity a) (Identity a)) (Rec a a) where
-  gbstrip = coerce
+instance GBareB n (Rec (P n Identity a) (Identity a)) (Rec a a) where
+  gbstrip _ = coerce
   {-# INLINE gbstrip #-}
 
-  gbcover = coerce
+  gbcover _ = coerce
   {-# INLINE gbcover #-}
 
 
-instance BareB b => GBareB (Rec (b Covered (P Identity)) (b Covered Identity))
-                           (Rec (b Bare    (P Identity)) (b Bare    Identity)) where
-  gbstrip = Rec . K1 . bstrip . unK1 . unRec
+instance BareB b => GBareB 0 (Rec (b Covered (P 0 Identity)) (b Covered Identity))
+                             (Rec (b Bare    (P 0 Identity)) (b Bare    Identity)) where
+  gbstrip _ = Rec . K1 . bstrip . unK1 . unRec
   {-# INLINE gbstrip #-}
 
-  gbcover = Rec . K1 .  bcover . unK1 . unRec
+  gbcover _ = Rec . K1 .  bcover . unK1 . unRec
   {-# INLINE gbcover #-}
 
 
 instance (Functor h, BareB b)
-    => GBareB (Rec (h (b Covered (P Identity))) (h (b Covered Identity)))
-              (Rec (h (b Bare    (P Identity))) (h (b Bare    Identity))) where
-  gbstrip = Rec . K1 . fmap bstrip . unK1 . unRec
+    => GBareB 0 (Rec (h (b Covered (P 0 Identity))) (h (b Covered Identity)))
+                (Rec (h (b Bare    (P 0 Identity))) (h (b Bare    Identity))) where
+  gbstrip _ = Rec . K1 . fmap bstrip . unK1 . unRec
   {-# INLINE gbstrip #-}
 
-  gbcover = Rec . K1 . fmap bcover . unK1 . unRec
+  gbcover _ = Rec . K1 . fmap bcover . unK1 . unRec
   {-# INLINE gbcover #-}
 
 
-instance repbi ~ repbb => GBareB (Rec repbi repbi) (Rec repbb repbb) where
-  gbstrip = id
+instance repbi ~ repbb => GBareB n (Rec repbi repbi) (Rec repbb repbb) where
+  gbstrip _ = id
   {-# INLINE gbstrip #-}
 
-  gbcover = id
+  gbcover _ = id
   {-# INLINE gbcover #-}

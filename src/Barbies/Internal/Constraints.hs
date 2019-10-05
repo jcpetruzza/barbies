@@ -33,6 +33,7 @@ import Data.Functor.Product (Product (..))
 import Data.Functor.Sum     (Sum (..))
 import Data.Kind            (Constraint, Type)
 import Data.Proxy           (Proxy (..))
+import GHC.TypeLits         (Nat)
 
 import Data.Generics.GenericN
 
@@ -78,7 +79,7 @@ class FunctorB b => ConstraintsB (b :: (k -> *) -> *) where
   --
   -- For requiring constraints of the form @c (f a)@, use 'AllBF'.
   type AllB (c :: k -> Constraint) b :: Constraint
-  type AllB c b = GAllB c (GAllBRep b)
+  type AllB c b = GAllB 0 c (GAllBRep b)
 
   baddDicts :: forall c f.  AllB c b => b f -> b (Dict c `Product` f)
 
@@ -173,8 +174,8 @@ data X a
 type CanDeriveConstraintsB c b f
   = ( GenericN (b f)
     , GenericN (b (Dict c `Product` f))
-    , AllB c b ~ GAllB c (GAllBRep b)
-    , GConstraintsB c f (GAllBRep b) (RepN (b f)) (RepN (b (Dict c `Product` f)))
+    , AllB c b ~ GAllB 0 c (GAllBRep b)
+    , GConstraintsB 0 c f (GAllBRep b) (RepN (b f)) (RepN (b (Dict c `Product` f)))
     )
 
 
@@ -190,69 +191,74 @@ gbaddDictsDefault
     )
   => b f -> b (Dict c `Product` f)
 gbaddDictsDefault
-  = toN . gbaddDicts @c @f @(GAllBRep b) . fromN
+  = toN . gbaddDicts @0 @c @f @(GAllBRep b) . fromN
 {-# INLINE gbaddDictsDefault #-}
 
 
-class GConstraintsB c f repbx repbf repbdf where
-  gbaddDicts :: GAllB c repbx => repbf x -> repbdf x
+class GConstraintsB n c f repbx repbf repbdf where
+  gbaddDicts :: GAllB n c repbx => repbf x -> repbdf x
 
-type family GAllB (c :: k -> Constraint) (repbf :: Type -> Type) :: Constraint
+type family GAllB (n :: Nat) (c :: k -> Constraint) (repbf :: Type -> Type) :: Constraint
 
 -- ----------------------------------
 -- Trivial cases
 -- ----------------------------------
 
-type instance GAllB c (M1 i k repbf) = GAllB c repbf
+type instance GAllB n c (M1 i k repbf) = GAllB n c repbf
 
 instance
-  GConstraintsB c f repbx repbf repbdf
-    => GConstraintsB c f (M1 i k repbx)
-                         (M1 i k repbf)
-                         (M1 i k repbdf) where
-  gbaddDicts = M1 . gbaddDicts @c @f @repbx . unM1
+  GConstraintsB n c f repbx repbf repbdf
+    => GConstraintsB n c f (M1 i k repbx)
+                           (M1 i k repbf)
+                           (M1 i k repbdf)
+  where
+  gbaddDicts
+    = M1 . gbaddDicts @n @c @f @repbx . unM1
   {-# INLINE gbaddDicts #-}
 
 
 
-type instance GAllB c V1 = ()
+type instance GAllB n c V1 = ()
 
-instance GConstraintsB c f V1 V1 V1 where
+instance GConstraintsB n c f V1 V1 V1 where
   gbaddDicts _ = undefined
 
 
 
-type instance GAllB c U1 = ()
+type instance GAllB n c U1 = ()
 
-instance GConstraintsB c f U1 U1 U1 where
+instance GConstraintsB n c f U1 U1 U1 where
   gbaddDicts = id
   {-# INLINE gbaddDicts #-}
 
 
-type instance GAllB c (l :*: r) = (GAllB c l, GAllB c r)
+type instance GAllB n c (l :*: r)
+  = (GAllB n c l, GAllB n c r)
 
 instance
-  ( GConstraintsB c f lx lf ldf
-  , GConstraintsB c f rx rf rdf
-  ) => GConstraintsB c f (lx  :*: rx)
-                         (lf  :*: rf)
-                         (ldf :*: rdf) where
+  ( GConstraintsB n c f lx lf ldf
+  , GConstraintsB n c f rx rf rdf
+  ) => GConstraintsB n c f (lx  :*: rx)
+                           (lf  :*: rf)
+                           (ldf :*: rdf)
+  where
   gbaddDicts (l :*: r)
-    = (gbaddDicts @c @f @lx l) :*: (gbaddDicts @c @f @rx r)
+    = (gbaddDicts @n @c @f @lx l) :*: (gbaddDicts @n @c @f @rx r)
   {-# INLINE gbaddDicts #-}
 
 
-type instance GAllB c (l :+: r) = (GAllB c l, GAllB c r)
+type instance GAllB n c (l :+: r) = (GAllB n c l, GAllB n c r)
 
 instance
-  ( GConstraintsB c f lx lf ldf
-  , GConstraintsB c f rx rf rdf
-  ) => GConstraintsB c f (lx  :+: rx)
-                         (lf  :+: rf)
-                         (ldf :+: rdf) where
+  ( GConstraintsB n c f lx lf ldf
+  , GConstraintsB n c f rx rf rdf
+  ) => GConstraintsB n c f (lx  :+: rx)
+                           (lf  :+: rf)
+                           (ldf :+: rdf)
+  where
   gbaddDicts = \case
-    L1 l -> L1 (gbaddDicts @c @f @lx l)
-    R1 r -> R1 (gbaddDicts @c @f @rx r)
+    L1 l -> L1 (gbaddDicts @n @c @f @lx l)
+    R1 r -> R1 (gbaddDicts @n @c @f @rx r)
   {-# INLINE gbaddDicts #-}
 
 
@@ -260,56 +266,60 @@ instance
 -- The interesting cases
 -- --------------------------------
 
-type P0 = Param 0
+type P = Param
 
 
-type instance GAllB c (Rec (P0 X a) (X a)) = c a
+type instance GAllB n c (Rec (P n X a) (X a)) = c a
 
-instance GConstraintsB c f (Rec (P0 X a) (X a))
-                           (Rec (P0 f a) (f a))
-                           (Rec (P0 (Dict c `Product` f) a)
-                                   ((Dict c `Product` f) a)) where
+instance GConstraintsB n c f (Rec (P n X a) (X a))
+                             (Rec (P n f a) (f a))
+                             (Rec (P n (Dict c `Product` f) a)
+                                      ((Dict c `Product` f) a))
+  where
   gbaddDicts
     = Rec . K1 . Pair Dict . unK1 . unRec
   {-# INLINE gbaddDicts #-}
 
 
 
-type instance GAllB c (Rec (Self b (P0 X)) (b X)) = ()
+type instance GAllB n c (Rec (Self b (P n X)) (b X)) = ()
 
 instance
   ( ConstraintsB b
   , AllB c b
-  ) => GConstraintsB c f (Rec (Self b (P0 X)) (b X))
-                         (Rec (b (P0 f)) (b f))
-                         (Rec (b (P0 (Dict c `Product` f)))
-                              (b     (Dict c `Product` f))) where
+  ) => GConstraintsB 0 c f (Rec (Self b (P 0 X)) (b X))
+                           (Rec (b (P 0 f)) (b f))
+                           (Rec (b (P 0 (Dict c `Product` f)))
+                                (b      (Dict c `Product` f)))
+  where
   gbaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec
   {-# INLINE gbaddDicts #-}
 
 
-type instance GAllB c (Rec (Other b (P0 X)) (b' X)) = AllB c b'
+type instance GAllB 0 c (Rec (Other b (P 0 X)) (b' X)) = AllB c b'
 
 instance
   ( SameOrParam b b'
   , ConstraintsB b'
   , AllB c b'
-  ) => GConstraintsB c f (Rec (Other b (P0 X)) (b' X))
-                         (Rec (b (P0 f)) (b' f))
-                         (Rec (b (P0 (Dict c `Product` f)))
-                              (b'    (Dict c `Product` f))) where
+  ) => GConstraintsB 0 c f (Rec (Other b (P 0 X)) (b' X))
+                           (Rec (b (P 0 f)) (b' f))
+                           (Rec (b (P 0 (Dict c `Product` f)))
+                                (b'     (Dict c `Product` f)))
+  where
   gbaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec
   {-# INLINE gbaddDicts #-}
 
 
 
-type instance GAllB c (Rec a a) = ()
+type instance GAllB n c (Rec a a) = ()
 
-instance GConstraintsB c f (Rec a a)
-                           (Rec a a)
-                           (Rec a a) where
+instance GConstraintsB n c f (Rec a a)
+                             (Rec a a)
+                             (Rec a a)
+  where
   gbaddDicts = id
   {-# INLINE gbaddDicts #-}
 

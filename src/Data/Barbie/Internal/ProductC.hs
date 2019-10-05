@@ -37,7 +37,7 @@ class (ConstraintsB b, ProductB b) => ProductBC (b :: (k -> Type) -> Type) where
 
 type CanDeriveProductBC c b
   = ( GenericN (b (Dict c))
-    , AllB c b ~ GAllB c (GAllBRep b)
+    , AllB c b ~ GAllB 0 c (GAllBRep b)
     , GProductBC c (GAllBRep b) (RepN (b (Dict c)))
     )
 
@@ -70,7 +70,7 @@ gbdictsDefault
 
 
 class GProductBC c repbx repbd where
-  gbdicts :: GAllB c repbx => repbd x
+  gbdicts :: GAllB 0 c repbx => repbd x
 
 -- ----------------------------------
 -- Trivial cases
