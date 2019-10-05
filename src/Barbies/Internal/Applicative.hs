@@ -19,9 +19,11 @@ import Data.Functor.Const   (Const (..))
 import Data.Functor.Product (Product (..))
 import Data.Kind            (Type)
 import Data.Proxy           (Proxy (..))
+import Data.Semigroup       (Semigroup(..))
 
 import Data.Generics.GenericN
 
+import Prelude hiding (Semigroup(..))
 
 -- | A 'FunctorB' with application, providing operations to:
 --     * embed an "empty" value ('bpure')
