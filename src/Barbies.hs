@@ -120,8 +120,7 @@ module Barbies
     -- * Trivial Barbies
   , Trivial.Void
   , Trivial.Unit (..)
-
-   ) where
+  ) where
 
 import Barbies.Internal.Containers as Containers
 

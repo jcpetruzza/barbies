@@ -5,16 +5,16 @@
 -- Functors from indexed-types to types.
 ----------------------------------------------------------------------------
 module Data.Functor.Barbie
-  (
-    -- * Functor
-    FunctorB(bmap)
+  ( -- * Functor
+    Func.FunctorB(bmap)
 
     -- * Traversable
-  , TraversableB(btraverse)
+  , Trav.TraversableB(btraverse)
     -- ** Utility functions
-  , btraverse_
-  , bfoldMap
-  , bsequence, bsequence'
+  , Trav.btraverse_
+  , Trav.bfoldMap
+  , Trav.bsequence
+  , Trav.bsequence'
 
     -- * Applicative
   , Appl.ApplicativeB(bpure, bprod)
@@ -55,20 +55,14 @@ module Data.Functor.Barbie
   , Cons.bmempty
 
     -- * Support for generic derivations
-  , Rec(..)
+  , GenericN.Rec(..)
   )
 
 where
 
 import qualified Barbies.Internal.Constraints as Cons
-
-import Barbies.Internal.Functor(FunctorB(..))
+import qualified Barbies.Internal.Functor as Func
 import qualified Barbies.Internal.Applicative as Appl
+import qualified Barbies.Internal.Traversable as Trav
 
-import Barbies.Internal.Traversable
-  ( TraversableB(..)
-  , bsequence, bsequence'
-  , bfoldMap, btraverse_
-  )
-
-import Data.Generics.GenericN(Rec(..))
+import qualified Data.Generics.GenericN as GenericN
