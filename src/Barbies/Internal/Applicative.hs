@@ -15,6 +15,7 @@ where
 
 import Barbies.Internal.Functor (FunctorB (..))
 
+import Data.Functor.Const   (Const (..))
 import Data.Functor.Product (Product (..))
 import Data.Kind            (Type)
 import Data.Proxy           (Proxy (..))
@@ -213,15 +214,26 @@ instance
 -- --------------------------------
 
 instance ApplicativeB Proxy where
-  bprod _ _ = Proxy
-  {-# INLINE bprod #-}
-
   bpure _ = Proxy
   {-# INLINE bpure #-}
 
-instance (ApplicativeB a, ApplicativeB b) => ApplicativeB (Product a b) where
-  bprod (Pair ll lr) (Pair rl rr) = Pair (bprod ll rl) (bprod lr rr)
+  bprod _ _ = Proxy
   {-# INLINE bprod #-}
 
-  bpure x = Pair (bpure x) (bpure x)
+instance Monoid a => ApplicativeB (Const a) where
+  bpure _
+    = Const mempty
   {-# INLINE bpure #-}
+
+  bprod (Const l) (Const r)
+    = Const (l <> r)
+  {-# INLINE bprod #-}
+
+instance (ApplicativeB a, ApplicativeB b) => ApplicativeB (Product a b) where
+  bpure x
+    = Pair (bpure x) (bpure x)
+  {-# INLINE bpure #-}
+
+  bprod (Pair ll lr) (Pair rl rr)
+    = Pair (bprod ll rl) (bprod lr rr)
+  {-# INLINE bprod #-}
