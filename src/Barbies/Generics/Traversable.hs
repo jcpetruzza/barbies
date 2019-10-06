@@ -61,11 +61,13 @@ instance
 
 type P = Param
 
-instance GTraversable n f g (Rec (P n f a) (f a))
-                            (Rec (P n g a) (g a)) where
+instance GTraversable n f g (Rec (P n f a_or_pma) (f a))
+                            (Rec (P n g a_or_pma) (g a))
+  where
   gtraverse _ h
     = fmap (Rec . K1) . h . unK1 . unRec
   {-# INLINE gtraverse #-}
+
 
 instance GTraversable n f g (Rec a a) (Rec a a) where
   gtraverse _ _ = pure

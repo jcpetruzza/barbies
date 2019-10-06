@@ -1,3 +1,4 @@
+{-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
 module Barbies.Generics.Bare
   ( GBare(..)

@@ -98,11 +98,11 @@ instance
 type P = Param
 
 
-type instance GAll n c (Rec (P n X a) (X a)) = c a
+type instance GAll n c (Rec (P n X _) (X a)) = c a
 
-instance GConstraints n c f (Rec (P n X a) (X a))
-                            (Rec (P n f a) (f a))
-                            (Rec (P n (Dict c `Product` f) a)
+instance GConstraints n c f (Rec (P n X a_or_pma) (X a))
+                            (Rec (P n f a_or_pma) (f a))
+                            (Rec (P n (Dict c `Product` f) a_or_pma)
                                      ((Dict c `Product` f) a))
   where
   gaddDicts
@@ -111,7 +111,8 @@ instance GConstraints n c f (Rec (P n X a) (X a))
 
 
 -- Break all recursive cases
-type instance GAll n c (Rec (Self b (P n X)) (b X)) = ()
+-- b' is b, maybe with 'Param' annotations
+type instance GAll n c (Rec (Self b' (P n X)) (b X)) = ()
 
 type instance GAll n c (Rec a a) = ()
 
@@ -141,27 +142,30 @@ data Other (b :: (k -> *) -> *) (f :: k -> *)
 --   family to inspect @RepN (b f)@ and distinguish recursive usages from
 --   non-recursive ones, tagging them with different types, so we can distinguish
 --   them in the instances.
-type family TagSelf (b :: (k -> *) -> *) (repbf :: * -> *) :: * -> * where
-  TagSelf b (M1 mt m s)
-    = M1 mt m (TagSelf b s)
+type TagSelf b repbf
+  = TagSelf' b (Indexed b 1) repbf
 
-  TagSelf b (l :+: r)
-    = TagSelf b l :+: TagSelf b r
+type family TagSelf' (b :: (k -> *) -> *) (b' :: (k -> *) -> *) (repbf :: * -> *) :: * -> * where
+  TagSelf' b b' (M1 mt m s)
+    = M1 mt m (TagSelf' b b' s)
 
-  TagSelf b (l :*: r)
-    = TagSelf b l :*: TagSelf b r
+  TagSelf' b b' (l :+: r)
+    = TagSelf' b b' l :+: TagSelf' b b' r
 
-  TagSelf b (Rec (b f) (b g))
-    = Rec (Self b f) (b g)
+  TagSelf' b b' (l :*: r)
+    = TagSelf' b b' l :*: TagSelf' b b' r
 
-  TagSelf (b :: (k -> *) -> *) (Rec (b' f) ((b'' :: (k -> *) -> *) g))
-    = Rec (Other b' f) (b'' g)
+  TagSelf' b  b' (Rec (b' f) (b g))
+    = Rec (Self b' f) (b g)
 
-  TagSelf b (Rec p a)
+  TagSelf' (b :: (k -> *) -> *) b' (Rec (b'' f) ((b''' :: (k -> *) -> *) g))
+    = Rec (Other b'' f) (b''' g)
+
+  TagSelf' b b' (Rec p a)
     = Rec p a
 
-  TagSelf b U1
+  TagSelf' b b' U1
     = U1
 
-  TagSelf b V1
+  TagSelf' b b' V1
     = V1

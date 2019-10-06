@@ -83,9 +83,9 @@ instance
 
 type P = Param
 
-instance GApplicative n f g (Rec (P n f a) (f a))
-                            (Rec (P n g a) (g a))
-                            (Rec (P n (f `Product` g) a) ((f `Product` g) a))
+instance GApplicative n f g (Rec (P n f a_or_pma) (f a))
+                            (Rec (P n g a_or_pma) (g a))
+                            (Rec (P n (f `Product` g) a_or_pma) ((f `Product` g) a))
   where
   gprod _ _ _ (Rec (K1 fa)) (Rec (K1 ga))
     = Rec (K1 (Pair fa ga))

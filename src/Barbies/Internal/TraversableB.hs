@@ -108,23 +108,22 @@ gbtraverseDefault h
 
 type P = Param
 
+-- b' is b, maybe with 'Param' annotations
 instance
-  ( SameOrParam b b'
-  , TraversableB b'
-  ) => GTraversable 0 f g (Rec (b (P 0 f)) (b' f))
-                          (Rec (b (P 0 g)) (b' g))
+  ( TraversableB b
+  ) => GTraversable 0 f g (Rec (b' (P 0 f)) (b f))
+                          (Rec (b' (P 0 g)) (b g))
   where
   gtraverse _ h
     = fmap (Rec . K1) . btraverse h . unK1 . unRec
   {-# INLINE gtraverse #-}
 
+-- b' and h' are b and h, maybe with 'Param' annotations
 instance
-   ( SameOrParam h h'
-   , SameOrParam b b'
-   , Traversable h'
-   , TraversableB b'
-   ) => GTraversable 0 f g (Rec (h (b (P 0 f))) (h' (b' f)))
-                           (Rec (h (b (P 0 g))) (h' (b' g)))
+   ( Traversable h
+   , TraversableB b
+   ) => GTraversable 0 f g (Rec (h' (b' (P 0 f))) (h (b f)))
+                           (Rec (h' (b' (P 0 g))) (h (b g)))
   where
   gtraverse _ h
     = fmap (Rec . K1) . traverse (btraverse h) . unK1 . unRec

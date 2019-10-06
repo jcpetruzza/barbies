@@ -121,9 +121,9 @@ instance
 
 type P0 = Param 0
 
-instance GProductB f g (Rec (P0 f a) (f a))
-                       (Rec (P0 g a) (g a))
-                       (Rec (P0 (f `Product` g) a) ((f `Product` g) a)) where
+instance GProductB f g (Rec (P0 f a_or_pma) (f a))
+                       (Rec (P0 g a_or_pma) (g a))
+                       (Rec (P0 (f `Product` g) a_or_pma) ((f `Product` g) a)) where
   gbprod _ _ (Rec (K1 fa)) (Rec (K1 ga))
     = Rec (K1 (Pair fa ga))
   {-# INLINE gbprod #-}
@@ -132,12 +132,12 @@ instance GProductB f g (Rec (P0 f a) (f a))
   {-# INLINE gbuniq #-}
 
 
+-- b' is b, maybe with 'Param' annotations
 instance
-  ( SameOrParam b b'
-  , ProductB b'
-  ) => GProductB f g (Rec (b (P0 f)) (b' f))
-                     (Rec (b (P0 g)) (b' g))
-                     (Rec (b (P0 (f `Product` g))) (b' (f `Product` g))) where
+  ( ProductB b
+  ) => GProductB f g (Rec (b' (P0 f)) (b f))
+                     (Rec (b' (P0 g)) (b g))
+                     (Rec (b' (P0 (f `Product` g))) (b (f `Product` g))) where
   gbprod _ _ (Rec (K1 bf)) (Rec (K1 bg))
     = Rec (K1 (bf `bprod` bg))
   {-# INLINE gbprod #-}

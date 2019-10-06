@@ -1,4 +1,5 @@
 {-# LANGUAGE PolyKinds    #-}
+{-# LANGUAGE TypeFamilies #-}
 module Barbies.Generics.Functor
   ( GFunctor(..)
   )
@@ -8,7 +9,9 @@ where
 import Data.Generics.GenericN
 import Data.Proxy (Proxy (..))
 
-class GFunctor n f g repbf repbg where
+import GHC.TypeLits (Nat)
+
+class GFunctor (n :: Nat) f g repbf repbg where
   gmap :: Proxy n -> (forall a . f a -> g a) -> repbf x -> repbg x
 
 -- ----------------------------------
@@ -60,11 +63,54 @@ instance
 
 type P = Param
 
-instance GFunctor n f g (Rec (P n f a) (f a))
-                        (Rec (P n g a) (g a)) where
+-- {{ Apply -----------------------------------------------
+instance
+  {-# OVERLAPPING #-}
+  GFunctor n f g (Rec (P n f a) (f a))
+                 (Rec (P n g a) (g a))
+  where
   gmap _ h (Rec (K1 fa)) = Rec (K1 (h fa))
   {-# INLINE gmap #-}
 
-instance GFunctor n f g (Rec x x) (Rec x x) where
+instance
+  {-# OVERLAPPING #-}
+  GFunctor n f g (Rec (P n f (P o a)) (f a))
+                 (Rec (P n g (P o a)) (g a))
+  where
+  gmap _ h (Rec (K1 fa)) = Rec (K1 (h fa))
+  {-# INLINE gmap #-}
+-- }} Apply -----------------------------------------------
+
+
+-- {{ Not the functor argument ----------------------------
+instance
+  (f ~ g
+  ) =>
+  GFunctor n f g (Rec (P m f a) (f a))
+                 (Rec (P m g a) (g a))
+  where
   gmap _ _ = id
   {-# INLINE gmap #-}
+
+instance
+  (f ~ g
+  ) =>
+  GFunctor n f g (Rec (P m f (P o a)) (f a))
+                 (Rec (P m g (P o a)) (g a))
+  where
+  gmap _ _ = id
+  {-# INLINE gmap #-}
+-- }} Not the functor argument ----------------------------
+
+
+-- {{ Not a functor application --------------------------
+instance GFunctor n f g (Rec x x) (Rec x x)
+  where
+  gmap _ _ = id
+  {-# INLINE gmap #-}
+
+instance GFunctor n f g (Rec (P m x) x) (Rec (P m x) x)
+  where
+  gmap _ _ = id
+  {-# INLINE gmap #-}
+-- }} Not a functor application --------------------------

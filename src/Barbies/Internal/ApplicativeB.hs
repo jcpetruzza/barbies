@@ -141,12 +141,12 @@ gbpureDefault x
 
 type P = Param
 
+-- b' is b, maybe with 'Param' annotations
 instance
-  ( SameOrParam b b'
-  , ApplicativeB b'
-  ) => GApplicative 0 f g (Rec (b (P 0 f)) (b' f))
-                          (Rec (b (P 0 g)) (b' g))
-                          (Rec (b (P 0 (f `Product` g))) (b' (f `Product` g)))
+  (  ApplicativeB b
+  ) => GApplicative 0 f g (Rec (b' (P 0 f)) (b f))
+                          (Rec (b' (P 0 g)) (b g))
+                          (Rec (b' (P 0 (f `Product` g))) (b (f `Product` g)))
   where
   gprod _ _ _ (Rec (K1 bf)) (Rec (K1 bg))
     = Rec (K1 (bf `bprod` bg))

@@ -69,22 +69,22 @@ gbmapDefault f
 
 type P = Param
 
+-- b' is b, maybe with 'Param' annotations
 instance
-  ( SameOrParam b b'
-  , FunctorB b'
-  ) => GFunctor 0 f g (Rec (b (P 0 f)) (b' f))
-                      (Rec (b (P 0 g)) (b' g))
+  ( FunctorB b
+  ) => GFunctor 0 f g (Rec (b' (P 0 f)) (b f))
+                      (Rec (b' (P 0 g)) (b g))
   where
   gmap _ h (Rec (K1 bf)) = Rec (K1 (bmap h bf))
   {-# INLINE gmap #-}
 
+-- h' and b' are essentially  h and b, but maybe
+-- with 'Param' annotations
 instance
-  ( SameOrParam h h'
-  , SameOrParam b b'
-  , Functor h'
-  , FunctorB b'
-  ) => GFunctor 0 f g (Rec (h (b (P 0 f))) (h' (b' f)))
-                      (Rec (h (b (P 0 g))) (h' (b' g)))
+  ( Functor h
+  , FunctorB b
+  ) => GFunctor 0 f g (Rec (h' (b' (P 0 f))) (h (b f)))
+                      (Rec (h' (b' (P 0 g))) (h (b g)))
   where
   gmap _ h (Rec (K1 hbf)) = Rec (K1 (fmap (bmap h) hbf))
   {-# INLINE gmap #-}

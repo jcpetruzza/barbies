@@ -22,7 +22,7 @@
 
 module Data.Generics.GenericN
   ( Param
-  , SameOrParam
+  , Indexed
   , Rec (Rec, unRec)
   , GenericN (..)
   , module GHC.Generics
@@ -33,7 +33,7 @@ import GHC.Generics
 import GHC.TypeLits
 import Data.Coerce
 
-data Param (n :: Nat) (original :: k -> k') (a :: k)
+data family Param (n :: Nat) (a :: k) :: k
 
 type family Indexed (t :: k) (i :: Nat) :: k where
   Indexed (t a) i = Indexed t (i + 1) (Param i a)
@@ -76,13 +76,3 @@ instance
   fromN :: forall x. a -> RepN a x
   fromN = coerce (from :: a -> Rep a x)
   {-# INLINE fromN #-}
-
-
--- | @'SameOrParam' a b@ holds iff @a ~ b@ or @'Param' n a ~ b@.
---   It is useful when defining generic instances and one don't
---   want to differentiate the case of a parameter-usage from
---   the usage of a constant.
-class SameOrParam (a :: k) (b :: k)
-instance SameOrParam a a
-instance SameOrParam (Param n a) a
-instance SameOrParam a (Param n a)

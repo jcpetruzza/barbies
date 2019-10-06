@@ -1,3 +1,4 @@
+{-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.BareB
@@ -76,8 +77,11 @@ gbcoverDefault
 -- -----------------------------------------------------------
 type P = Param
 
-instance BareB b => GBare 0 (Rec (b Covered (P 0 Identity)) (b Covered Identity))
-                            (Rec (b Bare    (P 0 Identity)) (b Bare    Identity))
+instance
+  ( BareB b
+  ) => -- b' is b, maybe with 'Param' annotations
+       GBare 0 (Rec (b' (P 1 Covered) (P 0 Identity)) (b Covered Identity))
+               (Rec (b' (P 1 Bare)    (P 0 Identity)) (b Bare    Identity))
   where
   gstrip _ = Rec . K1 . bstrip . unK1 . unRec
   {-# INLINE gstrip #-}
@@ -86,9 +90,12 @@ instance BareB b => GBare 0 (Rec (b Covered (P 0 Identity)) (b Covered Identity)
   {-# INLINE gcover #-}
 
 
-instance (Functor h, BareB b)
-    => GBare 0 (Rec (h (b Covered (P 0 Identity))) (h (b Covered Identity)))
-               (Rec (h (b Bare    (P 0 Identity))) (h (b Bare    Identity)))
+instance
+  ( Functor h
+  , BareB b
+  ) => -- b' is b, maybe with 'Param' annotations. idem h and h'
+       GBare 0 (Rec (h' (b' (P 1 Covered) (P 0 Identity))) (h (b Covered Identity)))
+               (Rec (h' (b' (P 1 Bare)    (P 0 Identity))) (h (b Bare    Identity)))
   where
   gstrip _ = Rec . K1 . fmap bstrip . unK1 . unRec
   {-# INLINE gstrip #-}

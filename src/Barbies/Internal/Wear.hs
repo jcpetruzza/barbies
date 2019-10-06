@@ -7,6 +7,7 @@ module Barbies.Internal.Wear
 where
 
 import GHC.TypeLits (ErrorMessage (..), TypeError)
+import Data.Generics.GenericN (Param)
 
 data Bare
 data Covered
@@ -34,6 +35,7 @@ data Covered
 type family Wear t f a where
   Wear Bare    f a = a
   Wear Covered f a = f a
+  Wear (Param _ t) f a = Wear t f a
   Wear t       _ _ = TypeError (     'Text "`Wear` should only be used with "
                                ':<>: 'Text "`Bare` or `Covered`."
                                ':$$: 'Text "`" ':<>: 'ShowType t ':<>: 'Text "`"

@@ -195,10 +195,11 @@ type P = Param
 instance
   ( ConstraintsB b
   , AllB c b
-  ) => GConstraints 0 c f (Rec (Self b (P 0 X)) (b X))
-                          (Rec (b (P 0 f)) (b f))
-                          (Rec (b (P 0 (Dict c `Product` f)))
-                               (b      (Dict c `Product` f)))
+  ) => -- b' is b, maybe with 'Param' annotations
+       GConstraints 0 c f (Rec (Self b' (P 0 X)) (b X))
+                          (Rec (b' (P 0 f)) (b f))
+                          (Rec (b' (P 0 (Dict c `Product` f)))
+                               (b       (Dict c `Product` f)))
   where
   gaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec
@@ -208,13 +209,12 @@ instance
 type instance GAll 0 c (Rec (Other b (P 0 X)) (b' X)) = AllB c b'
 
 instance
-  ( SameOrParam b b'
-  , ConstraintsB b'
-  , AllB c b'
-  ) => GConstraints 0 c f (Rec (Other b (P 0 X)) (b' X))
-                          (Rec (b (P 0 f)) (b' f))
-                          (Rec (b (P 0 (Dict c `Product` f)))
-                               (b'     (Dict c `Product` f)))
+  ( ConstraintsB b
+  , AllB c b
+  ) => GConstraints 0 c f (Rec (Other b' (P 0 X)) (b X))
+                          (Rec (b' (P 0 f)) (b f))
+                          (Rec (b' (P 0 (Dict c `Product` f)))
+                               (b       (Dict c `Product` f)))
   where
   gaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec
