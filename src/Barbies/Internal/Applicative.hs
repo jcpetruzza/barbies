@@ -19,11 +19,8 @@ import Data.Functor.Const   (Const (..))
 import Data.Functor.Product (Product (..))
 import Data.Kind            (Type)
 import Data.Proxy           (Proxy (..))
-import Data.Semigroup       (Semigroup(..))
 
 import Data.Generics.GenericN
-
-import Prelude hiding (Semigroup(..))
 
 -- | A 'FunctorB' with application, providing operations to:
 --     * embed an "empty" value ('bpure')
@@ -228,7 +225,7 @@ instance Monoid a => ApplicativeB (Const a) where
   {-# INLINE bpure #-}
 
   bprod (Const l) (Const r)
-    = Const (l <> r)
+    = Const (l `mappend` r)
   {-# INLINE bprod #-}
 
 instance (ApplicativeB a, ApplicativeB b) => ApplicativeB (Product a b) where
