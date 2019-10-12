@@ -3,7 +3,7 @@
 {-# LANGUAGE PolyKinds            #-}
 module Barbies.Generics.Constraints
   ( GAll
-  , GAllRep, X
+  , X, Y
   , TagSelf, Self, Other
   , GConstraints(..)
   )
@@ -14,7 +14,7 @@ import Barbies.Internal.Dicts(Dict (..))
 
 import Data.Functor.Product (Product (..))
 import Data.Kind            (Constraint, Type)
-import GHC.TypeLits         (Nat)
+import GHC.TypeLits         (Nat, type (+))
 
 import Data.Generics.GenericN
 
@@ -23,11 +23,10 @@ class GConstraints n c f repbx repbf repbdf where
 
 type family GAll (n :: Nat) (c :: k -> Constraint) (repbf :: Type -> Type) :: Constraint
 
--- | The representation used for the generic computation of the @'AllB' c b@
---   constraints. Here 'X' is an arbitrary constant since the actual
---   argument to @b@ is irrelevant.
-type GAllRep b = TagSelf b (RepN (b X))
 data X a
+data family Y :: k
+
+
 
 -- ----------------------------------
 -- Trivial cases
@@ -112,7 +111,8 @@ instance GConstraints n c f (Rec (P n X a_or_pma) (X a))
 
 -- Break all recursive cases
 -- b' is b, maybe with 'Param' annotations
-type instance GAll n c (Rec (Self b' (P n X)) (b X)) = ()
+type instance GAll 0 c (Rec (Self b' (P 0 X)) (b X)) = ()
+type instance GAll 1 c (Rec (Self b' (P 1 X) (P 0 Y)) (b X Y)) = ()
 
 type instance GAll n c (Rec a a) = ()
 
@@ -136,8 +136,8 @@ instance GConstraints n c f (Rec (P m a') a)
 --
 -- ============================================================================
 
-data Self  (b :: (k -> *) -> *) (f :: k -> *)
-data Other (b :: (k -> *) -> *) (f :: k -> *)
+data family Self  (b :: k -> k') :: k -> k'
+data family Other (b :: k -> k') :: k -> k'
 
 -- | We use type-families to generically compute @'AllB' c b@. Intuitively, if
 --   @b' f@ occurs inside @b f@, then we should just add @AllB b' c@ to
@@ -145,34 +145,40 @@ data Other (b :: (k -> *) -> *) (f :: k -> *)
 --   then ghc will choke and blow the stack (instead of computing a fixpoint).
 --
 --   So, we would like to behave differently when @b = b'@ and add @()@ instead
---   of `AllB b f` to break the recursion. Our trick will be to use a type
+--   of @'AllB' b f@ to break the recursion. Our trick will be to use a type
 --   family to inspect @RepN (b f)@ and distinguish recursive usages from
 --   non-recursive ones, tagging them with different types, so we can distinguish
 --   them in the instances.
-type TagSelf b repbf
-  = TagSelf' b (Indexed b 1) repbf
+type TagSelf n b repbf
+  = TagSelf' n b (Indexed b (n + 1)) repbf
 
-type family TagSelf' (b :: (k -> *) -> *) (b' :: (k -> *) -> *) (repbf :: * -> *) :: * -> * where
-  TagSelf' b b' (M1 mt m s)
-    = M1 mt m (TagSelf' b b' s)
+type family TagSelf' (n :: Nat) (b :: kb) (b' :: kb) (repbf :: * -> *) :: * -> * where
+  TagSelf' n b b' (M1 mt m s)
+    = M1 mt m (TagSelf' n b b' s)
 
-  TagSelf' b b' (l :+: r)
-    = TagSelf' b b' l :+: TagSelf' b b' r
+  TagSelf' n b b' (l :+: r)
+    = TagSelf' n b b' l :+: TagSelf' n b b' r
 
-  TagSelf' b b' (l :*: r)
-    = TagSelf' b b' l :*: TagSelf' b b' r
+  TagSelf' n b b' (l :*: r)
+    = TagSelf' n b b' l :*: TagSelf' n b b' r
 
-  TagSelf' b  b' (Rec (b' f) (b g))
+  TagSelf' 0 b  b' (Rec (b' f) (b g))
     = Rec (Self b' f) (b g)
 
-  TagSelf' (b :: (k -> *) -> *) b' (Rec (b'' f) ((b''' :: (k -> *) -> *) g))
+  TagSelf' 0 (b :: k -> *) b' (Rec ((b'' :: k -> *) f) ((b''' :: k -> *) g))
     = Rec (Other b'' f) (b''' g)
 
-  TagSelf' b b' (Rec p a)
+  TagSelf' 1 b  b' (Rec (b' fl fr) (b gl gr))
+    = Rec (Self b' fl fr) (b gl gr)
+
+  TagSelf' 1 (b :: kl -> kr ->  *) b' (Rec ((b'' :: kl -> kr -> *) fl fr) ((b''' :: kl -> kr -> *) gl gr))
+    = Rec (Other b'' fl fr) (b''' gl gr)
+
+  TagSelf' n b b' (Rec p a)
     = Rec p a
 
-  TagSelf' b b' U1
+  TagSelf' n b b' U1
     = U1
 
-  TagSelf' b b' V1
+  TagSelf' n b b' V1
     = V1

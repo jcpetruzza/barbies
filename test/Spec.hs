@@ -10,7 +10,9 @@ import qualified Spec.Wrapper as Wrapper
 
 import TestBarbies
 import TestBarbiesW
+import qualified TestBiBarbies as Bi
 
+import Barbies(Flip)
 import Barbies.Bare(Covered)
 import Control.Applicative ( liftA2 )
 import Data.Functor.Barbie(bfoldMap, bmapC, btraverseC, bpureC, bfoldMapC, bzipWithC, bzipWith3C, bzipWith4C)
@@ -52,6 +54,18 @@ main
             , Functor.laws @(CompositeRecordW Covered)
             , Functor.laws @(NestedFW Covered)
             , Functor.laws @(Nested2FW Covered)
+
+            , Functor.laws @(Flip Bi.Record0 ())
+            , Functor.laws @(Flip Bi.Record1 ())
+            , Functor.laws @(Flip Bi.Record3 ())
+            , Functor.laws @(Flip Bi.Record1S ())
+            , Functor.laws @(Flip Bi.Record3S ())
+            , Functor.laws @(Flip Bi.Ignore1 ())
+            , Functor.laws @(Flip Bi.Sum3 ())
+            , Functor.laws @(Flip Bi.CompositeRecord ())
+            , Functor.laws @(Flip Bi.SumRec ())
+            , Functor.laws @(Flip Bi.NestedF ())
+            , Functor.laws @(Flip Bi.Nested2F ())
             ]
 
         , testGroup "Traversable Laws"
@@ -83,6 +97,19 @@ main
             , Traversable.laws @(CompositeRecordW Covered)
             , Traversable.laws @(NestedFW Covered)
             , Traversable.laws @(Nested2FW Covered)
+
+
+            , Traversable.laws @(Flip Bi.Record0 ())
+            , Traversable.laws @(Flip Bi.Record1 ())
+            , Traversable.laws @(Flip Bi.Record3 ())
+            , Traversable.laws @(Flip Bi.Record1S ())
+            , Traversable.laws @(Flip Bi.Record3S ())
+            , Traversable.laws @(Flip Bi.Ignore1 ())
+            , Traversable.laws @(Flip Bi.Sum3 ())
+            , Traversable.laws @(Flip Bi.CompositeRecord ())
+            , Traversable.laws @(Flip Bi.SumRec ())
+            , Traversable.laws @(Flip Bi.NestedF ())
+            , Traversable.laws @(Flip Bi.Nested2F ())
             ]
 
         , testGroup "Applicative laws"
@@ -104,9 +131,21 @@ main
 
             , Applicative.laws @(Record1WS Covered)
             , Applicative.laws @(Record3WS Covered)
+
+            , Applicative.laws @(ParX (Maybe ()))
+
+            , Applicative.laws @(Flip Bi.Record0 ())
+            , Applicative.laws @(Flip Bi.Record1 ())
+            , Applicative.laws @(Flip Bi.Record3 ())
+            , Applicative.laws @(Flip Bi.Record1S ())
+            , Applicative.laws @(Flip Bi.Record3S ())
+            , Applicative.laws @(Flip Bi.CompositeRecord ())
+            , Applicative.laws @(Flip Bi.NestedF ())
+            , Applicative.laws @(Flip Bi.Nested2F ())
+            , Applicative.laws @(Flip (Bi.ParX (Maybe ())) ())
             ]
 
-        , testGroup "adDict projection"
+        , testGroup "addDict projection"
             [ Constraints.lawAddDictPrj @Record0
             , Constraints.lawAddDictPrj @Record1
             , Constraints.lawAddDictPrj @Record3

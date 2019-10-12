@@ -20,8 +20,8 @@ module Barbies.Internal
   , Generics.GConstraints(..)
   , Internal.CanDeriveConstraintsB
   , Generics.GAll
-  , Generics.GAllRep
-  , Generics.X
+  , Internal.GAllRepB
+  , Generics.X, Generics.Y
   , Generics.TagSelf, Generics.Self, Generics.Other
 
     -- * Bare values

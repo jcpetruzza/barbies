@@ -103,6 +103,10 @@ module Barbies
      -- @
      module Data.Functor.Barbie
 
+     -- * Bi-functor and nested barbies
+   , module Data.Functor.Indexed
+
+   , Bi.Flip(..)
      -- * Container-barbies
 
      -- | Some clothes make barbies look like containers, and we can make those
@@ -125,5 +129,7 @@ module Barbies
 import Barbies.Internal.Containers as Containers
 
 import Data.Functor.Barbie
-import qualified Barbies.Internal.Wrappers as Wrappers
+import Data.Functor.Indexed
+import qualified Barbies.Internal.Bi as Bi
 import qualified Barbies.Internal.Trivial as Trivial
+import qualified Barbies.Internal.Wrappers as Wrappers
