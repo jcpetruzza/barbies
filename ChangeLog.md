@@ -19,6 +19,7 @@
     parameter not under the functor argument.
   - Derive instances for nested barbies occurring under two functors (Matthew Peddie).
   - Add `foldMapC` and `bzipWithxC` (Matthew Peddie).
+  - Add `Data.Functor.Indexed`
 
 ## 1.1.3.0
   - `Wear` will raise a `TypeError` instead of getting

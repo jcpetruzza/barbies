@@ -15,8 +15,8 @@ module Data.Barbie.Internal.ProductC
 
 where
 
-import Barbies.Generics.Constraints(GAll, GAllRep, Self, Other, X)
-import Barbies.Internal.ConstraintsB(ConstraintsB(..))
+import Barbies.Generics.Constraints(GAll, Self, Other, X)
+import Barbies.Internal.ConstraintsB(ConstraintsB(..), GAllRepB)
 import Barbies.Internal.Dicts(Dict (..), requiringDict)
 import Barbies.Internal.FunctorB(FunctorB(bmap))
 import Barbies.Internal.Trivial(Unit(..))
@@ -38,8 +38,8 @@ class (ConstraintsB b, ProductB b) => ProductBC (b :: (k -> Type) -> Type) where
 
 type CanDeriveProductBC c b
   = ( GenericN (b (Dict c))
-    , AllB c b ~ GAll 0 c (GAllRep b)
-    , GProductBC c (GAllRep b) (RepN (b (Dict c)))
+    , AllB c b ~ GAll 0 c (GAllRepB b)
+    , GProductBC c (GAllRepB b) (RepN (b (Dict c)))
     )
 
 {-# DEPRECATED buniqC "Use bpureC instead" #-}
@@ -66,7 +66,7 @@ gbdictsDefault
      )
   => b (Dict c)
 gbdictsDefault
-  = toN $ gbdicts @c @(GAllRep b)
+  = toN $ gbdicts @c @(GAllRepB b)
 {-# INLINE gbdictsDefault #-}
 
 

@@ -18,11 +18,12 @@ module Barbies.Internal.ConstraintsB
 
   , CanDeriveConstraintsB
   , gbaddDictsDefault
+  , GAllRepB
   )
 
 where
 
-import Barbies.Generics.Constraints(GConstraints(..), GAll, GAllRep, Self, Other, X)
+import Barbies.Generics.Constraints(GConstraints(..), GAll, TagSelf, Self, Other, X)
 import Barbies.Internal.ApplicativeB(ApplicativeB(..))
 import Barbies.Internal.Dicts(ClassF, Dict (..), requiringDict)
 import Barbies.Internal.FunctorB(FunctorB (..))
@@ -55,7 +56,7 @@ import Data.Generics.GenericN
 --     B z w -> B ('Pair' 'Dict' z) ('Pair' 'Dict' w)
 -- @
 --
--- Now if we given a @T f@, we need to use the 'Show' instance of
+-- Now, when we given a @T f@, if we need to use the 'Show' instance of
 -- their fields, we can use:
 --
 -- @
@@ -74,14 +75,18 @@ class FunctorB b => ConstraintsB (b :: (k -> *) -> *) where
   --   @a@ occurring under an @f@ in @b f@. E.g.:
   --
   -- @
-  -- 'AllB' 'Show' Barbie ~ ('Show' 'String', 'Show' 'Int')
+  -- 'AllB' 'Show' Person ~ ('Show' 'String', 'Show' 'Int')
   -- @
   --
   -- For requiring constraints of the form @c (f a)@, use 'AllBF'.
   type AllB (c :: k -> Constraint) b :: Constraint
-  type AllB c b = GAll 0 c (GAllRep b)
+  type AllB c b = GAll 0 c (GAllRepB b)
 
-  baddDicts :: forall c f.  AllB c b => b f -> b (Dict c `Product` f)
+  baddDicts
+    :: forall c f
+    .  AllB c b
+    => b f
+    -> b (Dict c `Product` f)
 
   default baddDicts
     :: forall c f
@@ -103,12 +108,13 @@ class FunctorB b => ConstraintsB (b :: (k -> *) -> *) where
 -- >   where
 -- >     showField :: forall a. Show a => Identity a -> Const String a
 -- >     showField (Identity a) = Const (show a)
-bmapC :: forall c b f g.
-      (AllB c b, ConstraintsB b)
+bmapC :: forall c b f g
+      .  (AllB c b, ConstraintsB b)
       => (forall a. c a => f a -> g a)
       -> b f
       -> b g
-bmapC f bf = bmap go (baddDicts bf)
+bmapC f bf
+  = bmap go (baddDicts bf)
   where
     go :: forall a. (Dict c `Product` f) a -> g a
     go (d `Pair` fa) = requiringDict (f fa) d
@@ -120,7 +126,8 @@ btraverseC
   => (forall a. c a => f a -> g (h a))
   -> b f
   -> g (b h)
-btraverseC f b = btraverse (\(Pair (Dict :: Dict c a) x) -> f x) (baddDicts b)
+btraverseC f b
+  = btraverse (\(Pair (Dict :: Dict c a) x) -> f x) (baddDicts b)
 
 bfoldMapC
   :: forall c b m f
@@ -172,33 +179,43 @@ bzipWith4C f bf bg bh bi
 --   between the constraint @c@ and the type @a@. For example:
 --
 --   @
---   'AllB'  'Show'   Barbie ~ ('Show'    'String',  'Show'    'Int')
---   'AllBF' 'Show' f Barbie ~ ('Show' (f 'String'), 'Show' (f 'Int'))
+--   'AllB'  'Show'   Person ~ ('Show'    'String',  'Show'    'Int')
+--   'AllBF' 'Show' f Person ~ ('Show' (f 'String'), 'Show' (f 'Int'))
 --   @
 type AllBF c f b = AllB (ClassF c f) b
 
 
 -- | Similar to 'baddDicts' but can produce the instance dictionaries
 --   "out of the blue".
-bdicts :: forall c b . (ConstraintsB b, ApplicativeB b,  AllB c b) => b (Dict c)
-bdicts = bmap (\(Pair c _) -> c) $ baddDicts $ bpure Proxy
+bdicts
+  :: forall c b
+  . (ConstraintsB b, ApplicativeB b,  AllB c b)
+  => b (Dict c)
+bdicts
+  = bmap (\(Pair c _) -> c) $ baddDicts $ bpure Proxy
 
 
 -- | Like 'bpure' but a constraint is allowed to be required on
 --   each element of @b@.
 bpureC
-  :: forall c f b .
-   ( AllB c b
-   , ConstraintsB b
-   , ApplicativeB b
-   )
+  :: forall c f b
+  .  ( AllB c b
+     , ConstraintsB b
+     , ApplicativeB b
+     )
   => (forall a . c a => f a)
   -> b f
-bpureC x
-  = bmap (requiringDict @c x) bdicts
+bpureC fa
+  = bmap (requiringDict @c fa) bdicts
 
 -- | Builds a @b f@, by applying 'mempty' on every field of @b@.
-bmempty :: forall f b . (AllBF Monoid f b, ConstraintsB b, ApplicativeB b) => b f
+bmempty
+  :: forall f b
+  .  ( AllBF Monoid f b
+     , ConstraintsB b
+     , ApplicativeB b
+     )
+  => b f
 bmempty
   = bpureC @(ClassF Monoid f) mempty
 
@@ -214,9 +231,14 @@ bmempty
 type CanDeriveConstraintsB c b f
   = ( GenericN (b f)
     , GenericN (b (Dict c `Product` f))
-    , AllB c b ~ GAll 0 c (GAllRep b)
-    , GConstraints 0 c f (GAllRep b) (RepN (b f)) (RepN (b (Dict c `Product` f)))
+    , AllB c b ~ GAll 0 c (GAllRepB b)
+    , GConstraints 0 c f (GAllRepB b) (RepN (b f)) (RepN (b (Dict c `Product` f)))
     )
+
+-- | The representation used for the generic computation of the @'AllB' c b@
+--   constraints. Here 'X' is an arbitrary constant since the actual
+--   argument to @b@ is irrelevant.
+type GAllRepB b = TagSelf 0 b (RepN (b X))
 
 
 -- ===============================================================
@@ -229,9 +251,10 @@ gbaddDictsDefault
   . ( CanDeriveConstraintsB c b f
     , AllB c b
     )
-  => b f -> b (Dict c `Product` f)
+  => b f
+  -> b (Dict c `Product` f)
 gbaddDictsDefault
-  = toN . gaddDicts @0 @c @f @(GAllRep b) . fromN
+  = toN . gaddDicts @0 @c @f @(GAllRepB b) . fromN
 {-# INLINE gbaddDictsDefault #-}
 
 

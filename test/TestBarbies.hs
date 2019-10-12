@@ -22,6 +22,7 @@ module TestBarbies
   , NestedF(..)
   , Nested2F(..)
 
+  , ParX(..)
   , HKB(..)
   )
 
@@ -235,7 +236,7 @@ data NestedF f
   = NestedF
       { npf_1 :: f Int
       , npf_2 :: [Record3 f]
-      , npf_4 :: Maybe (NestedF f)
+      , npf_3 :: Maybe (NestedF f)
       }
   deriving (Generic, Typeable)
 
@@ -299,6 +300,12 @@ instance TraversableB (ParX a)
 instance Monoid a => ApplicativeB (ParX a)
 instance ConstraintsB (ParX a)
 
+deriving instance (Show a, Show (f a)) => Show (ParX a f)
+deriving instance (Eq a, Eq (f a)) => Eq (ParX a f)
+
+instance (Arbitrary a, Arbitrary (f a)) => Arbitrary (ParX a f) where
+  arbitrary
+    = ParX <$> arbitrary <*> arbitrary
 
 -----------------------------------------------------
 -- Higher-kinded barbies

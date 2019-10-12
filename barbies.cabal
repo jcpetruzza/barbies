@@ -30,6 +30,7 @@ library
       Barbies.Internal
 
       Data.Functor.Barbie
+      Data.Functor.Indexed
 
       -- Deprecated modules
       Data.Barbie
@@ -45,15 +46,25 @@ library
       Barbies.Generics.Traversable
 
       Barbies.Internal.ApplicativeB
+      Barbies.Internal.ApplicativeI
+
       Barbies.Internal.BareB
+      Barbies.Internal.Bi
       Barbies.Internal.ConstraintsB
+      Barbies.Internal.ConstraintsI
       Barbies.Internal.Containers
       Barbies.Internal.Dicts
+
       Barbies.Internal.FunctorB
+      Barbies.Internal.FunctorI
+
       Barbies.Internal.TraversableB
+      Barbies.Internal.TraversableI
+
       Barbies.Internal.Trivial
       Barbies.Internal.Wear
       Barbies.Internal.Wrappers
+      Barbies.Internal.Writer
 
       Data.Generics.GenericN
 
@@ -97,6 +108,7 @@ test-suite barbies-test
   other-modules:
       TestBarbies
       TestBarbiesW
+      TestBiBarbies
       Clothes
       Spec.Applicative
       Spec.Bare

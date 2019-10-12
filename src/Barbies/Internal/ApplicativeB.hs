@@ -46,7 +46,7 @@ import Data.Generics.GenericN
 --  'bmap' (\('Pair' a ('Pair' b c)) -> 'Pair' ('Pair' a b) c) (u `'bprod'` (v `'bprod'` w)) = (u `'bprod'` v) `'bprod'` w
 --  @
 --
---  It is to 'FunctorB' in is that 'Applicative'
+--  It is to 'FunctorB' in the same way as 'Applicative'
 --  relates to 'Functor'. For a presentation of 'Applicative' as
 --  a monoidal functor, see Section 7 of
 --  <http://www.soi.city.ac.uk/~ross/papers/Applicative.html Applicative Programming with Effects>.
@@ -56,44 +56,77 @@ import Data.Generics.GenericN
 -- This corresponds rougly to record types (in the presence of sums, there would
 -- be several candidates for `bpure`), where the argument @f@ covers every field.
 class FunctorB b => ApplicativeB (b :: (k -> Type) -> Type) where
-  bpure :: (forall a . f a) -> b f
-  bprod :: b f -> b g -> b (f `Product` g)
+  bpure
+    :: (forall a . f a)
+    -> b f
 
-  default bpure :: CanDeriveApplicativeB b f f => (forall a . f a) -> b f
+  bprod
+    :: b f
+    -> b g
+    -> b (f `Product` g)
+
+  default bpure
+    :: CanDeriveApplicativeB b f f
+    => (forall a . f a)
+    -> b f
   bpure = gbpureDefault
 
-  default bprod :: CanDeriveApplicativeB b f g => b f -> b g -> b (f `Product` g)
+  default bprod
+    :: CanDeriveApplicativeB b f g
+    => b f
+    -> b
+    g -> b (f `Product` g)
   bprod = gbprodDefault
 
 
--- | An alias of 'bprod', since this is like a 'zip' for Barbie-types.
-bzip :: ApplicativeB b => b f -> b g -> b (f `Product` g)
+-- | An alias of 'bprod', since this is like a 'zip'.
+bzip
+  :: ApplicativeB b
+  => b f
+  -> b g
+  -> b (f `Product` g)
 bzip = bprod
 
--- | An equivalent of 'unzip' for Barbie-types.
-bunzip :: ApplicativeB b => b (f `Product` g) -> (b f, b g)
-bunzip bfg = (bmap (\(Pair a _) -> a) bfg, bmap (\(Pair _ b) -> b) bfg)
+-- | An equivalent of 'unzip'.
+bunzip
+  :: ApplicativeB b
+  => b (f `Product` g)
+  -> (b f, b g)
+bunzip bfg
+  = (bmap (\(Pair a _) -> a) bfg, bmap (\(Pair _ b) -> b) bfg)
 
--- | An equivalent of 'Data.List.zipWith' for Barbie-types.
-bzipWith :: ApplicativeB b => (forall a. f a -> g a -> h a) -> b f -> b g -> b h
+-- | An equivalent of 'Data.List.zipWith'.
+bzipWith
+  :: ApplicativeB b
+  => (forall a. f a -> g a -> h a)
+  -> b f
+  -> b g
+  -> b h
 bzipWith f bf bg
   = bmap (\(Pair fa ga) -> f fa ga) (bf `bprod` bg)
 
--- | An equivalent of 'Data.List.zipWith3' for Barbie-types.
+-- | An equivalent of 'Data.List.zipWith3'.
 bzipWith3
   :: ApplicativeB b
   => (forall a. f a -> g a -> h a -> i a)
-  -> b f -> b g -> b h -> b i
+  -> b f
+  -> b g
+  -> b h
+  -> b i
 bzipWith3 f bf bg bh
   = bmap (\(Pair (Pair fa ga) ha) -> f fa ga ha)
          (bf `bprod` bg `bprod` bh)
 
 
--- | An equivalent of 'Data.List.zipWith4' for Barbie-types.
+-- | An equivalent of 'Data.List.zipWith4'.
 bzipWith4
   :: ApplicativeB b
   => (forall a. f a -> g a -> h a -> i a -> j a)
-  -> b f -> b g -> b h -> b i -> b j
+  -> b f
+  -> b g
+  -> b h
+  -> b
+  i -> b j
 bzipWith4 f bf bg bh bi
   = bmap (\(Pair (Pair (Pair fa ga) ha) ia) -> f fa ga ha ia)
          (bf `bprod` bg `bprod` bh `bprod` bi)
@@ -124,14 +157,25 @@ type CanDeriveApplicativeB b f g
 gbprodDefault
   :: forall b f g
   .  CanDeriveApplicativeB b f g
-  => b f -> b g -> b (f `Product` g)
+  => b f
+  -> b g
+  -> b (f `Product` g)
 gbprodDefault l r
   = toN $ gprod (Proxy @0) (Proxy @f) (Proxy @g) (fromN l) (fromN r)
 {-# INLINE gbprodDefault #-}
 
-gbpureDefault:: forall b f . CanDeriveApplicativeB b f f => (forall a . f a) -> b f
-gbpureDefault x
-  = toN $ gpure (Proxy @0) (Proxy @f) (Proxy @(RepN (b f))) (Proxy @(RepN (b (f `Product` f)))) x
+gbpureDefault
+  :: forall b f
+  .  CanDeriveApplicativeB b f f
+  => (forall a . f a)
+  -> b f
+gbpureDefault fa
+  = toN $ gpure
+      (Proxy @0)
+      (Proxy @f)
+      (Proxy @(RepN (b f)))
+      (Proxy @(RepN (b (f `Product` f))))
+      fa
 {-# INLINE gbpureDefault #-}
 
 
@@ -148,8 +192,8 @@ instance
                           (Rec (b' (P 0 g)) (b g))
                           (Rec (b' (P 0 (f `Product` g))) (b (f `Product` g)))
   where
-  gpure _ _ _ _ x
-    = Rec (K1 (bpure x))
+  gpure _ _ _ _ fa
+    = Rec (K1 (bpure fa))
   {-# INLINE gpure #-}
 
   gprod _ _ _ (Rec (K1 bf)) (Rec (K1 bg))
@@ -167,8 +211,8 @@ instance
                           (Rec (h' (b' (P 0 g))) (h (b g)))
                           (Rec (h' (b' (P 0 (f `Product` g)))) (h (b (f `Product` g))))
   where
-  gpure _ _ _ _ x
-    = Rec (K1 (pure $ bpure x))
+  gpure _ _ _ _ fa
+    = Rec (K1 (pure $ bpure fa))
   {-# INLINE gpure #-}
 
   gprod _ _ _ (Rec (K1 hbf)) (Rec (K1 hbg))
