@@ -148,14 +148,32 @@ instance
                           (Rec (b' (P 0 g)) (b g))
                           (Rec (b' (P 0 (f `Product` g))) (b (f `Product` g)))
   where
-  gprod _ _ _ (Rec (K1 bf)) (Rec (K1 bg))
-    = Rec (K1 (bf `bprod` bg))
-  {-# INLINE gprod #-}
-
   gpure _ _ _ _ x
     = Rec (K1 (bpure x))
   {-# INLINE gpure #-}
 
+  gprod _ _ _ (Rec (K1 bf)) (Rec (K1 bg))
+    = Rec (K1 (bf `bprod` bg))
+  {-# INLINE gprod #-}
+
+
+
+-- h' and b' are essentially  h and b, but maybe
+-- with 'Param' annotations
+instance
+  ( Applicative h
+  , ApplicativeB b
+  ) => GApplicative 0 f g (Rec (h' (b' (P 0 f))) (h (b f)))
+                          (Rec (h' (b' (P 0 g))) (h (b g)))
+                          (Rec (h' (b' (P 0 (f `Product` g)))) (h (b (f `Product` g))))
+  where
+  gpure _ _ _ _ x
+    = Rec (K1 (pure $ bpure x))
+  {-# INLINE gpure #-}
+
+  gprod _ _ _ (Rec (K1 hbf)) (Rec (K1 hbg))
+    = Rec (K1 (bprod <$> hbf <*> hbg))
+  {-# INLINE gprod #-}
 
 -- --------------------------------
 -- Instances for base types

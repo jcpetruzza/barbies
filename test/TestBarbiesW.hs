@@ -88,6 +88,7 @@ data Record3W t f
 
 instance FunctorB (Record3W Bare)
 instance FunctorB (Record3W Covered)
+instance TraversableB (Record3W Bare)
 instance TraversableB (Record3W Covered)
 instance ApplicativeB (Record3W Covered)
 instance ConstraintsB (Record3W Bare)
@@ -245,27 +246,25 @@ data NestedFW t f
   = NestedFW
       { npfw_1 :: Wear t f Int
       , npfw_2 :: [Record3W t f]
-      , npfw_3 :: Maybe (Sum3W t f)
       , npfw_4 :: Maybe (NestedFW t f)
       }
   deriving (Generic, Typeable)
 
 
-
 instance FunctorB (NestedFW Bare)
 instance FunctorB (NestedFW Covered)
+instance TraversableB (NestedFW Bare)
 instance TraversableB (NestedFW Covered)
+instance ApplicativeB (NestedFW Covered)
 instance BareB NestedFW
--- instance ConstraintsB (NestedFW Bare)
--- instance ConstraintsB (NestedFW Covered)
 
 deriving instance Show (NestedFW Bare f)
 deriving instance Eq   (NestedFW Bare f)
-deriving instance (Show (f Int), Show (Record3W Covered f), Show (Sum3W Covered f)) => Show (NestedFW Covered f)
-deriving instance (Eq   (f Int), Eq   (Record3W Covered f), Eq   (Sum3W Covered f)) => Eq   (NestedFW Covered f)
+deriving instance (Show (f Int), Show (Record3W Covered f)) => Show (NestedFW Covered f)
+deriving instance (Eq   (f Int), Eq   (Record3W Covered f)) => Eq   (NestedFW Covered f)
 
 instance (Arbitrary (f Int), Arbitrary (f Bool), Arbitrary (f Char)) => Arbitrary (NestedFW Covered f) where
-  arbitrary = NestedFW <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = NestedFW <$> arbitrary <*> arbitrary <*> arbitrary
 
 
 -----------------------------------------------------
@@ -299,6 +298,7 @@ data ParBHW h b t (f :: * -> *)
 
 instance (Functor h, FunctorB (b t)) => FunctorB (ParBHW h b t)
 instance (Traversable h, TraversableB (b t)) => TraversableB (ParBHW h b t)
+instance (Applicative h, ApplicativeB (b t)) => ApplicativeB (ParBHW h b t)
 instance (Functor h, BareB b) => BareB (ParBHW h b)
 
 data ParXW a t f

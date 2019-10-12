@@ -75,6 +75,7 @@ main
             , Traversable.laws @NestedF
 
             , Traversable.laws @(CompositeRecordW Covered)
+            , Traversable.laws @(NestedFW Covered)
             ]
 
         , testGroup "Product Laws of derived applicatives"
@@ -82,6 +83,7 @@ main
             , Applicative.productLaws @Record1
             , Applicative.productLaws @Record3
             , Applicative.productLaws @CompositeRecord
+            , Applicative.productLaws @NestedF
 
             , Applicative.productLaws @Record1S
             , Applicative.productLaws @Record3S
@@ -89,6 +91,7 @@ main
             , Applicative.productLaws @(Record1W Covered)
             , Applicative.productLaws @(Record3W Covered)
             , Applicative.productLaws @(CompositeRecordW Covered)
+            , Applicative.productLaws @(NestedFW Covered)
 
             , Applicative.productLaws @(Record1WS Covered)
             , Applicative.productLaws @(Record3WS Covered)

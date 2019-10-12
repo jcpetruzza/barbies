@@ -232,19 +232,19 @@ data NestedF f
   = NestedF
       { npf_1 :: f Int
       , npf_2 :: [Record3 f]
-      , npf_3 :: Maybe (Sum3 f)
       , npf_4 :: Maybe (NestedF f)
       }
   deriving (Generic, Typeable)
 
 instance FunctorB NestedF
 instance TraversableB NestedF
+instance ApplicativeB NestedF
 
-deriving instance (Show (f Int), Show (Record3 f), Show (Sum3 f)) => Show (NestedF f)
-deriving instance (Eq   (f Int), Eq   (Record3 f), Eq   (Sum3 f)) => Eq   (NestedF f)
+deriving instance (Show (f Int), Show (Record3 f)) => Show (NestedF f)
+deriving instance (Eq   (f Int), Eq   (Record3 f)) => Eq   (NestedF f)
 
-instance (Arbitrary (f Int), AllBF Arbitrary f Record3, AllBF Arbitrary f Sum3) => Arbitrary (NestedF f) where
-  arbitrary = NestedF <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+instance (Arbitrary (f Int), AllBF Arbitrary f Record3) => Arbitrary (NestedF f) where
+  arbitrary = NestedF <$> arbitrary <*> arbitrary <*> arbitrary
 
 
 
@@ -267,6 +267,7 @@ data ParBH h b (f :: * -> *)
 
 instance (Functor h, FunctorB b) => FunctorB (ParBH h b)
 instance (Traversable h, TraversableB b) => TraversableB (ParBH h b)
+instance (Applicative h, ApplicativeB b) => ApplicativeB (ParBH h b)
 
 data ParX a f
   = ParX (f a)
