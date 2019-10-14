@@ -1,6 +1,13 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE QuantifiedConstraints #-}
 {-# LANGUAGE TypeFamilies #-}
+
+#if __GLASGOW_HASKELL__ >= 806
+
+{-# LANGUAGE QuantifiedConstraints #-}
+
+#endif
+
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.ApplicativeI
   ( ApplicativeI(ipure, iprod)
@@ -16,6 +23,7 @@ import Barbies.Generics.Applicative(GApplicative(..))
 import Barbies.Internal.FunctorI (FunctorI (..))
 
 import Data.Functor.Product (Product (..))
+import Data.Functor.Reverse (Reverse (..))
 import Data.Functor.Sum (Sum (..))
 import Data.Kind (Type)
 import Data.Proxy (Proxy (..))
@@ -245,6 +253,17 @@ instance
 -- Instances for base types
 -- --------------------------------
 
+instance ApplicativeI Reverse where
+  ipure fa
+    = Reverse fa
+  {-# INLINE ipure #-}
+
+  iprod (Reverse fa) (Reverse ga)
+    = Reverse (Pair fa ga)
+  {-# INLINE iprod #-}
+
+#if __GLASGOW_HASKELL__ >= 806
+
 instance (forall a . Monoid (f a)) => ApplicativeI (Product f) where
   ipure fa
     = Pair mempty fa
@@ -267,3 +286,4 @@ instance (forall a . Semigroup (f a)) => ApplicativeI (Sum f) where
         (InL fl, InR _)  -> InL fl
         (InL fl, InL fr) -> InL (fl <> fr)
   {-# INLINE iprod #-}
+#endif

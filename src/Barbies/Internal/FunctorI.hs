@@ -11,7 +11,22 @@ where
 
 import Barbies.Generics.Functor (GFunctor(..))
 
+import Control.Applicative.Backwards(Backwards (..))
+import Control.Applicative.Lift(Lift, mapLift )
+
+import Control.Monad.Trans.Except(ExceptT, mapExceptT)
+import Control.Monad.Trans.Identity(IdentityT, mapIdentityT)
+import Control.Monad.Trans.Maybe(MaybeT, mapMaybeT)
+import Control.Monad.Trans.RWS.Lazy as Lazy (RWST, mapRWST)
+import Control.Monad.Trans.RWS.Strict as Strict (RWST, mapRWST)
+import Control.Monad.Trans.Reader(ReaderT, mapReaderT)
+import Control.Monad.Trans.State.Lazy as Lazy (StateT, mapStateT)
+import Control.Monad.Trans.State.Strict as Strict (StateT, mapStateT)
+import Control.Monad.Trans.Writer.Lazy as Lazy (WriterT, mapWriterT)
+import Control.Monad.Trans.Writer.Strict as Strict (WriterT, mapWriterT)
+
 import Data.Functor.Product   (Product (..))
+import Data.Functor.Reverse   (Reverse (..))
 import Data.Functor.Sum       (Sum (..))
 import Data.Generics.GenericN
 import Data.Proxy             (Proxy (..))
@@ -114,4 +129,61 @@ instance FunctorI (Sum f) where
   imap h = \case
     InL fa -> InL fa
     InR ga -> InR (h ga)
+  {-# INLINE imap #-}
+
+-- --------------------------------
+-- Instances for transformers types
+-- --------------------------------
+
+instance FunctorI Backwards where
+  imap h (Backwards fa)
+    = Backwards (h fa)
+  {-# INLINE imap #-}
+
+instance FunctorI Reverse where
+  imap h (Reverse fa) = Reverse (h fa)
+  {-# INLINE imap #-}
+
+instance FunctorI Lift where
+  imap h = mapLift h
+  {-# INLINE imap #-}
+
+instance FunctorI (ExceptT e) where
+  imap h = mapExceptT h
+  {-# INLINE imap #-}
+
+instance FunctorI IdentityT where
+  imap h = mapIdentityT h
+  {-# INLINE imap #-}
+
+instance FunctorI MaybeT where
+  imap h = mapMaybeT h
+  {-# INLINE imap #-}
+
+instance FunctorI (Lazy.RWST r w s) where
+  imap h = Lazy.mapRWST h
+  {-# INLINE imap #-}
+
+instance FunctorI (Strict.RWST r w s) where
+  imap h = Strict.mapRWST h
+  {-# INLINE imap #-}
+
+instance FunctorI (ReaderT r) where
+  imap h = mapReaderT h
+  {-# INLINE imap #-}
+
+instance FunctorI (Lazy.StateT s) where
+  imap h = Lazy.mapStateT h
+  {-# INLINE imap #-}
+
+instance FunctorI (Strict.StateT s) where
+  imap h = Strict.mapStateT h
+  {-# INLINE imap #-}
+
+instance FunctorI (Lazy.WriterT w) where
+  imap h = Lazy.mapWriterT h
+  {-# INLINE imap #-}
+
+instance FunctorI (Strict.WriterT w) where
+  imap h = Strict.mapWriterT h
   {-# INLINE imap #-}

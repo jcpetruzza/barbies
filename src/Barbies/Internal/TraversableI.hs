@@ -18,11 +18,20 @@ import Barbies.Generics.Traversable(GTraversable(..))
 import Barbies.Internal.FunctorI(FunctorI (..))
 import Barbies.Internal.Writer(execWr, tell)
 
+import Control.Applicative.Backwards(Backwards (..))
+import Control.Applicative.Lift(Lift(..))
+import Control.Monad.Trans.Except(ExceptT(..))
+import Control.Monad.Trans.Identity(IdentityT(..))
+import Control.Monad.Trans.Maybe(MaybeT(..))
+import Control.Monad.Trans.Writer.Lazy as Lazy (WriterT(..))
+import Control.Monad.Trans.Writer.Strict as Strict (WriterT(..))
+
 import Data.Functor           (void)
 import Data.Functor.Compose   (Compose (..))
 import Data.Functor.Const     (Const (..))
 import Data.Functor.Identity  (Identity (..))
 import Data.Functor.Product   (Product (..))
+import Data.Functor.Reverse   (Reverse (..))
 import Data.Functor.Sum       (Sum (..))
 import Data.Kind              (Type)
 import Data.Generics.GenericN
@@ -169,4 +178,48 @@ instance TraversableI (Sum f) where
   itraverse h = \case
     InL fa -> pure $ InL fa
     InR ga -> InR <$> h ga
+  {-# INLINE itraverse #-}
+
+-- -----------------------------------------------------------
+-- Instances for transformers types
+-- -----------------------------------------------------------
+
+instance TraversableI Backwards where
+  itraverse h (Backwards fa)
+    = Backwards <$> h fa
+  {-# INLINE itraverse #-}
+
+instance TraversableI Lift where
+  itraverse h = \case
+    Pure  a  -> pure $ Pure a
+    Other fa -> Other <$> h fa
+  {-# INLINE itraverse #-}
+
+instance TraversableI Reverse where
+  itraverse h (Reverse fa) = Reverse <$> h fa
+  {-# INLINE itraverse #-}
+
+instance TraversableI (ExceptT e) where
+  itraverse h (ExceptT mea)
+    = ExceptT <$> h mea
+  {-# INLINE itraverse #-}
+
+instance TraversableI IdentityT where
+  itraverse h (IdentityT ma)
+    = IdentityT <$> h ma
+  {-# INLINE itraverse #-}
+
+instance TraversableI MaybeT where
+  itraverse h (MaybeT mma)
+    = MaybeT <$> h mma
+  {-# INLINE itraverse #-}
+
+instance TraversableI (Lazy.WriterT w) where
+  itraverse h (Lazy.WriterT maw)
+    = Lazy.WriterT <$> h maw
+  {-# INLINE itraverse #-}
+
+instance TraversableI (Strict.WriterT w) where
+  itraverse h (Strict.WriterT maw)
+    = Strict.WriterT <$> h maw
   {-# INLINE itraverse #-}
