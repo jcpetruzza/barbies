@@ -78,40 +78,23 @@ main
             , Traversable.laws @(NestedFW Covered)
             ]
 
-        , testGroup "Product Laws of derived applicatives"
-            [ Applicative.productLaws @Record0
-            , Applicative.productLaws @Record1
-            , Applicative.productLaws @Record3
-            , Applicative.productLaws @CompositeRecord
-            , Applicative.productLaws @NestedF
+        , testGroup "Applicative laws"
+            [ Applicative.laws @Record0
+            , Applicative.laws @Record1
+            , Applicative.laws @Record3
+            , Applicative.laws @CompositeRecord
+            , Applicative.laws @NestedF
 
-            , Applicative.productLaws @Record1S
-            , Applicative.productLaws @Record3S
+            , Applicative.laws @Record1S
+            , Applicative.laws @Record3S
 
-            , Applicative.productLaws @(Record1W Covered)
-            , Applicative.productLaws @(Record3W Covered)
-            , Applicative.productLaws @(CompositeRecordW Covered)
-            , Applicative.productLaws @(NestedFW Covered)
+            , Applicative.laws @(Record1W Covered)
+            , Applicative.laws @(Record3W Covered)
+            , Applicative.laws @(CompositeRecordW Covered)
+            , Applicative.laws @(NestedFW Covered)
 
-            , Applicative.productLaws @(Record1WS Covered)
-            , Applicative.productLaws @(Record3WS Covered)
-            ]
-
-        , testGroup "Uniq Laws"
-            [ Applicative.uniqLaws @Record0
-            , Applicative.uniqLaws @Record1
-            , Applicative.uniqLaws @Record3
-            , Applicative.uniqLaws @CompositeRecord
-
-            , Applicative.uniqLaws @Record1S
-            , Applicative.uniqLaws @Record3S
-
-            , Applicative.uniqLaws @(Record1W Covered)
-            , Applicative.uniqLaws @(Record3W Covered)
-            , Applicative.uniqLaws @(CompositeRecordW Covered)
-
-            , Applicative.uniqLaws @(Record1WS Covered)
-            , Applicative.uniqLaws @(Record3WS Covered)
+            , Applicative.laws @(Record1WS Covered)
+            , Applicative.laws @(Record3WS Covered)
             ]
 
         , testGroup "adDict projection"

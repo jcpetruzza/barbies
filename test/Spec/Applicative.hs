@@ -1,49 +1,55 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 module Spec.Applicative
- ( productLaws, uniqLaws )
+ ( laws
+ )
 
 where
 
-import Clothes(F, G)
+import Clothes(F(..), G, H, I, FG(..), HI(..), NatTransf(..))
 
 import Data.Functor.Barbie(FunctorB(..), ApplicativeB(..))
 
 import Data.Functor.Product(Product(Pair))
 import Data.Typeable(Typeable, Proxy(..), typeRep)
 
-import Test.Tasty(TestTree)
+import Test.Tasty(TestTree, testGroup)
 import Test.Tasty.QuickCheck(Arbitrary(..), testProperty, (===))
 
-
--- We only derive ApplicativeB for products, so we test the product
--- laws, which are stronger than the applicative ones.
-productLaws
+laws
   :: forall b
-  . ( ApplicativeB b
-    , Eq (b F), Eq (b G)
-    , Show (b F), Show (b G)
-    , Arbitrary (b F), Arbitrary (b G)
-    , Typeable b
-    )
+  .  ( ApplicativeB b
+     , Eq (b F), Eq (b (G `Product` I)), Eq (b ((F `Product` G) `Product` H))
+     , Show (b F), Show (b G), Show (b H)
+     , Show (b (G `Product` I)), Show (b ((F `Product` G) `Product` H))
+     , Arbitrary (b F), Arbitrary (b G), Arbitrary (b H)
+     , Typeable b
+     )
   => TestTree
-productLaws
-  = testProperty (show (typeRep (Proxy :: Proxy b))) $ \l r ->
-      bmap first  (bprod l r) == (l :: b F) &&
-      bmap second (bprod l r) == (r :: b G)
-  where
-    first  (Pair a _) = a
-    second (Pair _ b) = b
+laws
+  = testGroup (show (typeRep (Proxy @b)))
+      [ testProperty "naturality of bprod" $
+          \(FG (NatTransf f)) (HI (NatTransf g)) l r ->
+            let
+              lhs, rhs :: b F -> b H -> b (G `Product` I)
+              lhs u v = bmap (\(Pair a b) -> Pair (f a) (g b)) (u `bprod` v)
+              rhs u v = bmap f u `bprod` bmap g v
+            in
+              lhs l r === rhs l r
 
--- `bpure` is uniquely determined in products
-uniqLaws
-  :: forall b
-  . ( ApplicativeB b
-    , Eq (b Maybe)
-    , Show (b F), Show (b Maybe)
-    , Arbitrary (b F)
-    , Typeable b
-    )
-  => TestTree
-uniqLaws
-  = testProperty (show (typeRep (Proxy :: Proxy b))) $ \b ->
-      bmap (const Nothing) (b :: b F) === bpure Nothing
+      , testProperty "left identity" $ \u ->
+          bmap (\(Pair _ b) -> b) (bpure (F []) `bprod` u) === (u :: b F)
+
+      , testProperty "left identity" $ \u ->
+          bmap (\(Pair a _) -> a) (u `bprod` bpure (F [])) === (u :: b F)
+
+      , testProperty "associativity" $ \u v w ->
+          let
+            assocPair (Pair a (Pair b c))
+              = Pair (Pair a b) c
+
+            lhs, rhs :: b ((F `Product` G) `Product` H)
+            lhs = bmap assocPair (u `bprod` (v `bprod` w))
+            rhs = (u `bprod` v) `bprod` w
+          in
+            lhs === rhs
+      ]

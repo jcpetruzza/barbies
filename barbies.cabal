@@ -113,7 +113,7 @@ test-suite barbies-test
   hs-source-dirs:
       test
 
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -O0
 
   build-depends:
       barbies

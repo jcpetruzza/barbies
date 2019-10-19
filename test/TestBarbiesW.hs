@@ -264,7 +264,9 @@ deriving instance (Show (f Int), Show (Record3W Covered f)) => Show (NestedFW Co
 deriving instance (Eq   (f Int), Eq   (Record3W Covered f)) => Eq   (NestedFW Covered f)
 
 instance (Arbitrary (f Int), Arbitrary (f Bool), Arbitrary (f Char)) => Arbitrary (NestedFW Covered f) where
-  arbitrary = NestedFW <$> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary
+    = scale (`div` 2) $
+        NestedFW <$> arbitrary <*> scale (`div` 2) arbitrary <*> arbitrary
 
 
 -----------------------------------------------------

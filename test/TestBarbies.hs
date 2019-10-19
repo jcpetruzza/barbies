@@ -244,7 +244,9 @@ deriving instance (Show (f Int), Show (Record3 f)) => Show (NestedF f)
 deriving instance (Eq   (f Int), Eq   (Record3 f)) => Eq   (NestedF f)
 
 instance (Arbitrary (f Int), AllBF Arbitrary f Record3) => Arbitrary (NestedF f) where
-  arbitrary = NestedF <$> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary
+    = scale (`div` 2) $
+        NestedF <$> arbitrary <*> scale (`div` 2) arbitrary <*> arbitrary
 
 
 

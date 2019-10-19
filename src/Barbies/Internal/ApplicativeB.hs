@@ -36,8 +36,8 @@ import Data.Generics.GenericN
 --  [Left and right identity]
 --
 --  @
---  'bmap' (\('Pair' _ b) -> b) ('bpure' e ``bprod'` v) = v
---  'bmap' (\('Pair' a _) -> a) (u ``bprod' `'bpure' e) = u
+--  'bmap' (\('Pair' _ b) -> b) ('bpure' e `'bprod'` v) = v
+--  'bmap' (\('Pair' a _) -> a) (u `'bprod'` 'bpure' e) = u
 --  @
 --
 -- [Associativity]
