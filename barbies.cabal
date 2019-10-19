@@ -26,6 +26,7 @@ library
   exposed-modules:
       Barbies
       Barbies.Bare
+      Barbies.Bi
       Barbies.Constraints
       Barbies.Internal
 
@@ -49,7 +50,6 @@ library
       Barbies.Internal.ApplicativeI
 
       Barbies.Internal.BareB
-      Barbies.Internal.Bi
       Barbies.Internal.ConstraintsB
       Barbies.Internal.ConstraintsI
       Barbies.Internal.Containers
