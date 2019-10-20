@@ -1,14 +1,13 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
 module Spec.Constraints
   ( lawAddDictPrj
-  , lawDictsEquivPrj
   )
 
 where
 
 import Clothes(F)
 import Barbies.Constraints(ClassF, Dict)
-import Data.Functor.Barbie(bmap, bdicts, ApplicativeB, ConstraintsB(..), AllBF)
+import Data.Functor.Barbie(bmap, ConstraintsB(..), AllBF)
 
 import Data.Functor.Product (Product(Pair))
 import Data.Typeable(Typeable, Proxy(..), typeRep)
@@ -31,19 +30,3 @@ lawAddDictPrj
       bmap second (baddDicts b :: b (Dict (ClassF Show F) `Product` F)) === b
   where
     second (Pair _ b) = b
-
-
-lawDictsEquivPrj
-  :: forall b
-  . ( ApplicativeB b, ConstraintsB b, AllBF Show F b
-    , Eq (b (Dict (ClassF Show F)))
-    , Show (b F), Show (b (Dict (ClassF Show F)))
-    , Arbitrary (b F)
-    , Typeable b
-    )
-  => TestTree
-lawDictsEquivPrj
-  = testProperty (show (typeRep (Proxy :: Proxy b))) $ \b ->
-      bmap first (baddDicts b :: b (Dict (ClassF Show F) `Product` F)) === bdicts
-  where
-    first (Pair a _) = a

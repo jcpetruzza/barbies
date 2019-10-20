@@ -123,23 +123,6 @@ main
             , Constraints.lawAddDictPrj @(CompositeRecordW Covered)
             ]
 
-        , testGroup "bdicts projection"
-            [ Constraints.lawDictsEquivPrj @Record0
-            , Constraints.lawDictsEquivPrj @Record1
-            , Constraints.lawDictsEquivPrj @Record3
-            , Constraints.lawDictsEquivPrj @CompositeRecord
-
-            , Constraints.lawDictsEquivPrj @Record1S
-            , Constraints.lawDictsEquivPrj @Record3S
-
-            , Constraints.lawDictsEquivPrj @(Record1W Covered)
-            , Constraints.lawDictsEquivPrj @(Record3W Covered)
-            , Constraints.lawDictsEquivPrj @(CompositeRecordW Covered)
-
-            , Constraints.lawDictsEquivPrj @(Record1WS Covered)
-            , Constraints.lawDictsEquivPrj @(Record3WS Covered)
-            ]
-
         , testGroup "Bare laws"
             [ Bare.laws @Record1W
             , Bare.laws @Record3W
