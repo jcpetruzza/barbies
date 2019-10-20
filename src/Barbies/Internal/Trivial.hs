@@ -13,11 +13,8 @@ import Barbies.Internal.TraversableB(TraversableB(..))
 
 import Data.Data (Data(..))
 import Data.Kind (Type)
-import Data.Semigroup (Semigroup(..))
 import Data.Typeable (Typeable)
 import GHC.Generics (Generic)
-
-import Prelude hiding (Semigroup(..))
 
 ---------------------------------------------------
 -- Trivial Barbies

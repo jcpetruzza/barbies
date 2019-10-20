@@ -1,7 +1,7 @@
 # Changelog for barbies
 
 ## 2.0.0.0
-  - Builds with ghc 8.8.
+  - Builds with ghc 8.8, but drops support for ghc 8.0 and 8.2
   - Remove functions deprecated on release 1.0
   - Deprecate `Data.Functor.Prod`, `(/*)` and `(/*/)`.
   - Deprecate `Data.Barbie`, in favor of `Data.Functor.Barbie`.

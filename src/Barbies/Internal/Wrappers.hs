@@ -13,9 +13,7 @@ import Barbies.Internal.FunctorB
 import Barbies.Internal.TraversableB
 
 import Data.Kind (Type)
-import Data.Semigroup (Semigroup, (<>))
 
-import Prelude hiding (Semigroup, (<>))  -- ghc < 8.2
 
 -- | A wrapper for Barbie-types, providing useful instances.
 newtype Barbie (b :: (k -> Type) -> Type) f

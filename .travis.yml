@@ -15,8 +15,6 @@ before_install:
 
 matrix:
   include:
-    - env: STACK_YAML=stack-ghc-802.yaml
-    - env: STACK_YAML=stack-ghc-822.yaml
     - env: STACK_YAML=stack-ghc-844.yaml
     - env: STACK_YAML=stack-ghc-865.yaml
     - env: STACK_YAML=stack-ghc-881.yaml

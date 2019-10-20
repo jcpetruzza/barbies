@@ -6,11 +6,7 @@ module Spec.Wrapper (
 
 where
 
-import Prelude hiding (Semigroup, (<>))
-
 import Barbies (AllBF, ApplicativeB, Barbie(..), ConstraintsB)
-
-import Data.Semigroup (Semigroup, (<>))
 
 import Test.Tasty(testGroup, TestTree)
 import Test.Tasty.QuickCheck(Arbitrary(..), testProperty)
