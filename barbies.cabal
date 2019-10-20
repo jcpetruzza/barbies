@@ -152,7 +152,7 @@ test-suite barbies-test-legacy
   hs-source-dirs:
       test-legacy
 
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Wno-deprecations
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Wno-deprecations -O0
 
   build-depends:
       barbies
