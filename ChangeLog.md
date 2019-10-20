@@ -10,9 +10,13 @@
   - Create a `Barbies` module, to contain wrappers, basic docs, etc.
     `Data.Functor.Barbie` contains only functor-related stuff.
   - Add a `ErrorContainer` wrapper, similar to `Container` but for `Either e`.
-  - Replace `ProductB` by `ApplicativeB`, with more lax laws
+  - Replace `ProductB` by `ApplicativeB`, with more lax laws. Now we can derive
+    more instances than before, since arbitrary monoids are allowed as fields
+    of the record.
   - Remove `ProductBC`, since `bdicts` can now be defined in terms of `ApplicativeB`
     and `ConstraintsB`.
+  - Fix failure to derive `TraversableB` and `ConstraintsB` when using a type
+    parameter not under the functor argument.
 
 ## 1.1.3.0
   - `Wear` will raise a `TypeError` instead of getting

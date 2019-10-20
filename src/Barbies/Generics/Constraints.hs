@@ -123,6 +123,13 @@ instance GConstraints n c f (Rec a a)
   gaddDicts = id
   {-# INLINE gaddDicts #-}
 
+instance GConstraints n c f (Rec (P m a') a)
+                            (Rec (P m a') a)
+                            (Rec (P m a') a)
+  where
+  gaddDicts = id
+  {-# INLINE gaddDicts #-}
+
 
 -- ============================================================================
 -- ## Identifying recursive usages of the barbie-type ##

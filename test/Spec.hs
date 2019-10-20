@@ -149,7 +149,7 @@ main
 
         , testGroup "bfoldMap"
             [ testCase "Record3" $ do
-                let b = Record3 (Const "tic") (Const "tac") (Const "toe")
+                let b = Record3 (Const "tic") (Const "tac") (Const "toe") Nothing
                 bfoldMap getConst b @?= "tictactoe"
             ]
         , testGroup

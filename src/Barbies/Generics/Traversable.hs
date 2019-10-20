@@ -61,14 +61,22 @@ instance
 
 type P = Param
 
+-- {{ Apply -------------------------------------------------------------------
 instance GTraversable n f g (Rec (P n f a_or_pma) (f a))
                             (Rec (P n g a_or_pma) (g a))
   where
   gtraverse _ h
     = fmap (Rec . K1) . h . unK1 . unRec
   {-# INLINE gtraverse #-}
+-- }} Apply -------------------------------------------------------------------
 
 
+-- {{ Not a functor application -----------------------------------------------
 instance GTraversable n f g (Rec a a) (Rec a a) where
   gtraverse _ _ = pure
   {-# INLINE gtraverse #-}
+
+instance GTraversable n f g (Rec (P m a') a) (Rec (P m a') a) where
+  gtraverse _ _ = pure
+  {-# INLINE gtraverse #-}
+-- }} Not a functor application -----------------------------------------------

@@ -91,6 +91,7 @@ data Record3 f
       { rec3_f1 :: f Int
       , rec3_f2 :: f Bool
       , rec3_f3 :: f Char
+      , rec3_m1 :: Maybe ()
       }
   deriving (Generic, Typeable)
 
@@ -104,7 +105,8 @@ deriving instance AllBF Show f Record3 => Show (Record3 f)
 deriving instance AllBF Eq   f Record3 => Eq   (Record3 f)
 
 instance AllBF Arbitrary f Record3 => Arbitrary (Record3 f) where
-  arbitrary = Record3 <$> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = Record3 <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
 
 data Record3S f
   = Record3S
@@ -272,12 +274,12 @@ instance (Traversable h, TraversableB b) => TraversableB (ParBH h b)
 instance (Applicative h, ApplicativeB b) => ApplicativeB (ParBH h b)
 
 data ParX a f
-  = ParX (f a)
+  = ParX (f a) a
   deriving (Generic, Typeable)
 
 instance FunctorB (ParX a)
 instance TraversableB (ParX a)
-instance ApplicativeB (ParX a)
+instance Monoid a => ApplicativeB (ParX a)
 instance ConstraintsB (ParX a)
 
 

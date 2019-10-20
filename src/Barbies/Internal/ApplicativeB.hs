@@ -106,8 +106,8 @@ bzipWith4 f bf bg bh bi
 --
 --     * @B@ has only one constructor (that is, it is not a sum-type).
 --
---     * Every field of @B f@ is of the form @f a@, for some type @a@.
---       In other words, @B@ has no "hidden" structure.
+--     * Every field of @B f@ is either a monoid, or of the form @f a@, for
+--       some type @a@.
 type CanDeriveApplicativeB b f g
   = ( GenericN (b f)
     , GenericN (b g)
