@@ -63,53 +63,48 @@ instance
 
 type P = Param
 
--- {{ Apply -----------------------------------------------
+-- {{ Functor application ------------------------------------
 instance
   {-# OVERLAPPING #-}
-  GFunctor n f g (Rec (P n f a) (f a))
-                 (Rec (P n g a) (g a))
+  GFunctor n f g (Rec (P n f a') (f a))
+                 (Rec (P n g a') (g a))
   where
   gmap _ h (Rec (K1 fa)) = Rec (K1 (h fa))
   {-# INLINE gmap #-}
 
 instance
   {-# OVERLAPPING #-}
-  GFunctor n f g (Rec (P n f (P o a)) (f a))
-                 (Rec (P n g (P o a)) (g a))
-  where
-  gmap _ h (Rec (K1 fa)) = Rec (K1 (h fa))
-  {-# INLINE gmap #-}
--- }} Apply -----------------------------------------------
-
-
--- {{ Not the functor argument ----------------------------
-instance
-  (f ~ g
+  ( Functor h
   ) =>
-  GFunctor n f g (Rec (P m f a) (f a))
-                 (Rec (P m g a) (g a))
+  GFunctor n f g (Rec (h' (P n f a')) (h (f a)))
+                 (Rec (h' (P n g a')) (h (g a)))
+  where
+  gmap _ h (Rec (K1 hfa)) = Rec (K1 (h <$> hfa))
+  {-# INLINE gmap #-}
+
+instance
+  {-# INCOHERENT #-}
+  GFunctor n f g (Rec (P m h' a') (h a))
+                 (Rec (P m h' a') (h a))
   where
   gmap _ _ = id
   {-# INLINE gmap #-}
 
-instance
-  (f ~ g
-  ) =>
-  GFunctor n f g (Rec (P m f (P o a)) (f a))
-                 (Rec (P m g (P o a)) (g a))
-  where
-  gmap _ _ = id
-  {-# INLINE gmap #-}
--- }} Not the functor argument ----------------------------
+
+
+-- }} Functor application ------------------------------------
 
 
 -- {{ Not a functor application --------------------------
-instance GFunctor n f g (Rec x x) (Rec x x)
+instance
+  GFunctor n f g (Rec x x) (Rec x x)
   where
   gmap _ _ = id
   {-# INLINE gmap #-}
 
-instance GFunctor n f g (Rec (P m x) x) (Rec (P m x) x)
+
+instance
+  GFunctor n f g (Rec (P m x') x) (Rec (P m x') x)
   where
   gmap _ _ = id
   {-# INLINE gmap #-}

@@ -23,6 +23,7 @@ module TestBarbies
   , Nested2F(..)
 
   , ParX(..)
+  , ParF(..)
   , HKB(..)
   )
 
@@ -237,6 +238,7 @@ data NestedF f
       { npf_1 :: f Int
       , npf_2 :: [Record3 f]
       , npf_3 :: Maybe (NestedF f)
+      , npg_4 :: Maybe (f Int)
       }
   deriving (Generic, Typeable)
 
@@ -250,7 +252,7 @@ deriving instance (Eq   (f Int), Eq   (Record3 f)) => Eq   (NestedF f)
 instance (Arbitrary (f Int), AllBF Arbitrary f Record3) => Arbitrary (NestedF f) where
   arbitrary
     = scale (`div` 2) $
-        NestedF <$> arbitrary <*> scale (`div` 2) arbitrary <*> arbitrary
+        NestedF <$> arbitrary <*> scale (`div` 2) arbitrary <*> arbitrary <*> arbitrary
 
 
 data Nested2F f
@@ -306,6 +308,26 @@ deriving instance (Eq a, Eq (f a)) => Eq (ParX a f)
 instance (Arbitrary a, Arbitrary (f a)) => Arbitrary (ParX a f) where
   arbitrary
     = ParX <$> arbitrary <*> arbitrary
+
+
+data ParF g f
+  = ParF
+      { pf1 :: g Int
+      , pf2 :: f Int
+      }
+  deriving (Generic, Typeable)
+
+instance FunctorB (ParF g)
+instance TraversableB (ParF g)
+instance Monoid (g Int) => ApplicativeB (ParF g)
+instance ConstraintsB (ParF g)
+
+deriving instance (Show (g Int), Show (f Int)) => Show (ParF g f)
+deriving instance (Eq (g Int), Eq (f Int)) => Eq (ParF g f)
+
+instance (Arbitrary (g Int), Arbitrary (f Int)) => Arbitrary (ParF g f) where
+  arbitrary
+    = ParF <$> arbitrary <*> arbitrary
 
 -----------------------------------------------------
 -- Higher-kinded barbies
