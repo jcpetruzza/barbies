@@ -99,15 +99,28 @@ type P = Param
 
 type instance GAll n c (Rec (P n X _) (X a)) = c a
 
-instance GConstraints n c f (Rec (P n X a_or_pma) (X a))
-                            (Rec (P n f a_or_pma) (f a))
-                            (Rec (P n (Dict c `Product` f) a_or_pma)
-                                     ((Dict c `Product` f) a))
+-- {{ Functor application -----------------------------------------------------
+instance
+  GConstraints n c f (Rec (P n X a') (X a))
+                     (Rec (P n f a') (f a))
+                     (Rec (P n (Dict c `Product` f) a')
+                              ((Dict c `Product` f) a))
   where
   gaddDicts
     = Rec . K1 . Pair Dict . unK1 . unRec
   {-# INLINE gaddDicts #-}
 
+
+instance
+  GConstraints n c f (Rec (P m h a') (h a))
+                     (Rec (P m h a') (h a))
+                     (Rec (P m h a') (h a))
+  where
+  gaddDicts = id
+  {-# INLINE gaddDicts #-}
+-- }} Functor application -----------------------------------------------------
+
+-- {{ Not a functor application -----------------------------------------------
 
 -- Break all recursive cases
 -- b' is b, maybe with 'Param' annotations
@@ -116,19 +129,22 @@ type instance GAll 1 c (Rec (Self b' (P 1 X) (P 0 Y)) (b X Y)) = ()
 
 type instance GAll n c (Rec a a) = ()
 
-instance GConstraints n c f (Rec a a)
-                            (Rec a a)
-                            (Rec a a)
+instance
+  GConstraints n c f (Rec a a)
+                     (Rec a a)
+                     (Rec a a)
   where
   gaddDicts = id
   {-# INLINE gaddDicts #-}
 
-instance GConstraints n c f (Rec (P m a') a)
-                            (Rec (P m a') a)
-                            (Rec (P m a') a)
+instance
+  GConstraints n c f (Rec (P m a') a)
+                     (Rec (P m a') a)
+                     (Rec (P m a') a)
   where
   gaddDicts = id
   {-# INLINE gaddDicts #-}
+-- }} Not a functor application -----------------------------------------------
 
 
 -- ============================================================================

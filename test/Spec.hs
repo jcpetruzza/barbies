@@ -55,6 +55,8 @@ main
             , Functor.laws @(NestedFW Covered)
             , Functor.laws @(Nested2FW Covered)
 
+            , Functor.laws @(ParF Maybe)
+
             , Functor.laws @(Flip Bi.Record0 ())
             , Functor.laws @(Flip Bi.Record1 ())
             , Functor.laws @(Flip Bi.Record3 ())
@@ -66,6 +68,7 @@ main
             , Functor.laws @(Flip Bi.SumRec ())
             , Functor.laws @(Flip Bi.NestedF ())
             , Functor.laws @(Flip Bi.Nested2F ())
+            , Functor.laws @(Flip Bi.NestedB Maybe)
             ]
 
         , testGroup "Traversable Laws"
@@ -98,6 +101,8 @@ main
             , Traversable.laws @(NestedFW Covered)
             , Traversable.laws @(Nested2FW Covered)
 
+            , Traversable.laws @(ParF Maybe)
+
 
             , Traversable.laws @(Flip Bi.Record0 ())
             , Traversable.laws @(Flip Bi.Record1 ())
@@ -110,6 +115,7 @@ main
             , Traversable.laws @(Flip Bi.SumRec ())
             , Traversable.laws @(Flip Bi.NestedF ())
             , Traversable.laws @(Flip Bi.Nested2F ())
+            , Traversable.laws @(Flip Bi.NestedB Maybe)
             ]
 
         , testGroup "Applicative laws"
@@ -133,6 +139,7 @@ main
             , Applicative.laws @(Record3WS Covered)
 
             , Applicative.laws @(ParX (Maybe ()))
+            , Applicative.laws @(ParF Sum)
 
             , Applicative.laws @(Flip Bi.Record0 ())
             , Applicative.laws @(Flip Bi.Record1 ())

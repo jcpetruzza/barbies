@@ -19,6 +19,8 @@
     parameter not under the functor argument.
   - Derive instances for nested barbies occurring under two functors (Matthew Peddie).
   - Add `foldMapC` and `bzipWithxC` (Matthew Peddie).
+  - Fix failure to derive instances for types with arguments of kind `k -> Type`.
+  - Fix failure to derive instances where functor arg is applied under a functor.
   - Add `Data.Functor.Indexed`
 
 ## 1.1.3.0

@@ -83,11 +83,13 @@ instance
 
 type P = Param
 
--- {{ Apply -------------------------------------------------------------------
-instance GApplicative n f g (Rec (P n f a_or_pma) (f a))
-                            (Rec (P n g a_or_pma) (g a))
-                            (Rec (P n (f `Product` g) a_or_pma) ((f `Product` g) a))
+-- {{ Functor application -----------------------------------------------------
+instance
+  GApplicative n f g (Rec (P n f a') (f a))
+                     (Rec (P n g a') (g a))
+                     (Rec (P n (f `Product` g) a') ((f `Product` g) a))
   where
+
   gprod _ _ _ (Rec (K1 fa)) (Rec (K1 ga))
     = Rec (K1 (Pair fa ga))
   {-# INLINE gprod #-}
@@ -95,8 +97,39 @@ instance GApplicative n f g (Rec (P n f a_or_pma) (f a))
   gpure _ _ _ _ x
     = Rec (K1 x)
   {-# INLINE gpure #-}
--- }} Apply -------------------------------------------------------------------
 
+
+instance
+  ( Applicative h
+  ) =>
+  GApplicative n f g (Rec (h' (P n f a')) (h (f a)))
+                     (Rec (h' (P n g a')) (h (g a)))
+                     (Rec (h' (P n (f `Product` g) a')) (h ((f `Product` g) a)))
+  where
+
+  gprod _ _ _ (Rec (K1 fa)) (Rec (K1 ga))
+    = Rec (K1 (Pair <$> fa <*> ga))
+  {-# INLINE gprod #-}
+
+  gpure _ _ _ _ x
+    = Rec (K1 $ pure x)
+  {-# INLINE gpure #-}
+
+
+instance
+  ( Monoid (h a)
+  ) => GApplicative n f g (Rec (P m h a') (h a))
+                          (Rec (P m h a') (h a))
+                          (Rec (P m h a') (h a))
+  where
+  gprod _ _ _ (Rec (K1 l)) (Rec (K1 r))
+    = Rec (K1 (l <> r))
+  {-# INLINE gprod #-}
+
+  gpure _ _ _ _ _
+    = Rec (K1 mempty)
+  {-# INLINE gpure #-}
+-- }} Functor application -----------------------------------------------------
 
 
 -- {{ Not a functor application -----------------------------------------------
