@@ -11,6 +11,10 @@ module Barbies.Internal.ConstraintsB
   , bdicts
   , bpureC
   , bmempty
+  , bzipWithC
+  , bzipWith3C
+  , bzipWith4C
+  , bfoldMapC
 
   , CanDeriveConstraintsB
   , gbaddDictsDefault
@@ -117,6 +121,52 @@ btraverseC
   -> b f
   -> g (b h)
 btraverseC f b = btraverse (\(Pair (Dict :: Dict c a) x) -> f x) (baddDicts b)
+
+bfoldMapC
+  :: forall c b m f
+  .  (TraversableB b, ConstraintsB b,  AllB c b, Monoid m)
+  => (forall a. c a => f a -> m)
+  -> b f
+  -> m
+bfoldMapC f = getConst . btraverseC @c (Const . f)
+
+-- | Like 'Data.Functor.Barbie.bzipWith' but with a constraint on the elements of @b@.
+bzipWithC
+  :: forall c b f g h
+  .  (AllB c b, ConstraintsB b, ApplicativeB b)
+  => (forall a. c a => f a -> g a -> h a)
+  -> b f
+  -> b g
+  -> b h
+bzipWithC f bf bg
+  = bmapC @c go (bf `bprod` bg)
+  where
+    go :: forall a. c a => Product f g a -> h a
+    go (Pair fa ga) = f fa ga
+
+-- | Like 'Data.Functor.Barbie.bzipWith3' but with a constraint on the elements of @b@.
+bzipWith3C
+  :: forall c b f g h i
+  .  (AllB c b, ConstraintsB b, ApplicativeB b)
+  => (forall a. c a => f a -> g a -> h a -> i a)
+  -> b f -> b g -> b h -> b i
+bzipWith3C f bf bg bh
+  = bmapC @c go (bf `bprod` bg `bprod` bh)
+  where
+    go :: forall a. c a => Product (Product f g) h a -> i a
+    go (Pair (Pair fa ga) ha) = f fa ga ha
+
+-- | Like 'Data.Functor.Barbie.bzipWith4' but with a constraint on the elements of @b@.
+bzipWith4C
+  :: forall c b f g h i j
+  .  (AllB c b, ConstraintsB b, ApplicativeB b)
+  => (forall a. c a => f a -> g a -> h a -> i a -> j a)
+  -> b f -> b g -> b h -> b i -> b j
+bzipWith4C f bf bg bh bi
+  = bmapC @c go (bf `bprod` bg `bprod` bh `bprod` bi)
+  where
+    go :: forall a. c a => Product (Product (Product f g) h) i a -> j a
+    go (Pair (Pair (Pair fa ga) ha) ia) = f fa ga ha ia
 
 -- | Similar to 'AllB' but will put the functor argument @f@
 --   between the constraint @c@ and the type @a@. For example:

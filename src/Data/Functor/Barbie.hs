@@ -50,8 +50,12 @@ module Data.Functor.Barbie
     -- ** Utility functions
   , Cons.bdicts
   , Cons.bmapC
+  , Cons.bfoldMapC
   , Cons.btraverseC
   , Cons.bpureC
+  , Cons.bzipWithC
+  , Cons.bzipWith3C
+  , Cons.bzipWith4C
   , Cons.bmempty
 
     -- * Support for generic derivations
