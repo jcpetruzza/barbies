@@ -20,6 +20,7 @@ module TestBarbies
   , InfRec(..)
 
   , NestedF(..)
+  , Nested2F(..)
 
   , HKB(..)
   )
@@ -251,6 +252,22 @@ instance (Arbitrary (f Int), AllBF Arbitrary f Record3) => Arbitrary (NestedF f)
         NestedF <$> arbitrary <*> scale (`div` 2) arbitrary <*> arbitrary
 
 
+data Nested2F f
+  = Nested2F
+    { np2f_1 :: f Int
+    , np2f_2 :: [Maybe (Nested2F f)]
+    }
+  deriving (Generic, Typeable)
+
+instance FunctorB Nested2F
+instance TraversableB Nested2F
+instance ApplicativeB Nested2F
+
+deriving instance Show (f Int) => Show (Nested2F f)
+deriving instance Eq (f Int) => Eq (Nested2F f)
+
+instance Arbitrary (f Int) => Arbitrary (Nested2F f) where
+  arbitrary = scale (`div` 2) $ Nested2F <$> arbitrary <*> scale (`div` 2) arbitrary
 
 -----------------------------------------------------
 -- Parametric barbies

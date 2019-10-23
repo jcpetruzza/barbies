@@ -129,6 +129,19 @@ instance
     = fmap (Rec . K1) . traverse (btraverse h) . unK1 . unRec
   {-# INLINE gtraverse #-}
 
+-- This instance is the same as the previous instance but for nested
+-- Traversables.
+instance
+   ( Traversable h
+   , Traversable m
+   , TraversableB b
+   ) => GTraversable 0 f g (Rec (m' (h' (b' (P 0 f)))) (m (h (b f))))
+                           (Rec (m' (h' (b' (P 0 g)))) (m (h (b g))))
+  where
+  gtraverse _ h
+    = fmap (Rec . K1) . traverse (traverse (btraverse h)) . unK1 . unRec
+  {-# INLINE gtraverse #-}
+
 
 -- ---------------------------------------------------------------------
 -- We roll our own State/efficient-Writer monad, not to add dependencies
