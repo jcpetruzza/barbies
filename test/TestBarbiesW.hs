@@ -17,6 +17,7 @@ module TestBarbiesW
   , InfRecW(..)
 
   , NestedFW(..)
+  , Nested2FW(..)
   )
 
 where
@@ -267,6 +268,29 @@ instance (Arbitrary (f Int), Arbitrary (f Bool), Arbitrary (f Char)) => Arbitrar
   arbitrary
     = scale (`div` 2) $
         NestedFW <$> arbitrary <*> scale (`div` 2) arbitrary <*> arbitrary
+
+
+data Nested2FW t f
+  = Nested2FW
+    { np2fw_1 :: Wear t f Int
+    , np2fw_2 :: [Maybe (Nested2FW t f)]
+    }
+  deriving (Generic, Typeable)
+
+instance FunctorB (Nested2FW Bare)
+instance FunctorB (Nested2FW Covered)
+instance TraversableB (Nested2FW Bare)
+instance TraversableB (Nested2FW Covered)
+instance ApplicativeB (Nested2FW Covered)
+instance BareB Nested2FW
+
+deriving instance Show (Nested2FW Bare f)
+deriving instance Eq (Nested2FW Bare f)
+deriving instance Show (f Int) => Show (Nested2FW Covered f)
+deriving instance Eq (f Int) => Eq (Nested2FW Covered f)
+
+instance Arbitrary (f Int) => Arbitrary (Nested2FW Covered f) where
+  arbitrary = scale (`div` 2) $ Nested2FW <$> arbitrary <*> scale (`div` 2) arbitrary
 
 
 -----------------------------------------------------

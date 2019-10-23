@@ -89,6 +89,18 @@ instance
   gmap _ h (Rec (K1 hbf)) = Rec (K1 (fmap (bmap h) hbf))
   {-# INLINE gmap #-}
 
+-- This is the same as the previous instance, but for nested (normal-flavoured)
+-- functors.
+instance
+  ( Functor h
+  , Functor m
+  , FunctorB b
+  ) => GFunctor 0 f g (Rec (m' (h' (b' (P 0 f)))) (m (h (b f))))
+                      (Rec (m' (h' (b' (P 0 g)))) (m (h (b g))))
+  where
+  gmap _ h (Rec (K1 hbf)) = Rec (K1 (fmap (fmap (bmap h)) hbf))
+  {-# INLINE gmap #-}
+
 
 -- --------------------------------
 -- Instances for base types

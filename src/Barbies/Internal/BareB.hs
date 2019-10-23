@@ -102,3 +102,18 @@ instance
 
   gcover _ = Rec . K1 . fmap bcover . unK1 . unRec
   {-# INLINE gcover #-}
+
+-- This instance is the same as the previous, but for nested Functors
+instance
+  ( Functor h
+  , Functor m
+  , BareB b
+  ) =>
+       GBare 0 (Rec (m' (h' (b' (P 1 Covered) (P 0 Identity)))) (m (h (b Covered Identity))))
+               (Rec (m' (h' (b' (P 1 Bare)    (P 0 Identity)))) (m (h (b Bare    Identity))))
+  where
+  gstrip _ = Rec . K1 . fmap (fmap bstrip) . unK1 . unRec
+  {-# INLINE gstrip #-}
+
+  gcover _ = Rec . K1 . fmap (fmap bcover) . unK1 . unRec
+  {-# INLINE gcover #-}

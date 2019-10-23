@@ -175,6 +175,26 @@ instance
     = Rec (K1 (bprod <$> hbf <*> hbg))
   {-# INLINE gprod #-}
 
+-- This is the same as the previous instance, but for nested Applicatives.
+instance
+  ( Applicative h
+  , Applicative m
+  , ApplicativeB b
+  ) => GApplicative 0 f g (Rec (m' (h' (b' (P 0 f)))) (m (h (b f))))
+                          (Rec (m' (h' (b' (P 0 g)))) (m (h (b g))))
+                          (Rec (m' (h' (b' (P 0 (f `Product` g))))) (m (h (b (f `Product` g)))))
+  where
+  gpure _ _ _ _ x
+    = Rec (K1 (pure . pure $ bpure x))
+  {-# INLINE gpure #-}
+
+  gprod _ _ _ (Rec (K1 hbf)) (Rec (K1 hbg))
+    = Rec (K1 (go <$> hbf <*> hbg))
+    where
+      go a b = bprod <$> a <*> b
+  {-# INLINE gprod #-}
+
+
 -- --------------------------------
 -- Instances for base types
 -- --------------------------------

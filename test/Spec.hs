@@ -45,9 +45,11 @@ main
 
             , Functor.laws @CompositeRecord
             , Functor.laws @NestedF
+            , Functor.laws @Nested2F
 
             , Functor.laws @(CompositeRecordW Covered)
             , Functor.laws @(NestedFW Covered)
+            , Functor.laws @(Nested2FW Covered)
             ]
 
         , testGroup "Traversable Laws"
@@ -74,9 +76,11 @@ main
 
             , Traversable.laws @CompositeRecord
             , Traversable.laws @NestedF
+            , Traversable.laws @Nested2F
 
             , Traversable.laws @(CompositeRecordW Covered)
             , Traversable.laws @(NestedFW Covered)
+            , Traversable.laws @(Nested2FW Covered)
             ]
 
         , testGroup "Applicative laws"
@@ -85,6 +89,7 @@ main
             , Applicative.laws @Record3
             , Applicative.laws @CompositeRecord
             , Applicative.laws @NestedF
+            , Applicative.laws @Nested2F
 
             , Applicative.laws @Record1S
             , Applicative.laws @Record3S
@@ -93,6 +98,7 @@ main
             , Applicative.laws @(Record3W Covered)
             , Applicative.laws @(CompositeRecordW Covered)
             , Applicative.laws @(NestedFW Covered)
+            , Applicative.laws @(Nested2FW Covered)
 
             , Applicative.laws @(Record1WS Covered)
             , Applicative.laws @(Record3WS Covered)
