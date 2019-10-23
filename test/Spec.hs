@@ -47,6 +47,7 @@ main
             , Functor.laws @NestedF
 
             , Functor.laws @(CompositeRecordW Covered)
+            , Functor.laws @(NestedFW Covered)
             ]
 
         , testGroup "Traversable Laws"
