@@ -12,10 +12,12 @@ import TestBarbies
 import TestBarbiesW
 
 import Barbies.Bare(Covered)
-import Data.Functor.Barbie(bfoldMap, bmapC, btraverseC, bpureC)
+import Control.Applicative ( liftA2 )
+import Data.Functor.Barbie(bfoldMap, bmapC, btraverseC, bpureC, bfoldMapC, bzipWithC, bzipWith3C, bzipWith4C)
 import Data.Functor.Const    (Const (..))
 import Data.Functor.Identity (Identity (..))
 import Data.Monoid           (Sum (..))
+import Data.Typeable ( Typeable, typeOf )
 
 main :: IO ()
 main
@@ -177,4 +179,40 @@ main
                 bpureC @Num (Identity (fromIntegral (42 :: Int)))
                     @?= Record1 (Identity 42)
           ]
+        , testGroup "bfoldMapC"
+            [ testCase "Record3S" $ do
+                let
+                  b = Record3S (Just 22) Nothing (Just 'x')
+                  go :: forall a. Typeable a => Maybe a -> Maybe String
+                  go = fmap (show . typeOf)
+                bfoldMapC @Typeable go b @?= Just "IntChar"
+            ]
+        , testGroup "bzipWithC"
+            [ testCase "Record1S" $ do
+                let
+                  a = Record1S (Just 44)
+                  b = Record1S (Just 22)
+                bzipWithC @Num (liftA2 (+)) a b @?= Record1S (Just 66)
+            ]
+        , testGroup "bzipWith3C"
+            [ testCase "Record1S" $ do
+                let
+                  a = Record1S (Just 44)
+                  b = Record1S (Just 22)
+                  c = Record1S (Just 88)
+                  go :: forall a. Num a => Maybe a -> Maybe a -> Maybe a -> Maybe a
+                  go x y z = liftA2 (+) x $ liftA2 (+) y z
+                bzipWith3C @Num go a b c @?= Record1S (Just 154)
+            ]
+        , testGroup "bzipWith4C"
+            [ testCase "Record1S" $ do
+                let
+                  a = Record1S (Just 44)
+                  b = Record1S (Just 22)
+                  c = Record1S (Just 88)
+                  d = Record1S (Just 11)
+                  go :: forall a. Num a => Maybe a -> Maybe a -> Maybe a -> Maybe a -> Maybe a
+                  go w x y z = liftA2 (+) (liftA2 (+) w x) (liftA2 (+) y z)
+                bzipWith4C @Num go a b c d @?= Record1S (Just 165)
+            ]
         ]
