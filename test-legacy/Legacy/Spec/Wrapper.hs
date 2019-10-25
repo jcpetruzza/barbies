@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
-module Spec.Wrapper (
+module Legacy.Spec.Wrapper (
     lawsMonoid
   )
 

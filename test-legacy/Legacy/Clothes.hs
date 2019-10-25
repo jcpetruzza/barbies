@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Clothes
+module Legacy.Clothes
 
 where
 

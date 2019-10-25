@@ -1,5 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-module Spec.Bare ( laws )
+module Legacy.Spec.Bare ( laws )
 
 where
 

@@ -136,18 +136,18 @@ test-suite barbies-test
 test-suite barbies-test-legacy
   type: exitcode-stdio-1.0
 
-  main-is: Spec.hs
+  main-is: Legacy/Spec.hs
 
   other-modules:
-      TestBarbies
-      TestBarbiesW
-      Clothes
-      Spec.Bare
-      Spec.Constraints
-      Spec.Functor
-      Spec.Traversable
-      Spec.Product
-      Spec.Wrapper
+      Legacy.TestBarbies
+      Legacy.TestBarbiesW
+      Legacy.Clothes
+      Legacy.Spec.Bare
+      Legacy.Spec.Constraints
+      Legacy.Spec.Functor
+      Legacy.Spec.Traversable
+      Legacy.Spec.Product
+      Legacy.Spec.Wrapper
 
   hs-source-dirs:
       test-legacy

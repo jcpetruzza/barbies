@@ -1,9 +1,9 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-module Spec.Functor ( laws )
+module Legacy.Spec.Functor ( laws )
 
 where
 
-import Clothes (F, H, FG(..), GH(..), NatTransf(..))
+import Legacy.Clothes (F, H, FG(..), GH(..), NatTransf(..))
 
 import Data.Barbie (FunctorB(..))
 

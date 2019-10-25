@@ -1,12 +1,12 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-module Spec.Constraints
+module Legacy.Spec.Constraints
   ( lawAddDictPrj
   , lawDictsEquivPrj
   )
 
 where
 
-import Clothes(F)
+import Legacy.Clothes(F)
 import Data.Barbie(bmap, ConstraintsB(..), AllBF, ProductBC(..))
 import Data.Barbie.Constraints(ClassF, Dict)
 

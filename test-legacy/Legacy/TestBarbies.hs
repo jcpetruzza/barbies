@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass       #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module TestBarbies
+module Legacy.TestBarbies
   ( Void
 
   , Record0(..)

@@ -3,7 +3,7 @@
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
-module TestBarbiesW
+module Legacy.TestBarbiesW
   ( Record1W(..)
   , Record3W(..)
 

@@ -1,15 +1,15 @@
 import Test.Tasty (defaultMain, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
 
-import qualified Spec.Bare as Bare
-import qualified Spec.Constraints as Constraints
-import qualified Spec.Functor as Functor
-import qualified Spec.Product as Product
-import qualified Spec.Traversable as Traversable
-import qualified Spec.Wrapper as Wrapper
+import qualified Legacy.Spec.Bare as Bare
+import qualified Legacy.Spec.Constraints as Constraints
+import qualified Legacy.Spec.Functor as Functor
+import qualified Legacy.Spec.Product as Product
+import qualified Legacy.Spec.Traversable as Traversable
+import qualified Legacy.Spec.Wrapper as Wrapper
 
-import TestBarbies
-import TestBarbiesW
+import Legacy.TestBarbies
+import Legacy.TestBarbiesW
 
 import Data.Barbie           (bfoldMap, bmapC, btraverseC, buniqC)
 import Data.Barbie.Bare      (Covered)

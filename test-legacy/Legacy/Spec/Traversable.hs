@@ -1,9 +1,9 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-module Spec.Traversable ( laws )
+module Legacy.Spec.Traversable ( laws )
 
 where
 
-import Clothes (F, G, H, FG(..), GH(..), NatTransf(..))
+import Legacy.Clothes (F, G, H, FG(..), GH(..), NatTransf(..))
 
 import Data.Barbie (TraversableB(..))
 

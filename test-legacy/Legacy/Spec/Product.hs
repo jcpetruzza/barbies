@@ -1,9 +1,9 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
-module Spec.Product ( laws, uniqLaws )
+module Legacy.Spec.Product ( laws, uniqLaws )
 
 where
 
-import Clothes(F, G)
+import Legacy.Clothes(F, G)
 
 import Data.Barbie(FunctorB(..), ProductB(..))
 
