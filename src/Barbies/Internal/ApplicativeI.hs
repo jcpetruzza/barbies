@@ -31,16 +31,18 @@ import Data.Proxy (Proxy (..))
 import Data.Generics.GenericN
 
 -- | A 'FunctorI' with application, providing operations to:
+--
 --     * embed an "empty" value ('ipure')
+--
 --     * align and combine values ('iprod')
 --
 --  It should satisfy the following laws:
 --
 --  [Naturality of 'iprod']
 --
---    @
---    'imap' (\('Pair' a b) -> 'Pair' (f a) (g b)) (u `'iprod'` v) = 'imap' f u `'iprod'` 'imap' g v
---    @
+--  @
+--  'imap' (\('Pair' a b) -> 'Pair' (f a) (g b)) (u `'iprod'` v) = 'imap' f u `'iprod'` 'imap' g v
+--  @
 --
 --  [Left and right identity]
 --
@@ -63,7 +65,8 @@ import Data.Generics.GenericN
 -- There is a default implementation of 'iprod' and 'ipure' based on 'Generic'.
 -- Intuitively, it works on types where the value of `ipure` is uniquely defined.
 -- This corresponds rougly to record types (in the presence of sums, there would
--- be several candidates for `ipure`), where the argument @f@ covers every field.
+-- be several candidates for `ipure`), where every field is either a 'Monoid' or
+-- covered by the argument @f@.
 class FunctorI b => ApplicativeI (b :: (k -> Type) -> (k' -> Type)) where
   ipure
     :: (forall a . f a)

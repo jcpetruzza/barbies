@@ -22,16 +22,19 @@ import Data.Proxy           (Proxy (..))
 import Data.Generics.GenericN
 
 -- | A 'FunctorB' with application, providing operations to:
+--
 --     * embed an "empty" value ('bpure')
+--
 --     * align and combine values ('bprod')
 --
 --  It should satisfy the following laws:
 --
 --  [Naturality of 'bprod']
 --
---    @
---    'bmap' (\('Pair' a b) -> 'Pair' (f a) (g b)) (u `'bprod'` v) = 'bmap' f u `'bprod'` 'bmap' g v
---    @
+--  @
+--  'bmap' (\('Pair' a b) -> 'Pair' (f a) (g b)) (u `'bprod'` v) = 'bmap' f u `'bprod'` 'bmap' g v
+--  @
+--
 --
 --  [Left and right identity]
 --
@@ -54,7 +57,8 @@ import Data.Generics.GenericN
 -- There is a default implementation of 'bprod' and 'bpure' based on 'Generic'.
 -- Intuitively, it works on types where the value of `bpure` is uniquely defined.
 -- This corresponds rougly to record types (in the presence of sums, there would
--- be several candidates for `bpure`), where the argument @f@ covers every field.
+-- be several candidates for `bpure`), where every field is either a 'Monoid' or
+-- covered by the argument @f@.
 class FunctorB b => ApplicativeB (b :: (k -> Type) -> Type) where
   bpure
     :: (forall a . f a)
