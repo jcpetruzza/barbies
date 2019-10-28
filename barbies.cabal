@@ -31,7 +31,7 @@ library
       Barbies.Internal
 
       Data.Functor.Barbie
-      Data.Functor.Indexed
+      Data.Functor.Transformer
 
       -- Deprecated modules
       Data.Barbie
@@ -47,19 +47,19 @@ library
       Barbies.Generics.Traversable
 
       Barbies.Internal.ApplicativeB
-      Barbies.Internal.ApplicativeI
+      Barbies.Internal.ApplicativeT
 
       Barbies.Internal.BareB
       Barbies.Internal.ConstraintsB
-      Barbies.Internal.ConstraintsI
+      Barbies.Internal.ConstraintsT
       Barbies.Internal.Containers
       Barbies.Internal.Dicts
 
       Barbies.Internal.FunctorB
-      Barbies.Internal.FunctorI
+      Barbies.Internal.FunctorT
 
       Barbies.Internal.TraversableB
-      Barbies.Internal.TraversableI
+      Barbies.Internal.TraversableT
 
       Barbies.Internal.Trivial
       Barbies.Internal.Wear

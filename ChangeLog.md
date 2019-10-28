@@ -21,7 +21,7 @@
   - Add `foldMapC` and `bzipWithxC` (Matthew Peddie).
   - Fix failure to derive instances for types with arguments of kind `k -> Type`.
   - Fix failure to derive instances where functor arg is applied under a functor.
-  - Add `Data.Functor.Indexed`
+  - Add `Data.Functor.Transformer`
 
 ## 1.1.3.0
   - `Wear` will raise a `TypeError` instead of getting

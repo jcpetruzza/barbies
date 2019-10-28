@@ -148,7 +148,7 @@ module Barbies
      module Data.Functor.Barbie
 
      -- * Bi-functor and nested barbies
-   , module Data.Functor.Indexed
+   , module Data.Functor.Transformer
    , module Barbies.Bi
 
 
@@ -174,7 +174,7 @@ module Barbies
 import Barbies.Internal.Containers as Containers
 
 import Data.Functor.Barbie
-import Data.Functor.Indexed
+import Data.Functor.Transformer
 import Barbies.Bi
 import qualified Barbies.Internal.Trivial as Trivial
 import qualified Barbies.Internal.Wrappers as Wrappers

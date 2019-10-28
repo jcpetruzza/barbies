@@ -11,28 +11,28 @@
 {-# OPTIONS_GHC -Wno-simplifiable-class-constraints #-}
 module Barbies.Bi
   ( FunctorBI
-  , bimap
-  , bimap1
+  , btmap
+  , btmap1
 
   , TraversableBI
-  , bitraverse
-  , bitraverse1
+  , bttraverse
+  , bttraverse1
 
   , Flip(..)
   ) where
 
 import Barbies.Internal.ApplicativeB(ApplicativeB(..))
-import Barbies.Internal.ApplicativeI(ApplicativeI(..))
+import Barbies.Internal.ApplicativeT(ApplicativeT(..))
 import Barbies.Internal.FunctorB(FunctorB(..))
-import Barbies.Internal.FunctorI(FunctorI(..))
+import Barbies.Internal.FunctorT(FunctorT(..))
 import Barbies.Internal.TraversableB(TraversableB(..))
-import Barbies.Internal.TraversableI(TraversableI(..))
+import Barbies.Internal.TraversableT(TraversableT(..))
 
 import Control.Monad ((>=>))
 
 -- {{ Functor -----------------------------------------------------------------
 
--- | A 'FunctorB' and a 'FunctorI' together give us a bifunctor.
+-- | A 'FunctorB' and a 'FunctorT' together give us a bifunctor.
 --   One may wonder why we mention @f@ in @'FunctorBI' b f@. Two
 --   reasons: first, to avoid the need for @QuantifiedConstraints@,
 --   but more importantly, because @'FunctorB' (b f)@ may require
@@ -40,51 +40,51 @@ import Control.Monad ((>=>))
 --   types.
 class
   ( FunctorB (b f)
-  , FunctorI b
+  , FunctorT b
   ) => FunctorBI b f
 
 instance
   ( FunctorB (b f)
-  , FunctorI b
+  , FunctorT b
   ) => FunctorBI b f
 
-bimap
+btmap
   :: FunctorBI b f
   => (forall a . f a -> f' a)
   -> (forall a . g a -> g' a)
   -> b f g
   -> b f' g'
-bimap hf hg
-  = imap hf . bmap hg
-{-# INLINE bimap #-}
+btmap hf hg
+  = tmap hf . bmap hg
+{-# INLINE btmap #-}
 
--- | 'bimap' specialized to a single functor argument.
-bimap1
+-- | 'btmap' specialized to a single functor argument.
+btmap1
   :: FunctorBI b f
   => (forall a . f a -> g a)
   -> b f f
   -> b g g
-bimap1 h
-  = bimap h h
-{-# INLINE bimap1 #-}
+btmap1 h
+  = btmap h h
+{-# INLINE btmap1 #-}
 
 -- }} Functor -----------------------------------------------------------------
 
 
 -- {{ Traversable -------------------------------------------------------------
 
--- | A 'TraversableB' and a 'TraversableI' together give us a bitraversable
+-- | A 'TraversableB' and a 'TraversableT' together give us a bitraversable
 class
   ( TraversableB (b f)
-  , TraversableI b
+  , TraversableT b
   ) => TraversableBI b f
 
 instance
   ( TraversableB (b f)
-  , TraversableI b
+  , TraversableT b
   ) => TraversableBI b f
 
-bitraverse
+bttraverse
   :: ( TraversableBI b f
      , Monad t
      )
@@ -92,74 +92,74 @@ bitraverse
   -> (forall a . g a -> t (g' a))
   -> b f g
   -> t (b f' g')
-bitraverse hf hg
-  = btraverse hg >=> itraverse hf
-{-# INLINE bitraverse #-}
+bttraverse hf hg
+  = btraverse hg >=> ttraverse hf
+{-# INLINE bttraverse #-}
 
 
-bitraverse1
+bttraverse1
   :: ( TraversableBI b f
      , Monad t
      )
   => (forall a . f a -> t (g a))
   -> b f f
   -> t (b g g)
-bitraverse1 h
-  = bitraverse h h
-{-# INLINE bitraverse1 #-}
+bttraverse1 h
+  = bttraverse h h
+{-# INLINE bttraverse1 #-}
 
 
 -- }} Traversable -------------------------------------------------------------
 
 
--- | Convert a 'FunctorB' into a 'FunctorI' and vice-versa.
+-- | Convert a 'FunctorB' into a 'FunctorT' and vice-versa.
 newtype Flip b l r
   = Flip { runFlip :: b r l }
   deriving (Eq, Ord, Read, Show)
 
 
-instance FunctorI b => FunctorB (Flip b f) where
+instance FunctorT b => FunctorB (Flip b f) where
   bmap h (Flip bfx)
-    = Flip (imap h bfx)
+    = Flip (tmap h bfx)
   {-# INLINE bmap #-}
 
 
-instance TraversableI b => TraversableB (Flip b f) where
+instance TraversableT b => TraversableB (Flip b f) where
   btraverse h (Flip bfx)
-    = Flip <$> itraverse h bfx
+    = Flip <$> ttraverse h bfx
   {-# INLINE btraverse #-}
 
 
-instance ApplicativeI b => ApplicativeB (Flip b f) where
+instance ApplicativeT b => ApplicativeB (Flip b f) where
   bpure fa
-    = Flip (ipure fa)
+    = Flip (tpure fa)
   {-# INLINE bpure #-}
 
   bprod (Flip bfx) (Flip bgx)
-    = Flip (iprod bfx bgx)
+    = Flip (tprod bfx bgx)
   {-# INLINE bprod #-}
 
 
 #if __GLASGOW_HASKELL__ >= 806
 -- ** The following instances require QuantifiedConstraints ** --
 
-instance (forall f. FunctorB (b f)) => FunctorI (Flip b) where
-  imap h (Flip bxf)
+instance (forall f. FunctorB (b f)) => FunctorT (Flip b) where
+  tmap h (Flip bxf)
     = Flip (bmap h bxf)
-  {-# INLINE imap #-}
+  {-# INLINE tmap #-}
 
-instance (forall f. TraversableB (b f)) => TraversableI (Flip b) where
-  itraverse h (Flip bxf)
+instance (forall f. TraversableB (b f)) => TraversableT (Flip b) where
+  ttraverse h (Flip bxf)
     = Flip <$> btraverse h bxf
-  {-# INLINE itraverse #-}
+  {-# INLINE ttraverse #-}
 
 
-instance (forall f. ApplicativeB (b f)) => ApplicativeI (Flip b) where
-  ipure fa
+instance (forall f. ApplicativeB (b f)) => ApplicativeT (Flip b) where
+  tpure fa
     = Flip (bpure fa)
-  {-# INLINE ipure #-}
+  {-# INLINE tpure #-}
 
-  iprod (Flip bxf) (Flip bxg)
+  tprod (Flip bxf) (Flip bxg)
     = Flip (bprod bxf bxg)
-  {-# INLINE iprod #-}
+  {-# INLINE tprod #-}
 #endif

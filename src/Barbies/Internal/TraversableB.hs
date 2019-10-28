@@ -40,30 +40,36 @@ import Data.Proxy             (Proxy (..))
 -- There is a default 'btraverse' implementation for 'Generic' types, so
 -- instances can derived automatically.
 class FunctorB b => TraversableB (b :: (k -> Type) -> Type) where
-  btraverse :: Applicative t => (forall a . f a -> t (g a)) -> b f -> t (b g)
+  btraverse :: Applicative e => (forall a . f a -> e (g a)) -> b f -> e (b g)
 
   default btraverse
-    :: ( Applicative t, CanDeriveTraversableB b f g)
-    => (forall a . f a -> t (g a)) -> b f -> t (b g)
+    :: ( Applicative e, CanDeriveTraversableB b f g)
+    => (forall a . f a -> e (g a))
+    -> b f
+    -> e (b g)
   btraverse = gbtraverseDefault
 
 
 
 -- | Map each element to an action, evaluate these actions from left to right,
 --   and ignore the results.
-btraverse_ :: (TraversableB b, Applicative t) => (forall a. f a -> t c) -> b f -> t ()
+btraverse_
+  :: (TraversableB b, Applicative e)
+  => (forall a. f a -> e c)
+  -> b f
+  -> e ()
 btraverse_ f
   = void . btraverse (fmap (const $ Const ()) . f)
 
 
 -- | Evaluate each action in the structure from left to right,
 --   and collect the results.
-bsequence :: (Applicative f, TraversableB b) => b (Compose f g) -> f (b g)
+bsequence :: (Applicative e, TraversableB b) => b (Compose e f) -> e (b f)
 bsequence
   = btraverse getCompose
 
--- | A version of 'bsequence' with @g@ specialized to 'Identity'.
-bsequence' :: (Applicative f, TraversableB b) => b f -> f (b Identity)
+-- | A version of 'bsequence' with @f@ specialized to 'Identity'.
+bsequence' :: (Applicative e, TraversableB b) => b e -> e (b Identity)
 bsequence'
   = btraverse (fmap Identity)
 
@@ -94,10 +100,10 @@ type CanDeriveTraversableB b f g
 
 -- | Default implementation of 'btraverse' based on 'Generic'.
 gbtraverseDefault
-  :: forall b f g t
-  .  (Applicative t, CanDeriveTraversableB b f g)
-  => (forall a . f a -> t (g a))
-  -> b f -> t (b g)
+  :: forall b f g e
+  .  (Applicative e, CanDeriveTraversableB b f g)
+  => (forall a . f a -> e (g a))
+  -> b f -> e (b g)
 gbtraverseDefault h
   = fmap toN . gtraverse (Proxy @0) h . fromN
 {-# INLINE gbtraverseDefault #-}

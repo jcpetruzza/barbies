@@ -53,10 +53,10 @@ data Record0 (f :: kl -> *) (x :: kr)
     , Eq, Show
     )
 
-instance FunctorI Record0
-instance ApplicativeI Record0
-instance TraversableI Record0
-instance ConstraintsI Record0
+instance FunctorT Record0
+instance ApplicativeT Record0
+instance TraversableT Record0
+instance ConstraintsT Record0
 
 instance Arbitrary (Record0 f g) where arbitrary = pure Record0
 
@@ -66,15 +66,15 @@ data Record1 f (x :: kr)
   deriving (Generic, Typeable)
 
 
-instance FunctorI Record1
-instance ApplicativeI Record1
-instance TraversableI Record1
-instance ConstraintsI Record1
+instance FunctorT Record1
+instance ApplicativeT Record1
+instance TraversableT Record1
+instance ConstraintsT Record1
 
-deriving instance AllIF Show f Record1 => Show (Record1 f x)
-deriving instance AllIF Eq   f Record1 => Eq   (Record1 f x)
+deriving instance AllTF Show f Record1 => Show (Record1 f x)
+deriving instance AllTF Eq   f Record1 => Eq   (Record1 f x)
 
-instance AllIF Arbitrary f Record1 => Arbitrary (Record1 f g) where
+instance AllTF Arbitrary f Record1 => Arbitrary (Record1 f g) where
   arbitrary = Record1 <$> arbitrary
 
 
@@ -83,15 +83,15 @@ data Record1S f (x :: kr)
   deriving (Generic, Typeable)
 
 
-instance FunctorI Record1S
-instance ApplicativeI Record1S
-instance TraversableI Record1S
-instance ConstraintsI Record1S
+instance FunctorT Record1S
+instance ApplicativeT Record1S
+instance TraversableT Record1S
+instance ConstraintsT Record1S
 
-deriving instance AllIF Show f Record1S => Show (Record1S f x)
-deriving instance AllIF Eq   f Record1S => Eq   (Record1S f x)
+deriving instance AllTF Show f Record1S => Show (Record1S f x)
+deriving instance AllTF Eq   f Record1S => Eq   (Record1S f x)
 
-instance AllIF Arbitrary f Record1S => Arbitrary (Record1S f x) where
+instance AllTF Arbitrary f Record1S => Arbitrary (Record1S f x) where
   arbitrary = Record1S <$> arbitrary
 
 
@@ -105,15 +105,15 @@ data Record3 f x
   deriving (Generic, Typeable)
 
 
-instance FunctorI Record3
-instance ApplicativeI Record3
-instance TraversableI Record3
-instance ConstraintsI Record3
+instance FunctorT Record3
+instance ApplicativeT Record3
+instance TraversableT Record3
+instance ConstraintsT Record3
 
-deriving instance AllIF Show f Record3 => Show (Record3 f x)
-deriving instance AllIF Eq   f Record3 => Eq   (Record3 f x)
+deriving instance AllTF Show f Record3 => Show (Record3 f x)
+deriving instance AllTF Eq   f Record3 => Eq   (Record3 f x)
 
-instance AllIF Arbitrary f Record3 => Arbitrary (Record3 f x) where
+instance AllTF Arbitrary f Record3 => Arbitrary (Record3 f x) where
   arbitrary = Record3 <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
 data Record3S f x
@@ -125,15 +125,15 @@ data Record3S f x
   deriving (Generic, Typeable)
 
 
-instance FunctorI Record3S
-instance ApplicativeI Record3S
-instance TraversableI Record3S
-instance ConstraintsI Record3S
+instance FunctorT Record3S
+instance ApplicativeT Record3S
+instance TraversableT Record3S
+instance ConstraintsT Record3S
 
-deriving instance AllIF Show f Record3S => Show (Record3S f x)
-deriving instance AllIF Eq   f Record3S => Eq   (Record3S f x)
+deriving instance AllTF Show f Record3S => Show (Record3S f x)
+deriving instance AllTF Eq   f Record3S => Eq   (Record3S f x)
 
-instance AllIF Arbitrary f Record3S => Arbitrary (Record3S f x) where
+instance AllTF Arbitrary f Record3S => Arbitrary (Record3S f x) where
   arbitrary = Record3S <$> arbitrary <*> arbitrary <*> arbitrary
 
 -----------------------------------------------------
@@ -144,9 +144,9 @@ data Ignore1 (f :: * -> *) (x :: kx)
   = Ignore1 { ign1_f1 :: Int }
   deriving (Generic, Typeable, Eq, Show)
 
-instance FunctorI Ignore1
-instance TraversableI Ignore1
-instance ConstraintsI Ignore1
+instance FunctorT Ignore1
+instance TraversableT Ignore1
+instance ConstraintsT Ignore1
 
 instance Arbitrary (Ignore1 f x) where arbitrary = Ignore1 <$> arbitrary
 
@@ -161,14 +161,14 @@ data Sum3 f x
   | Sum3_2 (f Int) (f Bool)
   deriving (Generic, Typeable)
 
-instance FunctorI Sum3
-instance TraversableI Sum3
-instance ConstraintsI Sum3
+instance FunctorT Sum3
+instance TraversableT Sum3
+instance ConstraintsT Sum3
 
-deriving instance AllIF Show f Sum3 => Show (Sum3 f x)
-deriving instance AllIF Eq   f Sum3 => Eq   (Sum3 f x)
+deriving instance AllTF Show f Sum3 => Show (Sum3 f x)
+deriving instance AllTF Eq   f Sum3 => Eq   (Sum3 f x)
 
-instance AllIF Arbitrary f Sum3 => Arbitrary (Sum3 f x) where
+instance AllTF Arbitrary f Sum3 => Arbitrary (Sum3 f x) where
   arbitrary
     = oneof
         [ pure Sum3_0
@@ -189,15 +189,15 @@ data CompositeRecord f x
       }
   deriving (Generic, Typeable)
 
-instance FunctorI CompositeRecord
-instance ApplicativeI CompositeRecord
-instance TraversableI CompositeRecord
-instance ConstraintsI CompositeRecord
+instance FunctorT CompositeRecord
+instance ApplicativeT CompositeRecord
+instance TraversableT CompositeRecord
+instance ConstraintsT CompositeRecord
 
-deriving instance AllIF Show f CompositeRecord => Show (CompositeRecord f x)
-deriving instance AllIF Eq   f CompositeRecord => Eq   (CompositeRecord f x)
+deriving instance AllTF Show f CompositeRecord => Show (CompositeRecord f x)
+deriving instance AllTF Eq   f CompositeRecord => Eq   (CompositeRecord f x)
 
-instance AllIF Arbitrary f CompositeRecord => Arbitrary (CompositeRecord f x) where
+instance AllTF Arbitrary f CompositeRecord => Arbitrary (CompositeRecord f x) where
   arbitrary
     = CompositeRecord <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
 
@@ -208,14 +208,14 @@ data SumRec f x
   | SumRec_2 (f Int) (SumRec f x)
   deriving (Generic, Typeable)
 
-instance FunctorI SumRec
-instance TraversableI SumRec
-instance ConstraintsI SumRec
+instance FunctorT SumRec
+instance TraversableT SumRec
+instance ConstraintsT SumRec
 
-deriving instance AllIF Show f SumRec => Show (SumRec f x)
-deriving instance AllIF Eq   f SumRec => Eq   (SumRec f x)
+deriving instance AllTF Show f SumRec => Show (SumRec f x)
+deriving instance AllTF Eq   f SumRec => Eq   (SumRec f x)
 
-instance AllIF Arbitrary f SumRec => Arbitrary (SumRec f x) where
+instance AllTF Arbitrary f SumRec => Arbitrary (SumRec f x) where
   arbitrary
     = oneof
         [ pure SumRec_0
@@ -227,13 +227,13 @@ data InfRec f x
   = InfRec { ir_1 :: f Int, ir_2 :: InfRec f x }
   deriving (Generic, Typeable)
 
-instance FunctorI InfRec
-instance ApplicativeI InfRec
-instance TraversableI InfRec
-instance ConstraintsI InfRec
+instance FunctorT InfRec
+instance ApplicativeT InfRec
+instance TraversableT InfRec
+instance ConstraintsT InfRec
 
-deriving instance AllIF Show f InfRec => Show (InfRec f x)
-deriving instance AllIF Eq   f InfRec => Eq   (InfRec f x)
+deriving instance AllTF Show f InfRec => Show (InfRec f x)
+deriving instance AllTF Eq   f InfRec => Eq   (InfRec f x)
 
 -----------------------------------------------------
 -- Nested under functors
@@ -247,14 +247,14 @@ data NestedF f x
       }
   deriving (Generic, Typeable)
 
-instance FunctorI NestedF
-instance ApplicativeI NestedF
-instance TraversableI NestedF
+instance FunctorT NestedF
+instance ApplicativeT NestedF
+instance TraversableT NestedF
 
 deriving instance (Show (f Int), Show (Record3 f x)) => Show (NestedF f x)
 deriving instance (Eq   (f Int), Eq   (Record3 f x)) => Eq   (NestedF f x)
 
-instance (Arbitrary (f Int), AllIF Arbitrary f Record3, AllIF Arbitrary f Sum3) => Arbitrary (NestedF f x) where
+instance (Arbitrary (f Int), AllTF Arbitrary f Record3, AllTF Arbitrary f Sum3) => Arbitrary (NestedF f x) where
   arbitrary
     = scale (`div` 2) $
         NestedF <$> arbitrary <*> scale (`div` 2) arbitrary <*> arbitrary
@@ -267,9 +267,9 @@ data Nested2F f x
     }
   deriving (Generic, Typeable)
 
-instance FunctorI Nested2F
-instance TraversableI Nested2F
-instance ApplicativeI Nested2F
+instance FunctorT Nested2F
+instance TraversableT Nested2F
+instance ApplicativeT Nested2F
 
 deriving instance Show (f Int) => Show (Nested2F f x)
 deriving instance Eq (f Int) => Eq (Nested2F f x)
@@ -286,27 +286,27 @@ data ParB b (f :: k -> *) (x :: kx)
   = ParB (b f x)
   deriving (Generic, Typeable)
 
-instance FunctorI b => FunctorI (ParB b)
-instance ApplicativeI b => ApplicativeI (ParB b)
-instance TraversableI b => TraversableI (ParB b)
-instance ConstraintsI b => ConstraintsI (ParB b)
+instance FunctorT b => FunctorT (ParB b)
+instance ApplicativeT b => ApplicativeT (ParB b)
+instance TraversableT b => TraversableT (ParB b)
+instance ConstraintsT b => ConstraintsT (ParB b)
 
 data ParBH h b (f :: k -> *) (x :: kx)
   = ParBH (h (b f x))
   deriving (Generic, Typeable)
 
-instance (Functor h, FunctorI b) => FunctorI (ParBH h b)
-instance (Applicative h, ApplicativeI b) => ApplicativeI (ParBH h b)
-instance (Traversable h, TraversableI b) => TraversableI (ParBH h b)
+instance (Functor h, FunctorT b) => FunctorT (ParBH h b)
+instance (Applicative h, ApplicativeT b) => ApplicativeT (ParBH h b)
+instance (Traversable h, TraversableT b) => TraversableT (ParBH h b)
 
 data ParX a f x
   = ParX (f a) a
   deriving (Generic, Typeable)
 
-instance FunctorI (ParX a)
-instance Monoid a => ApplicativeI (ParX a)
-instance TraversableI (ParX a)
-instance ConstraintsI (ParX a)
+instance FunctorT (ParX a)
+instance Monoid a => ApplicativeT (ParX a)
+instance TraversableT (ParX a)
+instance ConstraintsT (ParX a)
 
 deriving instance (Show a, Show (f a)) => Show (ParX a f x)
 deriving instance (Eq a, Eq (f a)) => Eq (ParX a f x)
@@ -326,10 +326,10 @@ data HKB b x
       }
   deriving (Generic, Typeable)
 
-instance FunctorI HKB
-instance ApplicativeI HKB
-instance TraversableI HKB
-instance ConstraintsI HKB
+instance FunctorT HKB
+instance ApplicativeT HKB
+instance TraversableT HKB
+instance ConstraintsT HKB
 
 
 
@@ -347,8 +347,8 @@ data NestedB f g
       }
   deriving (Generic, Typeable)
 
-instance FunctorI NestedB
-instance TraversableI NestedB
+instance FunctorT NestedB
+instance TraversableT NestedB
 instance Functor f => FunctorB (NestedB f)
 instance Applicative f => ApplicativeB (NestedB f)
 instance Traversable f => TraversableB (NestedB f)
