@@ -60,7 +60,7 @@ import Data.Generics.GenericN
 -- their fields, we can use:
 --
 -- @
--- 'baddDicts' :: AllB Show b => b f -> b ('Dict' 'Show' `Product` b)
+-- 'baddDicts' :: AllB Show b => b f -> b ('Dict' 'Show' `'Product'` f)
 -- @
 --
 -- There is a default implementation of 'ConstraintsB' for
@@ -121,11 +121,11 @@ bmapC f bf
 
 -- | Like 'btraverse' but with a constraint on the elements of @b@.
 btraverseC
-  :: forall c b f g h
-  .  (TraversableB b, ConstraintsB b, AllB c b, Applicative g)
-  => (forall a. c a => f a -> g (h a))
+  :: forall c b f g e
+  .  (TraversableB b, ConstraintsB b, AllB c b, Applicative e)
+  => (forall a. c a => f a -> e (g a))
   -> b f
-  -> g (b h)
+  -> e (b g)
 btraverseC f b
   = btraverse (\(Pair (Dict :: Dict c a) x) -> f x) (baddDicts b)
 
