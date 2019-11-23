@@ -26,6 +26,9 @@ module Data.Functor.Transformer
   , Appl.tzipWith3
   , Appl.tzipWith4
 
+    -- * Monad
+  , Mon.MonadT(..)
+
     -- * Constraints and instance dictionaries
   , Cons.ConstraintsT(..)
   , Cons.AllTF
@@ -43,6 +46,7 @@ where
 import qualified Barbies.Internal.ApplicativeT as Appl
 import qualified Barbies.Internal.ConstraintsT as Cons
 import qualified Barbies.Internal.FunctorT as Func
+import qualified Barbies.Internal.MonadT as Mon
 import qualified Barbies.Internal.TraversableT as Trav
 
 import qualified Data.Generics.GenericN as GenericsN
