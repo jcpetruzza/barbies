@@ -58,6 +58,8 @@ library
       Barbies.Internal.FunctorB
       Barbies.Internal.FunctorT
 
+      Barbies.Internal.MonadT
+
       Barbies.Internal.TraversableB
       Barbies.Internal.TraversableT
 
