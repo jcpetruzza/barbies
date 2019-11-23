@@ -22,6 +22,7 @@ where
 import Barbies.Generics.Applicative(GApplicative(..))
 import Barbies.Internal.FunctorT (FunctorT (..))
 
+import Control.Applicative (Alternative(..))
 import Data.Functor.Compose (Compose (..))
 import Data.Functor.Product (Product (..))
 import Data.Functor.Reverse (Reverse (..))
@@ -275,19 +276,17 @@ instance ApplicativeT Reverse where
     = Reverse (Pair fa ga)
   {-# INLINE tprod #-}
 
-#if __GLASGOW_HASKELL__ >= 806
 
-instance (forall a . Monoid (f a)) => ApplicativeT (Product f) where
+instance Alternative f => ApplicativeT (Product f) where
   tpure fa
-    = Pair mempty fa
+    = Pair empty fa
   {-# INLINE tpure #-}
 
   tprod (Pair fl gl) (Pair fr gr)
-    = Pair (fl `mappend` fr) (Pair gl gr)
+    = Pair (fl <|> fr) (Pair gl gr)
   {-# INLINE tprod #-}
 
-
-instance (forall a . Semigroup (f a)) => ApplicativeT (Sum f) where
+instance Alternative f => ApplicativeT (Sum f) where
   tpure fa
     = InR fa
   {-# INLINE tpure #-}
@@ -297,6 +296,5 @@ instance (forall a . Semigroup (f a)) => ApplicativeT (Sum f) where
         (InR gl, InR gr) -> InR (Pair gl gr)
         (InR _,  InL fr) -> InL fr
         (InL fl, InR _)  -> InL fl
-        (InL fl, InL fr) -> InL (fl <> fr)
+        (InL fl, InL fr) -> InL (fl <|> fr)
   {-# INLINE tprod #-}
-#endif
