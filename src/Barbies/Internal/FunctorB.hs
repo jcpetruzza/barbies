@@ -13,6 +13,7 @@ import Barbies.Generics.Functor (GFunctor(..))
 
 import Data.Functor.Compose   (Compose (..))
 import Data.Functor.Const     (Const (..))
+import Data.Functor.Constant  (Constant (..))
 import Data.Functor.Product   (Product (..))
 import Data.Functor.Sum       (Sum (..))
 import Data.Generics.GenericN
@@ -125,4 +126,13 @@ instance FunctorB (Const x) where
 
 instance (Functor f, FunctorB b) => FunctorB (f `Compose` b) where
   bmap h (Compose x) = Compose (bmap h <$> x)
+  {-# INLINE bmap #-}
+
+
+-- --------------------------------
+-- Instances for transformer types
+-- --------------------------------
+
+instance FunctorB (Constant x) where
+  bmap _ (Constant x) = Constant x
   {-# INLINE bmap #-}
