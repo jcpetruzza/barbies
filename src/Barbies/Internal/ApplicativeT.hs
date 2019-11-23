@@ -22,6 +22,7 @@ where
 import Barbies.Generics.Applicative(GApplicative(..))
 import Barbies.Internal.FunctorT (FunctorT (..))
 
+import Data.Functor.Compose (Compose (..))
 import Data.Functor.Product (Product (..))
 import Data.Functor.Reverse (Reverse (..))
 import Data.Functor.Sum (Sum (..))
@@ -255,6 +256,15 @@ instance
 -- --------------------------------
 -- Instances for base types
 -- --------------------------------
+
+instance Applicative f => ApplicativeT (Compose f) where
+  tpure fa
+    = Compose (pure fa)
+  {-# INLINE tpure #-}
+
+  tprod (Compose fga) (Compose fha)
+    = Compose (Pair <$> fga <*> fha)
+  {-# INLINE tprod #-}
 
 instance ApplicativeT Reverse where
   tpure fa

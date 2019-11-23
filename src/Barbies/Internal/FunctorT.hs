@@ -25,6 +25,7 @@ import Control.Monad.Trans.State.Strict as Strict (StateT, mapStateT)
 import Control.Monad.Trans.Writer.Lazy as Lazy (WriterT, mapWriterT)
 import Control.Monad.Trans.Writer.Strict as Strict (WriterT, mapWriterT)
 
+import Data.Functor.Compose   (Compose (..))
 import Data.Functor.Product   (Product (..))
 import Data.Functor.Reverse   (Reverse (..))
 import Data.Functor.Sum       (Sum (..))
@@ -122,6 +123,11 @@ instance
 -- --------------------------------
 -- Instances for base types
 -- --------------------------------
+
+instance Functor f => FunctorT (Compose f) where
+  tmap h (Compose fga)
+    = Compose (fmap h fga)
+  {-# INLINE tmap #-}
 
 instance FunctorT (Product f) where
   tmap h (Pair fa ga) = Pair fa (h ga)

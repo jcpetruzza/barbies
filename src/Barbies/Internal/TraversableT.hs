@@ -174,6 +174,11 @@ instance
 -- Instances for base types
 -- -----------------------------------------------------------
 
+instance Traversable f => TraversableT (Compose f) where
+  ttraverse h (Compose fga)
+    = Compose <$> traverse h fga
+  {-# INLINE ttraverse #-}
+
 instance TraversableT (Product f) where
   ttraverse h (Pair fa ga) = Pair fa <$> h ga
   {-# INLINE ttraverse #-}
