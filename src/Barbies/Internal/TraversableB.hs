@@ -21,6 +21,7 @@ import Barbies.Internal.Writer(execWr, tell)
 import Data.Functor           (void)
 import Data.Functor.Compose   (Compose (..))
 import Data.Functor.Const     (Const (..))
+import Data.Functor.Constant  (Constant (..))
 import Data.Functor.Identity  (Identity (..))
 import Data.Functor.Product   (Product (..))
 import Data.Functor.Sum       (Sum (..))
@@ -174,4 +175,12 @@ instance TraversableB (Const a) where
 instance (Traversable f, TraversableB b) => TraversableB (f `Compose` b) where
   btraverse h (Compose x)
     = Compose <$> traverse (btraverse h) x
+  {-# INLINE btraverse #-}
+
+-- -----------------------------------------------------------
+-- Instances for transformer types
+-- -----------------------------------------------------------
+
+instance TraversableB (Constant a) where
+  btraverse _ (Constant x) = pure (Constant x)
   {-# INLINE btraverse #-}

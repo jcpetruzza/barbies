@@ -15,6 +15,7 @@ import Barbies.Generics.Applicative(GApplicative(..))
 import Barbies.Internal.FunctorB (FunctorB (..))
 
 import Data.Functor.Const   (Const (..))
+import Data.Functor.Constant(Constant (..))
 import Data.Functor.Product (Product (..))
 import Data.Kind            (Type)
 import Data.Proxy           (Proxy (..))
@@ -270,4 +271,18 @@ instance (ApplicativeB a, ApplicativeB b) => ApplicativeB (Product a b) where
 
   bprod (Pair ll lr) (Pair rl rr)
     = Pair (bprod ll rl) (bprod lr rr)
+  {-# INLINE bprod #-}
+
+
+-- --------------------------------
+-- Instances for base types
+-- --------------------------------
+
+instance Monoid a => ApplicativeB (Constant a) where
+  bpure _
+    = Constant mempty
+  {-# INLINE bpure #-}
+
+  bprod (Constant l) (Constant r)
+    = Constant (l `mappend` r)
   {-# INLINE bprod #-}
