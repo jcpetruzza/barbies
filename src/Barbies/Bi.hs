@@ -10,14 +10,18 @@
 
 {-# OPTIONS_GHC -Wno-simplifiable-class-constraints #-}
 module Barbies.Bi
-  ( FunctorBI
-  , btmap
+  ( -- * Functor
+    -- | A bifunctor is simultaneously a 'FunctorT' and a 'FunctorB'.
+    btmap
   , btmap1
 
-  , TraversableBI
+    -- * Traversable
+    -- | A traversable bifunctor is simultaneously a 'TraversableT
+    --   and a 'TraversableB'
   , bttraverse
   , bttraverse1
 
+    -- * Wrappers
   , Flip(..)
   ) where
 
@@ -32,24 +36,11 @@ import Control.Monad ((>=>))
 
 -- {{ Functor -----------------------------------------------------------------
 
--- | A 'FunctorB' and a 'FunctorT' together give us a bifunctor.
---   One may wonder why we mention @f@ in @'FunctorBI' b f@. Two
---   reasons: first, to avoid the need for @QuantifiedConstraints@,
---   but more importantly, because @'FunctorB' (b f)@ may require
---   a @'Functor' f@ instance, as will usually happen with nested
---   types.
-class
-  ( FunctorB (b f)
-  , FunctorT b
-  ) => FunctorBI b f
-
-instance
-  ( FunctorB (b f)
-  , FunctorT b
-  ) => FunctorBI b f
-
+-- | Map over both arguments at the same time.
 btmap
-  :: FunctorBI b f
+  :: ( FunctorB (b f)
+     , FunctorT b
+     )
   => (forall a . f a -> f' a)
   -> (forall a . g a -> g' a)
   -> b f g
@@ -58,9 +49,11 @@ btmap hf hg
   = tmap hf . bmap hg
 {-# INLINE btmap #-}
 
--- | 'btmap' specialized to a single functor argument.
+-- | A version of 'btmap' specialized to a single argument.
 btmap1
-  :: FunctorBI b f
+  :: ( FunctorB (b f)
+     , FunctorT b
+     )
   => (forall a . f a -> g a)
   -> b f f
   -> b g g
@@ -73,19 +66,10 @@ btmap1 h
 
 -- {{ Traversable -------------------------------------------------------------
 
--- | A 'TraversableB' and a 'TraversableT' together give us a bitraversable
-class
-  ( TraversableB (b f)
-  , TraversableT b
-  ) => TraversableBI b f
-
-instance
-  ( TraversableB (b f)
-  , TraversableT b
-  ) => TraversableBI b f
-
+-- | Traverse over both arguments, first over @f@, then over @g@..
 bttraverse
-  :: ( TraversableBI b f
+  :: ( TraversableB (b f)
+     , TraversableT b
      , Monad t
      )
   => (forall a . f a -> t (f' a))
@@ -96,9 +80,10 @@ bttraverse hf hg
   = btraverse hg >=> ttraverse hf
 {-# INLINE bttraverse #-}
 
-
+-- | A version of 'bttraverse' specialized to a single argument.
 bttraverse1
-  :: ( TraversableBI b f
+  :: ( TraversableB (b f)
+     , TraversableT b
      , Monad t
      )
   => (forall a . f a -> t (g a))
