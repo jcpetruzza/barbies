@@ -42,7 +42,7 @@ requiringDict r = \Dict -> r
 --   equivalent to @c (f a)@. However, we have
 --
 -- @
--- 'ClassF c f :: k -> 'Constraint'
+-- 'ClassF c f :: k -> 'Data.Kind.Constraint'
 -- @
 --
 -- This is useful since it allows to define constraint-constructors like

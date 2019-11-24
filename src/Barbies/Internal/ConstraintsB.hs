@@ -100,7 +100,7 @@ class FunctorB b => ConstraintsB (b :: (k -> *) -> *) where
 -- | Like 'bmap' but a constraint is allowed to be required on
 --   each element of @b@
 --
--- E.g. If all fields of 'b' are 'Show'able then you
+-- E.g. If all fields of @b@ are 'Show'able then you
 -- could store each shown value in it's slot using 'Const':
 --
 -- > showFields :: (AllB Show b, ConstraintsB b) => b Identity -> b (Const String)

@@ -3,26 +3,39 @@ module Barbies.Internal
     Internal.gbmapDefault
   , Generics.GFunctor(..)
   , Internal.CanDeriveFunctorB
+  , Internal.CanDeriveFunctorT
+
+
 
     -- * Traversable
   , Internal.gbtraverseDefault
   , Generics.GTraversable(..)
   , Internal.CanDeriveTraversableB
+  , Internal.CanDeriveTraversableT
+
+
 
     -- * Applicative
   , Internal.gbpureDefault
   , Internal.gbprodDefault
   , Generics.GApplicative(..)
   , Internal.CanDeriveApplicativeB
+  , Internal.CanDeriveApplicativeT
+
+
 
     -- * Constraints
   , Internal.gbaddDictsDefault
   , Generics.GConstraints(..)
   , Internal.CanDeriveConstraintsB
+  , Internal.CanDeriveConstraintsT
+
+
   , Generics.GAll
   , Internal.GAllRepB
+  , Internal.GAllRepT
   , Generics.X, Generics.Y
-  , Generics.TagSelf, Generics.Self, Generics.Other
+  , Generics.TagSelf, Generics.TagSelf', Generics.Self, Generics.Other
 
     -- * Bare values
   , Internal.gbcoverDefault
@@ -30,8 +43,10 @@ module Barbies.Internal
   , Generics.GBare(..)
   , Internal.CanDeriveBareB
 
+
+
     -- * Generic derivation support
-  , GenericN, Rec(..), RepN
+  , module Data.Generics.GenericN
   )
 
 where
@@ -43,9 +58,13 @@ import qualified Barbies.Generics.Functor as Generics
 import qualified Barbies.Generics.Traversable as Generics
 
 import qualified Barbies.Internal.ApplicativeB as Internal
+import qualified Barbies.Internal.ApplicativeT as Internal
 import qualified Barbies.Internal.BareB as Internal
 import qualified Barbies.Internal.ConstraintsB as Internal
+import qualified Barbies.Internal.ConstraintsT as Internal
 import qualified Barbies.Internal.FunctorB as Internal
+import qualified Barbies.Internal.FunctorT as Internal
 import qualified Barbies.Internal.TraversableB as Internal
+import qualified Barbies.Internal.TraversableT as Internal
 
-import Data.Generics.GenericN (GenericN, Rec(..), RepN)
+import Data.Generics.GenericN

@@ -22,8 +22,8 @@
 --       , password  :: 'Wear' t f 'String'
 --       , mailingOk :: 'Wear' t f 'Bool'
 --       }
---  instance 'FunctorB' (SignUpForm 'Covered')
---  instance 'TraversableB' (SignUpForm 'Covered')
+--  instance 'Data.Functor.Barbie.FunctorB' (SignUpForm 'Covered')
+--  instance 'Data.Functor.Barbie.TraversableB' (SignUpForm 'Covered')
 --  ...,
 --  instance 'BareB' SignUpForm
 --

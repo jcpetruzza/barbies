@@ -18,6 +18,7 @@ module Barbies.Internal.ConstraintsT
 
   , CanDeriveConstraintsT
   , gtaddDictsDefault
+  , GAllRepT
   )
 
 where
@@ -114,7 +115,7 @@ ttraverseC
 ttraverseC f t
   = ttraverse (\(Pair (Dict :: Dict c a) x) -> f x) (taddDicts t)
 
--- | Like 'tfoldMap' but with a constraint on the function.
+-- | Like 'Data.Functor.Transformer.tfoldMap' but with a constraint on the function.
 tfoldMapC
   :: forall c t m f x
   .  (TraversableT t, ConstraintsT t,  AllT c t, Monoid m)
@@ -175,7 +176,7 @@ tzipWith4C f tf tg th ti
 type AllTF c f t = AllT (ClassF c f) t
 
 
--- | Similar to 'itddDicts' but can produce the instance dictionaries
+-- | Similar to 'taddDicts' but can produce the instance dictionaries
 --   "out of the blue".
 tdicts
   :: forall c t x

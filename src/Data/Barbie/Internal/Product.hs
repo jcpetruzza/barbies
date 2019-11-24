@@ -7,6 +7,7 @@ module Data.Barbie.Internal.Product
   ( ProductB(buniq, bprod)
   , CanDeriveProductB
   , gbprodDefault, gbuniqDefault
+  , GProductB(..)
   )
 
 where

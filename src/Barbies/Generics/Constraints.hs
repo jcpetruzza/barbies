@@ -4,7 +4,7 @@
 module Barbies.Generics.Constraints
   ( GAll
   , X, Y
-  , TagSelf, Self, Other
+  , TagSelf, TagSelf', Self, Other
   , GConstraints(..)
   )
 
@@ -155,14 +155,14 @@ instance
 data family Self  (b :: k -> k') :: k -> k'
 data family Other (b :: k -> k') :: k -> k'
 
--- | We use type-families to generically compute @'AllB' c b@. Intuitively, if
---   @b' f@ occurs inside @b f@, then we should just add @AllB b' c@ to
---   @AllB b c@. The problem is that if @b@ is a recursive type, and @b'@ is @b@,
+-- | We use the type-families to generically compute @'Barbies.AllB' c b@. Intuitively, if
+--   @b' f@ occurs inside @b f@, then we should just add @'Barbies.AllB' b' c@ to
+--   @'Barbies.AllB' b c@. The problem is that if @b@ is a recursive type, and @b'@ is @b@,
 --   then ghc will choke and blow the stack (instead of computing a fixpoint).
 --
 --   So, we would like to behave differently when @b = b'@ and add @()@ instead
---   of @'AllB' b f@ to break the recursion. Our trick will be to use a type
---   family to inspect @RepN (b f)@ and distinguish recursive usages from
+--   of @'Barbies.AllB' b f@ to break the recursion. Our trick will be to use a type
+--   family to inspect @'RepN' (b f)@ and distinguish recursive usages from
 --   non-recursive ones, tagging them with different types, so we can distinguish
 --   them in the instances.
 type TagSelf n b repbf
