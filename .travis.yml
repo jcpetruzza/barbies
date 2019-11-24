@@ -20,4 +20,4 @@ matrix:
     - env: STACK_YAML=stack-ghc-881.yaml
 
 script:
-  - travis_wait 240 stack --no-terminal --install-ghc --skip-ghc-check test
+  - stack --no-terminal --install-ghc --skip-ghc-check test
