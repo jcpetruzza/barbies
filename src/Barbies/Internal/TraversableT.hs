@@ -41,12 +41,12 @@ import Data.Proxy             (Proxy (..))
 --   satisfy the following laws:
 --
 -- @
---  t . ttraverse' f   = ttraverse' (t . f)  -- naturality
--- ttraverse' 'Data.Functor.Identity' = 'Data.Functor.Identity'           -- identity
--- ttraverse' ('Compose' . 'fmap' g . f) = 'Compose' . 'fmap' (ttraverse' g) . ttraverse' f -- composition
+--  t . 'ttraverse' f   = 'ttraverse' (t . f)  -- naturality
+-- 'ttraverse' 'Data.Functor.Identity' = 'Data.Functor.Identity'           -- identity
+-- 'ttraverse' ('Compose' . 'fmap' g . f) = 'Compose' . 'fmap' ('ttraverse' g) . 'ttraverse' f -- composition
 -- @
 --
--- There is a default ttraverse' implementation for 'Generic' types, so
+-- There is a default 'ttraverse' implementation for 'Generic' types, so
 -- instances can derived automatically.
 class FunctorT t => TraversableT (t :: (k -> Type) -> k' -> Type) where
   ttraverse
@@ -117,7 +117,7 @@ type CanDeriveTraversableT t f g x
     , GTraversable 1 f g (RepN (t f x)) (RepN (t g x))
     )
 
--- | Default implementation of ttraverse' based on 'Generic'.
+-- | Default implementation of 'ttraverse' based on 'Generic'.
 ttraverseDefault
   :: forall t f g e x
   .  (Applicative e, CanDeriveTraversableT t f g x)

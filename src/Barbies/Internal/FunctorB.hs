@@ -24,8 +24,8 @@ import Data.Kind              (Type)
 --   satisfy the following laws:
 --
 -- @
---   'bmap' 'id' = 'id'
---   'bmap' f . 'bmap' g = 'bmap' (f . g)
+-- 'bmap' 'id' = 'id'
+-- 'bmap' f . 'bmap' g = 'bmap' (f . g)
 -- @
 --
 -- There is a default 'bmap' implementation for 'Generic' types, so

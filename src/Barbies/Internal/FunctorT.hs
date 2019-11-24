@@ -37,8 +37,8 @@ import Data.Kind              (Type)
 --   satisfy the following laws:
 --
 -- @
---   'tmap' 'id' = 'id'
---   'tmap' f . 'tmap' g = 'tmap' (f . g)
+-- 'tmap' 'id' = 'id'
+-- 'tmap' f . 'tmap' g = 'tmap' (f . g)
 -- @
 --
 -- There is a default 'tmap' implementation for 'Generic' types, so
