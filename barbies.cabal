@@ -88,12 +88,16 @@ library
       ConstraintKinds
     , DataKinds
     , DefaultSignatures
+    , DeriveFunctor
+    , DeriveFoldable
+    , DeriveTraversable
     , DeriveGeneric
     , DeriveDataTypeable
     , EmptyCase
     , ExplicitForAll
     , FlexibleContexts
     , FlexibleInstances
+    , GADTSyntax
     , KindSignatures
     , LambdaCase
     , MultiParamTypeClasses

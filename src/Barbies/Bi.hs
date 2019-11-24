@@ -16,23 +16,34 @@ module Barbies.Bi
   , btmap1
 
     -- * Traversable
-    -- | A traversable bifunctor is simultaneously a 'TraversableT
-    --   and a 'TraversableB'
+    -- | A traversable bifunctor is simultaneously a 'TraversableT'
+    --   and a 'TraversableB'.
   , bttraverse
   , bttraverse1
+
+   -- * Applicative
+   -- | If @t@ is an 'ApplicativeT', the type of 'tpure' shows that its
+   --   second argument must be a phantom-type, so there are really no
+   --   interesting types that are both 'ApplicativeT' and 'ApplicativeB'.
+   --   However, we can sometimes reconstruct a bi-applicative from an
+   --   'ApplicativeB' and a 'FunctorT'.
+  , btpure
+  , btpure1
+  , btprod
 
     -- * Wrappers
   , Flip(..)
   ) where
 
-import Barbies.Internal.ApplicativeB(ApplicativeB(..))
-import Barbies.Internal.ApplicativeT(ApplicativeT(..))
-import Barbies.Internal.FunctorB(FunctorB(..))
-import Barbies.Internal.FunctorT(FunctorT(..))
-import Barbies.Internal.TraversableB(TraversableB(..))
-import Barbies.Internal.TraversableT(TraversableT(..))
 
+import Barbies.Internal.Trivial (Unit(..))
+import Data.Functor.Barbie
+import Data.Functor.Transformer
+
+import Control.Applicative (Alternative(..))
 import Control.Monad ((>=>))
+import Data.Monoid (Alt(..))
+import Data.Functor.Product (Product(..))
 
 -- {{ Functor -----------------------------------------------------------------
 
@@ -92,9 +103,51 @@ bttraverse1
 bttraverse1 h
   = bttraverse h h
 {-# INLINE bttraverse1 #-}
-
-
 -- }} Traversable -------------------------------------------------------------
+
+
+-- {{ Applicative -------------------------------------------------------------
+-- | Conceptually, this is like simultaneously using `bpure' and 'tpure'.
+btpure
+ :: ( ApplicativeB (b Unit)
+    , FunctorT b
+    )
+ => (forall a . f a)
+ -> (forall a . g a)
+ -> b f g
+btpure fa ga
+  = tmap (\Unit-> fa) (bpure ga)
+{-# INLINE btpure #-}
+
+-- | A version of 'btpure' specialized to a single argument.
+btpure1
+  :: ( ApplicativeB (b Unit)
+     , FunctorT b
+     )
+  => (forall a . f a)
+  -> b f f
+btpure1 h
+  = btpure h h
+{-# INLINE btpure1 #-}
+
+-- | Simultaneous product on both arguments.
+btprod
+  :: ( ApplicativeB (b (Alt (Product f f')))
+     , FunctorT b
+     , Alternative f
+     , Alternative f'
+     )
+  => b f g
+  -> b f' g'
+  -> b (f `Product` f') (g `Product` g')
+btprod l r
+  = tmap getAlt $ (tmap oneL l) `bprod` (tmap oneR r)
+  where
+      oneL la = Alt (Pair la empty)
+      oneR ga = Alt (Pair empty ga)
+{-# INLINE btprod #-}
+
+-- }} Applicative -------------------------------------------------------------
 
 
 -- | Convert a 'FunctorB' into a 'FunctorT' and vice-versa.
