@@ -42,22 +42,22 @@ import Data.Generics.GenericN
 --
 --  [Naturality of 'tprod']
 --
---  @
---  'tmap' (\('Pair' a b) -> 'Pair' (f a) (g b)) (u `'tprod'` v) = 'tmap' f u `'tprod'` 'tmap' g v
---  @
+-- @
+-- 'tmap' (\('Pair' a b) -> 'Pair' (f a) (g b)) (u `'tprod'` v) = 'tmap' f u `'tprod'` 'tmap' g v
+-- @
 --
 --  [Left and right identity]
 --
---  @
---  'tmap' (\('Pair' _ b) -> b) ('tpure' e `'tprod'` v) = v
---  'tmap' (\('Pair' a _) -> a) (u `'tprod'` 'tpure' e) = u
---  @
+-- @
+-- 'tmap' (\('Pair' _ b) -> b) ('tpure' e `'tprod'` v) = v
+-- 'tmap' (\('Pair' a _) -> a) (u `'tprod'` 'tpure' e) = u
+-- @
 --
 -- [Associativity]
 --
---  @
---  'tmap' (\('Pair' a ('Pair' b c)) -> 'Pair' ('Pair' a b) c) (u `'tprod'` (v `'tprod'` w)) = (u `'tprod'` v) `'tprod'` w
---  @
+-- @
+-- 'tmap' (\('Pair' a ('Pair' b c)) -> 'Pair' ('Pair' a b) c) (u `'tprod'` (v `'tprod'` w)) = (u `'tprod'` v) `'tprod'` w
+-- @
 --
 --  It is to 'FunctorT' in the same way is 'Applicative'
 --  relates to 'Functor'. For a presentation of 'Applicative' as

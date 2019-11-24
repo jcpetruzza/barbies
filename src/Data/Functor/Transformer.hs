@@ -2,7 +2,7 @@
 -- |
 -- Module:  Data.Functor.Transformer
 --
--- Endofunctors on indexed-types.
+-- Functors on indexed-types.
 ----------------------------------------------------------------------------
 module Data.Functor.Transformer
   (

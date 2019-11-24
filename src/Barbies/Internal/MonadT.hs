@@ -36,20 +36,22 @@ import Data.Functor.Sum (Sum(..))
 --   Instances of this class should to satisfy the monad laws. They laws can stated
 --   either in terms of @('tlift', 'tjoin')@ or @('tlift', 'tembed')@. In the former:
 --
---   @
---   'tmap' h . 'tlift' = 'tlift' . h
---   'tmap' h . 'tjoin' = 'tjoin' . 'tmap' ('tmap' h)
---   'tjoin' . 'tlift'  = 'id'
---   'tjoin' . 'tmap tlift' = 'id'
---   'tjoin' . 'tjoin' = 'tjoin' . 'tmap' 'tjoin'
---   @
+-- @
+-- 'tmap' h . 'tlift' = 'tlift' . h
+-- 'tmap' h . 'tjoin' = 'tjoin' . 'tmap' ('tmap' h)
+-- 'tjoin' . 'tlift'  = 'id'
+-- 'tjoin' . 'tmap tlift' = 'id'
+-- 'tjoin' . 'tjoin' = 'tjoin' . 'tmap' 'tjoin'
+-- @
 --
 --   In the latter:
---   @
---   'tembed' f . 'tlift' = f
---   'tembed' 'tlift' = 'id'
---   'tembed f . 'tembed' g = 'tembed' ('tembed' f . g)
---   @
+--
+-- @
+-- 'tembed' f . 'tlift' = f
+-- 'tembed' 'tlift' = 'id'
+-- 'tembed' f . 'tembed' g = 'tembed' ('tembed' f . g)
+-- @
+--
 class FunctorT t => MonadT t where
   -- | Lift a functor to a transformed functor.
   tlift :: f a -> t f a

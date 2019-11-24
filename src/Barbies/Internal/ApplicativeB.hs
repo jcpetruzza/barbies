@@ -32,23 +32,23 @@ import Data.Generics.GenericN
 --
 --  [Naturality of 'bprod']
 --
---  @
---  'bmap' (\('Pair' a b) -> 'Pair' (f a) (g b)) (u `'bprod'` v) = 'bmap' f u `'bprod'` 'bmap' g v
---  @
+-- @
+-- 'bmap' (\('Pair' a b) -> 'Pair' (f a) (g b)) (u `'bprod'` v) = 'bmap' f u `'bprod'` 'bmap' g v
+-- @
 --
 --
 --  [Left and right identity]
 --
---  @
---  'bmap' (\('Pair' _ b) -> b) ('bpure' e `'bprod'` v) = v
---  'bmap' (\('Pair' a _) -> a) (u `'bprod'` 'bpure' e) = u
---  @
+-- @
+-- 'bmap' (\('Pair' _ b) -> b) ('bpure' e `'bprod'` v) = v
+-- 'bmap' (\('Pair' a _) -> a) (u `'bprod'` 'bpure' e) = u
+-- @
 --
 -- [Associativity]
 --
---  @
---  'bmap' (\('Pair' a ('Pair' b c)) -> 'Pair' ('Pair' a b) c) (u `'bprod'` (v `'bprod'` w)) = (u `'bprod'` v) `'bprod'` w
---  @
+-- @
+-- 'bmap' (\('Pair' a ('Pair' b c)) -> 'Pair' ('Pair' a b) c) (u `'bprod'` (v `'bprod'` w)) = (u `'bprod'` v) `'bprod'` w
+-- @
 --
 --  It is to 'FunctorB' in the same way as 'Applicative'
 --  relates to 'Functor'. For a presentation of 'Applicative' as
