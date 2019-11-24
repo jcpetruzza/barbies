@@ -38,7 +38,7 @@
 -- @Person@ so we will like to handle these transformations uniformly,
 -- without boilerplate or repetitions.  This package provides classes to
 -- manipulate these types, using notions that are familiar to haskellers like
--- 'Functor', 'Applicative' or 'Traversable'. For example, instead writing
+-- 'Functor', 'Applicative' or 'Traversable'. For example, instead of writing
 -- an ad-hoc function that checks that all fields have a correct value, like
 --
 -- @
@@ -76,7 +76,7 @@
 
 -----------------------------------------------------------------------------
 module Barbies
-  (  -- * Functor-based interface
+  (  -- * Barbies are functors
 
      -- | Barbie-types are functors. That means that if one is familiar
      --   with standard classes like 'Functor', 'Applicative' or 'Traversable',
@@ -144,11 +144,55 @@ module Barbies
      --   they map indexed-types to types, unlike the 'Functor' class, that
      --   captures endo-functors on 'Data.Kind.Type'.
      --
-     --   All these classes are defined in this module:
+     --   For further details see:
      module Data.Functor.Barbie
 
-     -- * Bi-functor and nested barbies
+     -- * Transformers are functors
+
+     -- | Haskellers may be more used to playing with another family of dolls:
+     --   <https://hackage.haskell.org/package/transformers transformers>.
+     --   Consider for example the following functor-transformers:
+     --
+     -- @
+     -- 'Data.Functor.Compose.Compose' g f a
+     -- 'Control.Monad.Trans.Reader.ReaderT' r f a
+     -- 'Control.Monad.Maybe.MaybeT' f a
+     -- @
+     --
+     --  Like with barbies, we can think that different choices of @f@ will
+     --  give us a different doll. And if we start thinking about how
+     --  to change the outfit of a transformer, we notice that, just like
+     --  barbie-types, transformer-types are functors too.
+     --
+     -- @
+     -- 'tmap' :: 'FunctorT' t => (forall a. f a -> g a) -> t f x -> b g x
+     -- @
+     --
+     --  Where 'FunctorB' captures functors from indexed-types to types,
+     --  'FunctorT' captures those between indexed-types. And again, we can
+     --  identitfy familiar classes of functors: 'ApplicativeT' and 'TraversableT'.
+     --
+     -- Now, transformers like the ones above, are actually endofunctors, e.g.
+     -- they map @'Data.Kind.Type' -> 'Data.Kind.Type'@ to itself. So it makes
+     -- sense to classify those that are actually monads: the 'MonadT' class
+     -- gives us a notion similar to that of `Control.Monad.Trans.Class.MonadTrans',
+     -- in that it lets us lift a value to its transformed version:
+     --
+     -- @
+     -- 'tlift' :: 'MonadT' t => f a -> t f a
+     --
+     --  -- E.g., using the instance for Compose:
+     -- 'tlift' [1, 2, 3] = 'Data.Functor.Compose.Compose' ('Just' [1, 2, 3]) :: 'Data.Functor.Compose' 'Maybe' [] 'Int'
+     -- @
+     --
+     -- Unlike all other classes in this package, 'MonadT' instances need to be written
+     -- by hand.
+     --
+     -- For further details, see:
+
    , module Data.Functor.Transformer
+
+     -- * Bi-functor and nested barbies
    , module Barbies.Bi
 
 
