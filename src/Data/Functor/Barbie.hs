@@ -36,7 +36,7 @@ module Data.Functor.Barbie
     -- We would then like to be able to do:
     --
     -- @
-    -- 'Data.Functor.Barbie.bmap' 'showIt' :: 'Data.Functor.Barbie.FunctorB' b => b 'Maybe' -> b ('Data.Functor.Const' 'String')
+    -- 'Data.Functor.Barbie.bmap' @showIt@ :: 'Data.Functor.Barbie.FunctorB' b => b 'Maybe' -> b ('Data.Functor.Const' 'String')
     -- @
     --
     -- This however doesn't work because of the @('Show' a)@ constraint in the

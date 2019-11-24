@@ -14,6 +14,7 @@ module Data.Barbie
 
     -- * Product
   , ProductB(buniq, bprod)
+  , CanDeriveProductB
 
     -- ** Utility functions
   , App.bzip
@@ -31,6 +32,7 @@ module Data.Barbie
 
     -- * Products and constaints
   , ProductBC(bdicts)
+  , CanDeriveProductBC
     -- ** Utility functions
   , buniqC
   , bmempty
@@ -44,6 +46,8 @@ module Data.Barbie
 
     -- * Generic derivations
   , Rec(..)
+  , GProductB(..)
+  , GProductBC(..)
 
     -- * Deprecations
   , (/*/), (/*)
@@ -57,8 +61,8 @@ import Barbies.Internal.FunctorB(FunctorB(..))
 import Barbies.Internal.Wrappers(Barbie(..))
 import qualified Barbies.Internal.ApplicativeB as App
 
-import Data.Barbie.Internal.Product(ProductB(..))
-import Data.Barbie.Internal.ProductC(ProductBC(..), buniqC)
+import Data.Barbie.Internal.Product(ProductB(..), CanDeriveProductB, GProductB(..))
+import Data.Barbie.Internal.ProductC(ProductBC(..), CanDeriveProductBC,  GProductBC(..), buniqC)
 
 import Barbies.Internal.TraversableB
   ( TraversableB(..)
@@ -86,14 +90,14 @@ infixr 4 /*/
 
 -- | Similar to '/*/' but one of the sides is already a @'Prod' fs@.
 --
---   Note that '/*', '/*/' and 'uncurryn' are meant to be used together:
+--   Note that '/*', '/*/' and 'Data.Functor.Prod.uncurryn' are meant to be used together:
 --   '/*' and '/*/' combine @b f1, b f2...b fn@ into a single product that
---   can then be consumed by using `uncurryn` on an n-ary function. E.g.
+--   can then be consumed by using `Data.Functor.Prod.uncurryn` on an n-ary function. E.g.
 --
 -- @
 -- f :: f a -> g a -> h a -> i a
 --
--- 'bmap' ('uncurryn' f) (bf '/*' bg '/*/' bh)
+-- 'bmap' ('Data.Functor.Prod.uncurryn' f) (bf '/*' bg '/*/' bh)
 -- @
 (/*) :: ProductB b => b f -> b (Prod fs) -> b (Prod (f ': fs))
 l /* r =

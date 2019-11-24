@@ -16,7 +16,7 @@
 --       }
 -- @
 --
--- Let's say that we are writing an application where 'Person' data
+-- Let's say that we are writing an application where @Person@ data
 -- will be read from a web form, validated, and stored in a database. Some
 -- possibles outfits that we could use along the way are:
 --
@@ -24,7 +24,7 @@
 -- Person ('Data.Functor.Const.Const' 'String')  -- for the raw input from the web-form,
 -- Person ('Either' 'String') -- for the result of parsing and validating,
 -- Person 'Data.Functor.Identity.Identity'        -- for the actual data,
--- Person DbColumn        -- To describe how to read / write a 'Person' to the db
+-- Person DbColumn        -- To describe how to read / write a @Person@ to the db
 --
 -- data DbColumn a
 --   = DbColumn

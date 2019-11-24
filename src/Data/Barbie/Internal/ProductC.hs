@@ -58,7 +58,7 @@ instance ProductBC Unit where
 --  Generic derivations
 -- ===============================================================
 
--- | Default implementation of 'bproof' based on 'Generic'.
+-- | Default implementation of 'bdicts' based on 'Generic'.
 gbdictsDefault
   :: forall b c
   .  ( CanDeriveProductBC c b

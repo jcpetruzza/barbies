@@ -51,8 +51,8 @@ bcoverWith f
   = bmap (f . runIdentity) . bcover
 
 
--- | All types that admit a generic FunctorB' instance, and have all
---   their occurrences of 'f' under a 'Wear' admit a generic 'BareB'
+-- | All types that admit a generic 'FunctorB' instance, and have all
+--   their occurrences of @f@ under a 'Wear' admit a generic 'BareB'
 --   instance.
 type CanDeriveBareB b
   = ( GenericN (b Bare Identity)

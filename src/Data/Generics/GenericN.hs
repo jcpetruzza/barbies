@@ -23,6 +23,7 @@
 module Data.Generics.GenericN
   ( Param
   , Indexed
+  , Zip
   , Rec (Rec, unRec)
   , GenericN (..)
   , module GHC.Generics
