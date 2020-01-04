@@ -3,10 +3,10 @@
 -- Module:  Barbies
 --
 -- A common Haskell idiom is to parameterise a datatype by a functor or GADT
--- (or any type with kind @k -> 'Data.Kind.Type'@, a pattern sometimes
--- called <https://reasonablypolymorphic.com/blog/higher-kinded-data/ HKD>).
+-- (or any "indexed type" @k -> 'Data.Kind.Type'@), a pattern
+-- sometimes called <https://reasonablypolymorphic.com/blog/higher-kinded-data/ HKD>).
 -- This parameter acts like the outfit of a Barbie, turning it into a different
---  doll. The canonical example would be:
+-- doll. The canonical example would be:
 --
 -- @
 -- data Person f
@@ -144,7 +144,7 @@ module Barbies
      --   they map indexed-types to types, unlike the 'Functor' class, that
      --   captures endo-functors on 'Data.Kind.Type'.
      --
-     --   For further details see:
+     --  All these classes, and other convenient functions are found in:
      module Data.Functor.Barbie
 
      -- * Transformers are functors
@@ -192,14 +192,75 @@ module Barbies
 
    , module Data.Functor.Transformer
 
-     -- * Bi-functor and nested barbies
+     -- * Bi-functors and nesting
+     --
+     -- | A barbie-type that is parametric on an additional functor can be made an
+     -- instance of both 'FunctorB' and 'FunctorT'. For example:
+     --
+     -- @
+     -- data B f g = B (f Int) (g Bool)
+     --   deriving (Generic)
+     --
+     -- instance FunctorB (B f)
+     -- instance FunctorT B
+     -- @
+     --
+     -- This gives us a a bifunctor on indexed-types, as we can map
+     -- simultaneously over both arguments using 'btmap':
+     --
+     -- @
+     -- 'btmap' :: ('FunctorB' (b f), 'FunctorT' b) => (forall a . f a -> f' a) -> (forall a . g a -> g' a) -> b f g -> b f' g'
+     -- @
+     --
+     -- When @f ~ g@, we can use a specialized version of 'btmap':
+     --
+     -- @
+     -- 'btmap1' :: ('FunctorB' (b f), 'FunctorT' b) => (forall a . f a -> f' a) -> b f f -> b f' f'
+     -- @
+     --
+     -- Functions like 'btmap1' can be useful to handle cases where we would like
+     -- a barbie-type to occur under the functor-argument. Let's consider an example
+     -- of this. Continuing the web form example above, one may want to find out
+     -- about a person's dependants and model it as follows:
+     --
+     -- @
+     -- newtype Dependants f
+     --   = Dependants { getDependants :: f [Person f] }
+     -- @
+     --
+     -- This has the appeal of letting us distinguish two states:
+     --
+     -- @
+     -- Dependants { getDependants = Just [] }  -- the user declared 0 dependants
+     -- Dependants { getDependants = Nothing }  -- the user didn't specify dependants yet
+     -- @
+     --
+     -- Unfortunately, it is not possible to write a 'FunctorB' instance for such
+     -- a type (before going on, try to write one yourself!). Intuitively, we would
+     -- need to have @'Functor' f@, which we can't assume. However, such a type
+     -- can be rewritten as follows:
+     --
+     -- @
+     -- newtype Dependants f' f
+     --   = Dependants { getDependants :: f' [Person f] }
+     --   deriving (Generic)
+     --
+     -- instance Functor f' => FunctorB (Dependants f')
+     -- instance FunctorT Dependants
+     --
+     -- type Dependants f = Dependants f f
+     -- @
+     --
+     -- We can thus use 'btmap1' as a poor man's version of 'bmap' for 'Dependants'.
+     --
+     -- For more details, see:
    , module Barbies.Bi
 
 
      -- * Container-barbies
 
      -- | Some clothes make barbies look like containers, and we can make those
-     --   behave like normal 'Functor's.
+     --   types behave like normal 'Functor's.
 
    , Containers.Container(..)
    , Containers.ErrorContainer(..)
