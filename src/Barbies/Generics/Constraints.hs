@@ -102,21 +102,12 @@ type instance GAll n c (Rec (P n X _) (X a)) = c a
 -- {{ Functor application -----------------------------------------------------
 instance
   GConstraints n c f (Rec (P n X a') (X a))
-                     (Rec (P n f a') (f a))
-                     (Rec (P n (Dict c `Product` f) a')
+                     (Rec (P n f a) (f a))
+                     (Rec (P n (Dict c `Product` f) a)
                               ((Dict c `Product` f) a))
   where
   gaddDicts
     = Rec . K1 . Pair Dict . unK1 . unRec
-  {-# INLINE gaddDicts #-}
-
-
-instance
-  GConstraints n c f (Rec (P m h a') (h a))
-                     (Rec (P m h a') (h a))
-                     (Rec (P m h a') (h a))
-  where
-  gaddDicts = id
   {-# INLINE gaddDicts #-}
 -- }} Functor application -----------------------------------------------------
 
@@ -130,17 +121,9 @@ type instance GAll 1 c (Rec (Self b' (P 1 X) (P 0 Y)) (b X Y)) = ()
 type instance GAll n c (Rec a a) = ()
 
 instance
-  GConstraints n c f (Rec a a)
+  GConstraints n c f (Rec a' a)
                      (Rec a a)
                      (Rec a a)
-  where
-  gaddDicts = id
-  {-# INLINE gaddDicts #-}
-
-instance
-  GConstraints n c f (Rec (P m a') a)
-                     (Rec (P m a') a)
-                     (Rec (P m a') a)
   where
   gaddDicts = id
   {-# INLINE gaddDicts #-}

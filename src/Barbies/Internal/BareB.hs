@@ -55,21 +55,21 @@ bcoverWith f
 --   their occurrences of @f@ under a 'Wear' admit a generic 'BareB'
 --   instance.
 type CanDeriveBareB b
-  = ( GenericN (b Bare Identity)
-    , GenericN (b Covered Identity)
-    , GBare 0 (RepN (b Covered Identity)) (RepN (b Bare Identity))
+  = ( GenericP 0 (b Bare Identity)
+    , GenericP 0 (b Covered Identity)
+    , GBare 0 (RepP 0 (b Covered Identity)) (RepP 0 (b Bare Identity))
     )
 
 -- | Default implementation of 'bstrip' based on 'Generic'.
 gbstripDefault :: CanDeriveBareB b => b Covered Identity -> b Bare Identity
 gbstripDefault
-  = toN . gstrip (Proxy @0) . fromN
+  = toP (Proxy @0) . gstrip (Proxy @0) . fromP (Proxy @0)
 {-# INLINE gbstripDefault #-}
 
 -- | Default implementation of 'bstrip' based on 'Generic'.
 gbcoverDefault :: CanDeriveBareB b => b Bare Identity -> b Covered Identity
 gbcoverDefault
-  = toN . gcover (Proxy @0) . fromN
+  = toP (Proxy @0) . gcover (Proxy @0) . fromP (Proxy @0)
 {-# INLINE gbcoverDefault #-}
 
 -- ------------------------------------------------------------
@@ -79,9 +79,8 @@ type P = Param
 
 instance
   ( BareB b
-  ) => -- b' is b, maybe with 'Param' annotations
-       GBare 0 (Rec (b' (P 1 Covered) (P 0 Identity)) (b Covered Identity))
-               (Rec (b' (P 1 Bare)    (P 0 Identity)) (b Bare    Identity))
+  ) => GBare 0 (Rec (b Covered (P 0 Identity)) (b Covered Identity))
+               (Rec (b Bare    (P 0 Identity)) (b Bare    Identity))
   where
   gstrip _ = Rec . K1 . bstrip . unK1 . unRec
   {-# INLINE gstrip #-}
@@ -93,9 +92,8 @@ instance
 instance
   ( Functor h
   , BareB b
-  ) => -- b' is b, maybe with 'Param' annotations. idem h and h'
-       GBare 0 (Rec (h' (b' (P 1 Covered) (P 0 Identity))) (h (b Covered Identity)))
-               (Rec (h' (b' (P 1 Bare)    (P 0 Identity))) (h (b Bare    Identity)))
+  ) =>  GBare 0 (Rec (h (b Covered (P 0 Identity))) (h (b Covered Identity)))
+                (Rec (h (b Bare    (P 0 Identity))) (h (b Bare    Identity)))
   where
   gstrip _ = Rec . K1 . fmap bstrip . unK1 . unRec
   {-# INLINE gstrip #-}
@@ -109,8 +107,8 @@ instance
   , Functor m
   , BareB b
   ) =>
-       GBare 0 (Rec (m' (h' (b' (P 1 Covered) (P 0 Identity)))) (m (h (b Covered Identity))))
-               (Rec (m' (h' (b' (P 1 Bare)    (P 0 Identity)))) (m (h (b Bare    Identity))))
+       GBare 0 (Rec (m (h (b Covered (P 0 Identity)))) (m (h (b Covered Identity))))
+               (Rec (m (h (b Bare    (P 0 Identity)))) (m (h (b Bare    Identity))))
   where
   gstrip _ = Rec . K1 . fmap (fmap bstrip) . unK1 . unRec
   {-# INLINE gstrip #-}
