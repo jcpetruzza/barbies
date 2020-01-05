@@ -147,10 +147,10 @@ bzipWith4 f bf bg bh bi
 --     * Every field of @B f@ is either a monoid, or of the form @f a@, for
 --       some type @a@.
 type CanDeriveApplicativeB b f g
-  = ( GenericN (b f)
-    , GenericN (b g)
-    , GenericN (b (f `Product` g))
-    , GApplicative 0 f g (RepN (b f)) (RepN (b g)) (RepN (b (f `Product` g)))
+  = ( GenericP 0 (b f)
+    , GenericP 0 (b g)
+    , GenericP 0 (b (f `Product` g))
+    , GApplicative 0 f g (RepP 0 (b f)) (RepP 0 (b g)) (RepP 0 (b (f `Product` g)))
     )
 
 
@@ -166,7 +166,9 @@ gbprodDefault
   -> b g
   -> b (f `Product` g)
 gbprodDefault l r
-  = toN $ gprod (Proxy @0) (Proxy @f) (Proxy @g) (fromN l) (fromN r)
+  = toP p0 $ gprod p0 (Proxy @f) (Proxy @g) (fromP p0 l) (fromP p0 r)
+  where
+    p0 = Proxy @0
 {-# INLINE gbprodDefault #-}
 
 gbpureDefault
@@ -175,11 +177,11 @@ gbpureDefault
   => (forall a . f a)
   -> b f
 gbpureDefault fa
-  = toN $ gpure
+  = toP (Proxy @0) $ gpure
       (Proxy @0)
       (Proxy @f)
-      (Proxy @(RepN (b f)))
-      (Proxy @(RepN (b (f `Product` f))))
+      (Proxy @(RepP 0 (b f)))
+      (Proxy @(RepP 0 (b (f `Product` f))))
       fa
 {-# INLINE gbpureDefault #-}
 
@@ -190,12 +192,11 @@ gbpureDefault fa
 
 type P = Param
 
--- b' is b, maybe with 'Param' annotations
 instance
   (  ApplicativeB b
-  ) => GApplicative 0 f g (Rec (b' (P 0 f)) (b f))
-                          (Rec (b' (P 0 g)) (b g))
-                          (Rec (b' (P 0 (f `Product` g))) (b (f `Product` g)))
+  ) => GApplicative 0 f g (Rec (b (P 0 f)) (b f))
+                          (Rec (b (P 0 g)) (b g))
+                          (Rec (b (P 0 (f `Product` g))) (b (f `Product` g)))
   where
   gpure _ _ _ _ fa
     = Rec (K1 (bpure fa))
@@ -207,14 +208,12 @@ instance
 
 
 
--- h' and b' are essentially  h and b, but maybe
--- with 'Param' annotations
 instance
   ( Applicative h
   , ApplicativeB b
-  ) => GApplicative 0 f g (Rec (h' (b' (P 0 f))) (h (b f)))
-                          (Rec (h' (b' (P 0 g))) (h (b g)))
-                          (Rec (h' (b' (P 0 (f `Product` g)))) (h (b (f `Product` g))))
+  ) => GApplicative 0 f g (Rec (h (b (P 0 f))) (h (b f)))
+                          (Rec (h (b (P 0 g))) (h (b g)))
+                          (Rec (h (b (P 0 (f `Product` g)))) (h (b (f `Product` g))))
   where
   gpure _ _ _ _ fa
     = Rec (K1 (pure $ bpure fa))
@@ -229,9 +228,9 @@ instance
   ( Applicative h
   , Applicative m
   , ApplicativeB b
-  ) => GApplicative 0 f g (Rec (m' (h' (b' (P 0 f)))) (m (h (b f))))
-                          (Rec (m' (h' (b' (P 0 g)))) (m (h (b g))))
-                          (Rec (m' (h' (b' (P 0 (f `Product` g))))) (m (h (b (f `Product` g)))))
+  ) => GApplicative 0 f g (Rec (m (h (b (P 0 f)))) (m (h (b f))))
+                          (Rec (m (h (b (P 0 g)))) (m (h (b g))))
+                          (Rec (m (h (b (P 0 (f `Product` g))))) (m (h (b (f `Product` g)))))
   where
   gpure _ _ _ _ x
     = Rec (K1 (pure . pure $ bpure x))

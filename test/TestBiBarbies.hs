@@ -344,6 +344,7 @@ data NestedB f g
       { nb_1 :: g Int
       , nb_2 :: f (g Bool)
       , nb_3 :: f (Record3' g)
+      , nb_4 :: Record3' g
       }
   deriving (Generic, Typeable)
 
@@ -354,10 +355,10 @@ instance Applicative f => ApplicativeB (NestedB f)
 instance Traversable f => TraversableB (NestedB f)
 
 
-deriving instance (Show (f (g Bool)), Show (g Int), Show (f (Record3' g))) => Show (NestedB f g)
-deriving instance (Eq (f (g Bool)), Eq (g Int), Eq (f (Record3' g))) => Eq (NestedB f g)
+deriving instance (Show (f (g Bool)), AllBF Show g Record3', Show (f (Record3' g))) => Show (NestedB f g)
+deriving instance (Eq (f (g Bool)), AllBF Eq g Record3', Eq (f (Record3' g))) => Eq (NestedB f g)
 
 
-instance (Arbitrary (f (g Bool)), Arbitrary (g Int), Arbitrary (f (Record3' g))) => Arbitrary (NestedB f g) where
+instance (Arbitrary (f (g Bool)), AllBF Arbitrary g Record3', Arbitrary (f (Record3' g))) => Arbitrary (NestedB f g) where
   arbitrary
-    = NestedB <$> arbitrary <*> arbitrary <*> arbitrary
+    = NestedB <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary

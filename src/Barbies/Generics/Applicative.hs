@@ -85,50 +85,33 @@ type P = Param
 
 -- {{ Functor application -----------------------------------------------------
 instance
-  GApplicative n f g (Rec (P n f a') (f a))
-                     (Rec (P n g a') (g a))
-                     (Rec (P n (f `Product` g) a') ((f `Product` g) a))
+  GApplicative n f g (Rec (P n f a) (f a))
+                     (Rec (P n g a) (g a))
+                     (Rec (P n (f `Product` g) a) ((f `Product` g) a))
   where
+  gpure _ _ _ _ x
+    = Rec (K1 x)
+  {-# INLINE gpure #-}
 
   gprod _ _ _ (Rec (K1 fa)) (Rec (K1 ga))
     = Rec (K1 (Pair fa ga))
   {-# INLINE gprod #-}
 
-  gpure _ _ _ _ x
-    = Rec (K1 x)
-  {-# INLINE gpure #-}
-
 
 instance
   ( Applicative h
   ) =>
-  GApplicative n f g (Rec (h' (P n f a')) (h (f a)))
-                     (Rec (h' (P n g a')) (h (g a)))
-                     (Rec (h' (P n (f `Product` g) a')) (h ((f `Product` g) a)))
+  GApplicative n f g (Rec (h (P n f a)) (h (f a)))
+                     (Rec (h (P n g a)) (h (g a)))
+                     (Rec (h (P n (f `Product` g) a)) (h ((f `Product` g) a)))
   where
-
-  gprod _ _ _ (Rec (K1 fa)) (Rec (K1 ga))
-    = Rec (K1 (Pair <$> fa <*> ga))
-  {-# INLINE gprod #-}
-
   gpure _ _ _ _ x
     = Rec (K1 $ pure x)
   {-# INLINE gpure #-}
 
-
-instance
-  ( Monoid (h a)
-  ) => GApplicative n f g (Rec (P m h a') (h a))
-                          (Rec (P m h a') (h a))
-                          (Rec (P m h a') (h a))
-  where
-  gprod _ _ _ (Rec (K1 l)) (Rec (K1 r))
-    = Rec (K1 (l <> r))
+  gprod _ _ _ (Rec (K1 fa)) (Rec (K1 ga))
+    = Rec (K1 (Pair <$> fa <*> ga))
   {-# INLINE gprod #-}
-
-  gpure _ _ _ _ _
-    = Rec (K1 mempty)
-  {-# INLINE gpure #-}
 -- }} Functor application -----------------------------------------------------
 
 
@@ -144,17 +127,4 @@ instance
   gprod _ _ _ (Rec (K1 l)) (Rec (K1 r))
     = Rec (K1 (l <> r))
   {-# INLINE gprod #-}
-
-
-instance
-  ( Monoid x
-  ) => GApplicative n f g (Rec (P m x') x) (Rec (P m x') x) (Rec (P m x') x)
-  where
-  gpure _ _ _ _ _
-    = Rec (K1 mempty)
-  {-# INLINE gpure #-}
-
-  gprod _ _ _ (Rec (K1 l)) (Rec (K1 r))
-    = Rec (K1 (l <> r))
-  {-# INLINE gprod #-}
-  -- }} Not a functor application -----------------------------------------------
+-- }} Not a functor application -----------------------------------------------

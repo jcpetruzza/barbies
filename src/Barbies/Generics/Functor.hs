@@ -65,7 +65,6 @@ type P = Param
 
 -- {{ Functor application ------------------------------------
 instance
-  {-# OVERLAPPING #-}
   GFunctor n f g (Rec (P n f a') (f a))
                  (Rec (P n g a') (g a))
   where
@@ -73,38 +72,19 @@ instance
   {-# INLINE gmap #-}
 
 instance
-  {-# OVERLAPPING #-}
   ( Functor h
   ) =>
-  GFunctor n f g (Rec (h' (P n f a')) (h (f a)))
-                 (Rec (h' (P n g a')) (h (g a)))
+  GFunctor n f g (Rec (h (P n f a')) (h (f a)))
+                 (Rec (h (P n g a')) (h (g a)))
   where
   gmap _ h (Rec (K1 hfa)) = Rec (K1 (h <$> hfa))
   {-# INLINE gmap #-}
-
-instance
-  {-# INCOHERENT #-}
-  GFunctor n f g (Rec (P m h' a') (h a))
-                 (Rec (P m h' a') (h a))
-  where
-  gmap _ _ = id
-  {-# INLINE gmap #-}
-
-
-
 -- }} Functor application ------------------------------------
 
 
 -- {{ Not a functor application --------------------------
 instance
   GFunctor n f g (Rec x x) (Rec x x)
-  where
-  gmap _ _ = id
-  {-# INLINE gmap #-}
-
-
-instance
-  GFunctor n f g (Rec (P m x') x) (Rec (P m x') x)
   where
   gmap _ _ = id
   {-# INLINE gmap #-}

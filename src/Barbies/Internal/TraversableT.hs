@@ -1,5 +1,6 @@
 {-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.TraversableT
   ( TraversableT(..)
@@ -112,9 +113,9 @@ tfoldMap f
 --     * @T f x@ can also contain usages of @t f x@ under a @'Traversable' h@.
 --       For example, one could use @'Maybe' (T f x)@ when defining @T f x@.
 type CanDeriveTraversableT t f g x
-  = ( GenericN (t f x)
-    , GenericN (t g x)
-    , GTraversable 1 f g (RepN (t f x)) (RepN (t g x))
+  = ( GenericP 1 (t f x)
+    , GenericP 1 (t g x)
+    , GTraversable 1 f g (RepP 1 (t f x)) (RepP 1 (t g x))
     )
 
 -- | Default implementation of 'ttraverse' based on 'Generic'.
@@ -124,7 +125,7 @@ ttraverseDefault
   => (forall a . f a -> e (g a))
   -> t f x -> e (t g x)
 ttraverseDefault h
-  = fmap toN . gtraverse (Proxy @1) h . fromN
+  = fmap (toP (Proxy @1)) . gtraverse (Proxy @1) h . fromP (Proxy @1)
 {-# INLINE ttraverseDefault #-}
 
 
@@ -134,22 +135,20 @@ ttraverseDefault h
 
 type P = Param
 
--- t' is t, maybe with 'Param' annotations
 instance
   ( TraversableT t
-  ) => GTraversable 1 f g (Rec (t' (P 1 f) (P 0 x)) (t f x))
-                          (Rec (t' (P 1 g) (P 0 x)) (t g x))
+  ) => GTraversable 1 f g (Rec (t (P 1 f) x) (t f x))
+                          (Rec (t (P 1 g) x) (t g x))
   where
   gtraverse _ h
     = fmap (Rec . K1) . ttraverse h . unK1 . unRec
   {-# INLINE gtraverse #-}
 
--- t' and h' are t and h, maybe with 'Param' annotations
 instance
    ( Traversable h
    , TraversableT t
-   ) => GTraversable 1 f g (Rec (h' (t' (P 1 f) (P 0 x))) (h (t f x)))
-                           (Rec (h' (t' (P 1 g) (P 0 x))) (h (t g x)))
+   ) => GTraversable 1 f g (Rec (h (t (P 1 f) x)) (h (t f x)))
+                           (Rec (h (t (P 1 g) x)) (h (t g x)))
   where
   gtraverse _ h
     = fmap (Rec . K1) . traverse (ttraverse h) . unK1 . unRec
@@ -162,8 +161,8 @@ instance
    ( Traversable h
    , Traversable m
    , TraversableT t
-   ) => GTraversable 1 f g (Rec (m' (h' (t' (P 1 f) (P 0 x)))) (m (h (t f x))))
-                           (Rec (m' (h' (t' (P 1 g) (P 0 x)))) (m (h (t g x))))
+   ) => GTraversable 1 f g (Rec (m (h (t (P 1 f) x))) (m (h (t f x))))
+                           (Rec (m (h (t (P 1 g) x))) (m (h (t g x))))
   where
   gtraverse _ h
     = fmap (Rec . K1) . traverse (traverse (ttraverse h)) . unK1 . unRec

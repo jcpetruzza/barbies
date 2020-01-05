@@ -51,9 +51,9 @@ class FunctorB (b :: (k -> Type) -> Type) where
 --     * @B f@ can also contain usages of @b f@ under a @'Functor' h@.
 --       For example, one could use @'Maybe' (B f)@ when defining @B f@.
 type CanDeriveFunctorB b f g
-  = ( GenericN (b f)
-    , GenericN (b g)
-    , GFunctor 0 f g (RepN (b f)) (RepN (b g))
+  = ( GenericP 0 (b f)
+    , GenericP 0 (b g)
+    , GFunctor 0 f g (RepP 0 (b f)) (RepP 0 (b g))
     )
 
 -- | Default implementation of 'bmap' based on 'Generic'.
@@ -61,7 +61,7 @@ gbmapDefault
   :: CanDeriveFunctorB b f g
   => (forall a . f a -> g a) -> b f -> b g
 gbmapDefault f
-  = toN . gmap (Proxy @0) f . fromN
+  = toP (Proxy @0) . gmap (Proxy @0) f . fromP (Proxy @0)
 {-# INLINE gbmapDefault #-}
 
 -- ------------------------------------------------------------

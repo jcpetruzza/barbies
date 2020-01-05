@@ -1,5 +1,6 @@
 {-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.FunctorT
   ( FunctorT(..)
@@ -66,9 +67,9 @@ class FunctorT (t :: (k -> Type) -> k' -> Type) where
 --     * @T f x@ can also contain usages of @t f y@ under a @'Functor' h@.
 --       For example, one could use @'Maybe' (T f y)@ when defining @T f y@.
 type CanDeriveFunctorT t f g x
-  = ( GenericN (t f x)
-    , GenericN (t g x)
-    , GFunctor 1 f g (RepN (t f x)) (RepN (t g x))
+  = ( GenericP 1 (t f x)
+    , GenericP 1 (t g x)
+    , GFunctor 1 f g (RepP 1 (t f x)) (RepP 1 (t g x))
     )
 
 -- | Default implementation of 'tmap' based on 'Generic'.
@@ -78,7 +79,7 @@ gtmapDefault
   -> t f x
   -> t g x
 gtmapDefault f
-  = toN . gmap (Proxy @1) f . fromN
+  = toP (Proxy @1) . gmap (Proxy @1) f . fromP (Proxy @1)
 {-# INLINE gtmapDefault #-}
 
 -- ------------------------------------------------------------
@@ -87,21 +88,20 @@ gtmapDefault f
 
 type P = Param
 
--- t' is t, maybe with 'Param' annotations
 instance
   ( FunctorT t
-  ) => GFunctor 1 f g (Rec (t' (P 1 f) (P 0 x)) (t f x))
-                      (Rec (t' (P 1 g) (P 0 x)) (t g x))
+  ) => GFunctor 1 f g (Rec (t (P 1 f) x) (t f x))
+                      (Rec (t (P 1 g) x) (t g x))
   where
   gmap _ h (Rec (K1 tf)) = Rec (K1 (tmap h tf))
   {-# INLINE gmap #-}
 
--- t' and h' are t and h, maybe with 'Param' annotations
+
 instance
   ( Functor h
   , FunctorT t
-  ) => GFunctor 1 f g (Rec (h' (t' (P 1 f) (P 0 x))) (h (t f x)))
-                      (Rec (h' (t' (P 1 g) (P 0 x))) (h (t g x)))
+  ) => GFunctor 1 f g (Rec (h (t (P 1 f) x)) (h (t f x)))
+                      (Rec (h (t (P 1 g) x)) (h (t g x)))
   where
   gmap _ h (Rec (K1 htf)) = Rec (K1 (fmap (tmap h) htf))
   {-# INLINE gmap #-}
@@ -113,12 +113,11 @@ instance
   ( Functor h
   , Functor m
   , FunctorT t
-  ) => GFunctor 1 f g (Rec (m' (h' (t' (P 1 f) (P 0 x)))) (m (h (t f x))))
-                      (Rec (m' (h' (t' (P 1 g) (P 0 x)))) (m (h (t g x))))
+  ) => GFunctor 1 f g (Rec (m (h (t (P 1 f) x))) (m (h (t f x))))
+                      (Rec (m (h (t (P 1 g) x))) (m (h (t g x))))
   where
   gmap _ h (Rec (K1 mhtf)) = Rec (K1 (fmap (fmap (tmap h)) mhtf))
   {-# INLINE gmap #-}
-
 
 -- --------------------------------
 -- Instances for base types

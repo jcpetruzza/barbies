@@ -94,9 +94,9 @@ bfoldMap f
 --     * @B f@ can also contain usages of @b f@ under a @'Traversable' h@.
 --       For example, one could use @'Maybe' (B f)@ when defining @B f@.
 type CanDeriveTraversableB b f g
-  = ( GenericN (b f)
-    , GenericN (b g)
-    , GTraversable 0 f g (RepN (b f)) (RepN (b g))
+  = ( GenericP 0 (b f)
+    , GenericP 0 (b g)
+    , GTraversable 0 f g (RepP 0 (b f)) (RepP 0 (b g))
     )
 
 -- | Default implementation of 'btraverse' based on 'Generic'.
@@ -106,7 +106,7 @@ gbtraverseDefault
   => (forall a . f a -> e (g a))
   -> b f -> e (b g)
 gbtraverseDefault h
-  = fmap toN . gtraverse (Proxy @0) h . fromN
+  = fmap (toP (Proxy @0)) . gtraverse (Proxy @0) h . fromP (Proxy @0)
 {-# INLINE gbtraverseDefault #-}
 
 
@@ -116,22 +116,20 @@ gbtraverseDefault h
 
 type P = Param
 
--- b' is b, maybe with 'Param' annotations
 instance
   ( TraversableB b
-  ) => GTraversable 0 f g (Rec (b' (P 0 f)) (b f))
-                          (Rec (b' (P 0 g)) (b g))
+  ) => GTraversable 0 f g (Rec (b (P 0 f)) (b f))
+                          (Rec (b (P 0 g)) (b g))
   where
   gtraverse _ h
     = fmap (Rec . K1) . btraverse h . unK1 . unRec
   {-# INLINE gtraverse #-}
 
--- b' and h' are b and h, maybe with 'Param' annotations
 instance
    ( Traversable h
    , TraversableB b
-   ) => GTraversable 0 f g (Rec (h' (b' (P 0 f))) (h (b f)))
-                           (Rec (h' (b' (P 0 g))) (h (b g)))
+   ) => GTraversable 0 f g (Rec (h (b (P 0 f))) (h (b f)))
+                           (Rec (h (b (P 0 g))) (h (b g)))
   where
   gtraverse _ h
     = fmap (Rec . K1) . traverse (btraverse h) . unK1 . unRec
@@ -143,8 +141,8 @@ instance
    ( Traversable h
    , Traversable m
    , TraversableB b
-   ) => GTraversable 0 f g (Rec (m' (h' (b' (P 0 f)))) (m (h (b f))))
-                           (Rec (m' (h' (b' (P 0 g)))) (m (h (b g))))
+   ) => GTraversable 0 f g (Rec (m (h (b (P 0 f)))) (m (h (b f))))
+                           (Rec (m (h (b (P 0 g)))) (m (h (b g))))
   where
   gtraverse _ h
     = fmap (Rec . K1) . traverse (traverse (btraverse h)) . unK1 . unRec

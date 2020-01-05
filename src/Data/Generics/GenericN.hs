@@ -23,13 +23,16 @@
 module Data.Generics.GenericN
   ( Param
   , Indexed
+  , FilterIndex
   , Zip
   , Rec (Rec, unRec)
   , GenericN (..)
+  , GenericP (..)
   , module GHC.Generics
   ) where
 
 import Data.Kind
+import Data.Proxy (Proxy)
 import GHC.Generics
 import GHC.TypeLits
 import Data.Coerce
@@ -39,6 +42,11 @@ data family Param (n :: Nat) (a :: k) :: k
 type family Indexed (t :: k) (i :: Nat) :: k where
   Indexed (t a) i = Indexed t (i + 1) (Param i a)
   Indexed t _     = t
+
+type family FilterIndex (n :: Nat) (t :: k) :: k where
+  FilterIndex n (t (Param n a)) = FilterIndex n t (Param n a)
+  FilterIndex n (t (Param _ a)) = FilterIndex n t a
+  FilterIndex _ t = t
 
 newtype Rec (p :: Type) a x = Rec { unRec :: K1 R a x }
 
@@ -77,3 +85,24 @@ instance
   fromN :: forall x. a -> RepN a x
   fromN = coerce (from :: a -> Rep a x)
   {-# INLINE fromN #-}
+
+class
+  ( Coercible (Rep a) (RepP n a)
+  , Generic a
+  ) => GenericP (n :: Nat) (a :: Type) where
+  type family RepP n a :: Type -> Type
+  type instance RepP n a = Zip (Rep (FilterIndex n (Indexed a 0))) (Rep a)
+  toP :: Proxy n -> RepP n a x -> a
+  fromP :: Proxy n -> a -> RepP n a x
+
+instance
+  ( Coercible (Rep a) (RepP n a)
+  , Generic a
+  ) => GenericP (n :: Nat) (a :: Type) where
+  toP :: forall x . Proxy n -> RepP n a x -> a
+  toP _ = coerce (to :: Rep a x -> a)
+  {-# INLINE toP #-}
+
+  fromP :: forall x . Proxy n -> a -> RepP n a x
+  fromP _ = coerce (from :: a -> Rep a x)
+  {-# INLINE fromP #-}

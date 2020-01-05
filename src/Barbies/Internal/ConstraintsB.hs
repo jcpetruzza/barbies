@@ -229,10 +229,10 @@ bmempty
 --       @'ConstraintsB' b@ instance. In particular, recursive usages of @B f@
 --       are allowed.
 type CanDeriveConstraintsB c b f
-  = ( GenericN (b f)
-    , GenericN (b (Dict c `Product` f))
+  = ( GenericP 0 (b f)
+    , GenericP 0 (b (Dict c `Product` f))
     , AllB c b ~ GAll 0 c (GAllRepB b)
-    , GConstraints 0 c f (GAllRepB b) (RepN (b f)) (RepN (b (Dict c `Product` f)))
+    , GConstraints 0 c f (GAllRepB b) (RepP 0 (b f)) (RepP 0 (b (Dict c `Product` f)))
     )
 
 -- | The representation used for the generic computation of the @'AllB' c b@
@@ -254,7 +254,7 @@ gbaddDictsDefault
   => b f
   -> b (Dict c `Product` f)
 gbaddDictsDefault
-  = toN . gaddDicts @0 @c @f @(GAllRepB b) . fromN
+  = toP (Proxy @0) . gaddDicts @0 @c @f @(GAllRepB b) . fromP (Proxy @0)
 {-# INLINE gbaddDictsDefault #-}
 
 
@@ -270,9 +270,9 @@ instance
   , AllB c b
   ) => -- b' is b, maybe with 'Param' annotations
        GConstraints 0 c f (Rec (Self b' (P 0 X)) (b X))
-                          (Rec (b' (P 0 f)) (b f))
-                          (Rec (b' (P 0 (Dict c `Product` f)))
-                               (b       (Dict c `Product` f)))
+                          (Rec (b (P 0 f)) (b f))
+                          (Rec (b (P 0 (Dict c `Product` f)))
+                               (b      (Dict c `Product` f)))
   where
   gaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec
@@ -285,9 +285,9 @@ instance
   ( ConstraintsB b
   , AllB c b
   ) => GConstraints 0 c f (Rec (Other b' (P 0 X)) (b X))
-                          (Rec (b' (P 0 f)) (b f))
-                          (Rec (b' (P 0 (Dict c `Product` f)))
-                               (b       (Dict c `Product` f)))
+                          (Rec (b (P 0 f)) (b f))
+                          (Rec (b (P 0 (Dict c `Product` f)))
+                               (b      (Dict c `Product` f)))
   where
   gaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec

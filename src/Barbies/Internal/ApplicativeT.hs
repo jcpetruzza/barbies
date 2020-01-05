@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 #if __GLASGOW_HASKELL__ >= 806
 
@@ -156,10 +157,10 @@ tzipWith4 f tf tg th ti
 --     * Every field of @T f x@ is either a monoid, or of the form @f a@, for
 --       some type @a@.
 type CanDeriveApplicativeT t f g x
-  = ( GenericN (t f x)
-    , GenericN (t g x)
-    , GenericN (t (f `Product` g) x)
-    , GApplicative 1 f g (RepN (t f x)) (RepN (t g x)) (RepN (t (f `Product` g) x))
+  = ( GenericP 1 (t f x)
+    , GenericP 1 (t g x)
+    , GenericP 1 (t (f `Product` g) x)
+    , GApplicative 1 f g (RepP 1 (t f x)) (RepP 1 (t g x)) (RepP 1 (t (f `Product` g) x))
     )
 
 
@@ -175,7 +176,9 @@ gtprodDefault
   -> t g x
   -> t (f `Product` g) x
 gtprodDefault l r
-  = toN $ gprod (Proxy @1) (Proxy @f) (Proxy @g) (fromN l) (fromN r)
+  = toP p1 $ gprod p1 (Proxy @f) (Proxy @g) (fromP p1 l) (fromP p1 r)
+  where
+      p1 = Proxy @1
 {-# INLINE gtprodDefault #-}
 
 gtpureDefault
@@ -184,11 +187,11 @@ gtpureDefault
   => (forall a . f a)
   -> t f x
 gtpureDefault fa
-  = toN $ gpure
+  = toP (Proxy @1) $ gpure
       (Proxy @1)
       (Proxy @f)
-      (Proxy @(RepN (t f x)))
-      (Proxy @(RepN (t (f `Product` f) x)))
+      (Proxy @(RepP 1 (t f x)))
+      (Proxy @(RepP 1 (t (f `Product` f) x)))
       fa
 {-# INLINE gtpureDefault #-}
 
@@ -199,12 +202,11 @@ gtpureDefault fa
 
 type P = Param
 
--- t' is t, maybe with 'Param' annotations
 instance
   (  ApplicativeT t
-  ) => GApplicative 1 f g (Rec (t' (P 1 f) (P 0 x)) (t f x))
-                          (Rec (t' (P 1 g) (P 0 x)) (t g x))
-                          (Rec (t' (P 1 (f `Product` g)) (P 0 x)) (t (f `Product` g) x))
+  ) => GApplicative 1 f g (Rec (t (P 1 f) x) (t f x))
+                          (Rec (t (P 1 g) x) (t g x))
+                          (Rec (t (P 1 (f `Product` g)) x) (t (f `Product` g) x))
   where
   gpure _ _ _ _ fa
     = Rec (K1 (tpure fa))
@@ -216,14 +218,12 @@ instance
 
 
 
--- h' and t' are essentially  h and t, but maybe
--- with 'Param' annotations
 instance
   ( Applicative h
   , ApplicativeT t
-  ) => GApplicative 1 f g (Rec (h' (t' (P 1 f) (P 0 x))) (h (t f x)))
-                          (Rec (h' (t' (P 1 g) (P 0 x))) (h (t g x)))
-                          (Rec (h' (t' (P 1 (f `Product` g)) (P 0 x))) (h (t (f `Product` g) x)))
+  ) => GApplicative 1 f g (Rec (h (t (P 1 f) x)) (h (t f x)))
+                          (Rec (h (t (P 1 g) x)) (h (t g x)))
+                          (Rec (h (t (P 1 (f `Product` g)) x)) (h (t (f `Product` g) x)))
   where
   gpure _ _ _ _ fa
     = Rec (K1 (pure $ tpure fa))
@@ -239,9 +239,9 @@ instance
   ( Applicative h
   , Applicative m
   , ApplicativeT t
-  ) => GApplicative 1 f g (Rec (m' (h' (t' (P 1 f) (P 0 x)))) (m (h (t f x))))
-                          (Rec (m' (h' (t' (P 1 g) (P 0 x)))) (m (h (t g x))))
-                          (Rec (m' (h' (t' (P 1 (f `Product` g)) (P 0 x)))) (m (h (t (f `Product` g) x))))
+  ) => GApplicative 1 f g (Rec (m (h (t (P 1 f) x))) (m (h (t f x))))
+                          (Rec (m (h (t (P 1 g) x))) (m (h (t g x))))
+                          (Rec (m (h (t (P 1 (f `Product` g)) x))) (m (h (t (f `Product` g) x))))
   where
   gpure _ _ _ _ x
     = Rec (K1 (pure . pure $ tpure x))

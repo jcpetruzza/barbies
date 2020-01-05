@@ -220,10 +220,10 @@ tmempty
 --       @'ConstraintsT' t@ instance. In particular, recursive usages of @T f x@
 --       are allowed.
 type CanDeriveConstraintsT c t f x
-  = ( GenericN (t f x)
-    , GenericN (t (Dict c `Product` f) x)
+  = ( GenericP 1 (t f x)
+    , GenericP 1 (t (Dict c `Product` f) x)
     , AllT c t ~ GAll 1 c (GAllRepT t)
-    , GConstraints 1 c f (GAllRepT t) (RepN (t f x)) (RepN (t (Dict c `Product` f) x))
+    , GConstraints 1 c f (GAllRepT t) (RepP 1 (t f x)) (RepP 1 (t (Dict c `Product` f) x))
     )
 
 -- | The representation used for the generic computation of the @'AllT' c t@
@@ -244,7 +244,7 @@ gtaddDictsDefault
   => t f x
   -> t (Dict c `Product` f) x
 gtaddDictsDefault
-  = toN . gaddDicts @1 @c @f @(GAllRepT t) . fromN
+  = toP (Proxy @1) . gaddDicts @1 @c @f @(GAllRepT t) . fromP (Proxy @1)
 {-# INLINE gtaddDictsDefault #-}
 
 
@@ -259,9 +259,9 @@ instance
   , AllT c t
   ) => -- t' is t, maybe with 'Param' annotations
        GConstraints 1 c f (Rec (Self t' (P 1 X) (P 0 Y)) (t X Y))
-                          (Rec (t' (P 1 f) (P 0 y)) (t f y))
-                          (Rec (t' (P 1 (Dict c `Product` f)) (P 0 y))
-                               (t       (Dict c `Product` f)       y))
+                          (Rec (t (P 1 f) y) (t f y))
+                          (Rec (t (P 1 (Dict c `Product` f)) y)
+                               (t      (Dict c `Product` f)  y))
   where
   gaddDicts
     = Rec . K1 . taddDicts . unK1 . unRec
@@ -274,9 +274,9 @@ instance
   ( ConstraintsT t
   , AllT c t
   ) => GConstraints 1 c f (Rec (Other t' (P 1 X) (P 0 Y)) (t X Y))
-                          (Rec (t' (P 1 f) (P 0 y)) (t f y))
-                          (Rec (t' (P 1 (Dict c `Product` f)) (P 0 y))
-                               (t       (Dict c `Product` f)       y))
+                          (Rec (t (P 1 f) y) (t f y))
+                          (Rec (t (P 1 (Dict c `Product` f)) y)
+                               (t      (Dict c `Product` f)  y))
   where
   gaddDicts
     = Rec . K1 . taddDicts . unK1 . unRec
