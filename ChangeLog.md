@@ -2,26 +2,26 @@
 
 ## 2.0.0.0
   - Builds with ghc 8.8, but drops support for ghc 8.0 and 8.2
+  - Fix failure to derive `TraversableB` and `ConstraintsB` when using a type
+    parameter not under the functor argument.
+  - Fix failure to derive instances for types with arguments of kind `k -> Type`.
+  - Fix failure to derive instances where functor arg is applied under a functor.
+  - Derive instances for nested barbies occurring under two functors (Matthew Peddie).
+  - Add `foldMapC` and `bzipWithxC` (Matthew Peddie).
+  - Create a `Barbies` module, to contain wrappers, basic docs, etc.
+    `Data.Functor.Barbie` contains only functor-related stuff.
+  - Replace `ProductB` by `ApplicativeB`, with more lax laws. Now we can derive
+    more instances than before, since arbitrary monoids are allowed as fields
+    of the record.
+  - Add `Data.Functor.Transformer`, operations for bi-barbies, including support for nesting.
+  - Add a `ErrorContainer` wrapper, similar to `Container` but for `Either e`.
+  - Remove `ProductBC`, since `bdicts` can now be defined in terms of `ApplicativeB`
+    and `ConstraintsB`.
   - Remove functions deprecated on release 1.0
   - Deprecate `Data.Functor.Prod`, `(/*)` and `(/*/)`.
   - Deprecate `Data.Barbie`, in favor of `Data.Functor.Barbie`.
   - Deprecate `Data.Barbie.Bare`, in favor of `Barbies.Bare`.
   - Deprecate `Data.Barbie.Constraints`, in favor of `Barbies.Constraints`.
-  - Create a `Barbies` module, to contain wrappers, basic docs, etc.
-    `Data.Functor.Barbie` contains only functor-related stuff.
-  - Add a `ErrorContainer` wrapper, similar to `Container` but for `Either e`.
-  - Replace `ProductB` by `ApplicativeB`, with more lax laws. Now we can derive
-    more instances than before, since arbitrary monoids are allowed as fields
-    of the record.
-  - Remove `ProductBC`, since `bdicts` can now be defined in terms of `ApplicativeB`
-    and `ConstraintsB`.
-  - Fix failure to derive `TraversableB` and `ConstraintsB` when using a type
-    parameter not under the functor argument.
-  - Derive instances for nested barbies occurring under two functors (Matthew Peddie).
-  - Add `foldMapC` and `bzipWithxC` (Matthew Peddie).
-  - Fix failure to derive instances for types with arguments of kind `k -> Type`.
-  - Fix failure to derive instances where functor arg is applied under a functor.
-  - Add `Data.Functor.Transformer`
 
 ## 1.1.3.0
   - `Wear` will raise a `TypeError` instead of getting
