@@ -6,16 +6,26 @@ to become a different doll. This is a common Haskell-idiom. E.g.,
 
 ```haskell
 
-data Barbie f
-  = Barbie
+data Person f
+  = Person
       { name :: f String
       , age  :: f Int
       }
 
-b1 :: Barbie Last       -- Barbie with a monoid structure
-b2 :: Barbie (Const a)  -- container Barbie
-b3 :: Barbie Identity   -- Barbie's new clothes
+b1 :: Person Last       -- Barbie with a monoid structure
+b2 :: Person (Const a)  -- container Barbie
+b3 :: Person Identity   -- Barbie's new clothes
 
 ```
 
 This package provides basic classes and abstractions to work with these types and easily transform them.
+See the [docs](https://hackage.haskell.org/package/barbies/docs/Barbies.html) to learn more.
+
+## Related packages
+
+  - [barbies-th](https://hackage.haskell.org/package/barbies-th): Use Template Haskell to
+    derive barbie-types from declarations that look like normal types.
+  - [higgledy](https://hackage.haskell.org/package/higgledy): Use Generics to give a barbie-type interface
+    to a normal type.
+  - [harg](https://hackage.haskell.org/package/harg): Program-configuration (from command-line arguments,
+     environment variables, configuration files, etc) via barbie-types
