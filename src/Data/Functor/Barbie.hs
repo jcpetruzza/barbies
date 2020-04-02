@@ -8,6 +8,10 @@ module Data.Functor.Barbie
   ( -- * Functor
     Func.FunctorB(bmap)
 
+    -- * Distributive
+  , Distr.DistributiveB(bdistribute)
+  , Distr.bshape
+
     -- * Traversable
   , Trav.TraversableB(btraverse)
     -- ** Utility functions
@@ -67,6 +71,7 @@ where
 import qualified Barbies.Internal.ApplicativeB as Appl
 import qualified Barbies.Internal.ConstraintsB as Cons
 import qualified Barbies.Internal.FunctorB as Func
+import qualified Barbies.Internal.DistributiveB as Distr
 import qualified Barbies.Internal.TraversableB as Trav
 
 import qualified Data.Generics.GenericN as GenericN

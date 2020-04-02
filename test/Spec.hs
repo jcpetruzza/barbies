@@ -6,6 +6,7 @@ import qualified Spec.Constraints as Constraints
 import qualified Spec.Functor as Functor
 import qualified Spec.Applicative as Applicative
 import qualified Spec.Traversable as Traversable
+import qualified Spec.Distributive as Distributive
 import qualified Spec.Wrapper as Wrapper
 
 import TestBarbies
@@ -69,6 +70,24 @@ main
             , Functor.laws @(Flip Bi.NestedF ())
             , Functor.laws @(Flip Bi.Nested2F ())
             , Functor.laws @(Flip Bi.NestedB Maybe)
+            ]
+
+        , testGroup "Distributive Laws"
+            [ Distributive.laws @Record0
+            , Distributive.laws @Record1
+
+            , Distributive.laws @Record1S
+            , Distributive.laws @Record3S
+
+            , Distributive.laws @(Record1W Covered)
+            , Distributive.laws @(Record3W Covered)
+
+            , Distributive.laws @CompositeRecord
+
+            , Distributive.laws @(Record1WS Covered)
+            , Distributive.laws @(Record3WS Covered)
+
+            , Distributive.laws @(CompositeRecordW Covered)
             ]
 
         , testGroup "Traversable Laws"

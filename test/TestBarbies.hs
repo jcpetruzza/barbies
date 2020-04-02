@@ -31,6 +31,7 @@ where
 
 import qualified Barbies
 import Data.Functor.Barbie
+import Data.Distributive
 
 import Data.Typeable
 import GHC.Generics
@@ -48,6 +49,7 @@ data Record0 (f :: * -> *)
     )
 
 instance FunctorB Record0
+instance DistributiveB Record0
 instance TraversableB Record0
 instance ApplicativeB Record0
 instance ConstraintsB Record0
@@ -61,6 +63,7 @@ data Record1 f
 
 
 instance FunctorB Record1
+instance DistributiveB Record1
 instance TraversableB Record1
 instance ApplicativeB Record1
 instance ConstraintsB Record1
@@ -78,6 +81,7 @@ data Record1S f
 
 
 instance FunctorB Record1S
+instance DistributiveB Record1S
 instance TraversableB Record1S
 instance ApplicativeB Record1S
 instance ConstraintsB Record1S
@@ -121,6 +125,7 @@ data Record3S f
 
 
 instance FunctorB Record3S
+instance DistributiveB Record3S
 instance TraversableB Record3S
 instance ApplicativeB Record3S
 instance ConstraintsB Record3S
@@ -179,12 +184,12 @@ data CompositeRecord f
   = CompositeRecord
       { crec_f1 :: f Int
       , crec_F2 :: f Bool
-      , crec_f3 :: Record3 f
       , crec_f4 :: Record1 f
       }
   deriving (Generic, Typeable)
 
 instance FunctorB CompositeRecord
+instance DistributiveB CompositeRecord
 instance TraversableB CompositeRecord
 instance ApplicativeB CompositeRecord
 instance ConstraintsB CompositeRecord
@@ -194,7 +199,7 @@ deriving instance AllBF Eq   f CompositeRecord => Eq   (CompositeRecord f)
 
 instance AllBF Arbitrary f CompositeRecord => Arbitrary (CompositeRecord f) where
   arbitrary
-    = CompositeRecord <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+    = CompositeRecord <$> arbitrary <*> arbitrary <*> arbitrary
 
 data SumRec f
   = SumRec_0
@@ -222,6 +227,7 @@ data InfRec f
   deriving (Generic, Typeable)
 
 instance FunctorB InfRec
+instance DistributiveB InfRec
 instance TraversableB InfRec
 instance ApplicativeB InfRec
 instance ConstraintsB InfRec
@@ -281,6 +287,7 @@ data ParB b (f :: * -> *)
   deriving (Generic, Typeable)
 
 instance FunctorB b => FunctorB (ParB b)
+instance DistributiveB b => DistributiveB (ParB b)
 instance TraversableB b => TraversableB (ParB b)
 instance ApplicativeB b => ApplicativeB (ParB b)
 instance ConstraintsB b => ConstraintsB (ParB b)
@@ -290,6 +297,7 @@ data ParBH h b (f :: * -> *)
   deriving (Generic, Typeable)
 
 instance (Functor h, FunctorB b) => FunctorB (ParBH h b)
+instance (Distributive h, DistributiveB b) => DistributiveB (ParBH h b)
 instance (Traversable h, TraversableB b) => TraversableB (ParBH h b)
 instance (Applicative h, ApplicativeB b) => ApplicativeB (ParBH h b)
 
