@@ -9,6 +9,7 @@ where
 import Barbies.Internal.ApplicativeB(ApplicativeB(..))
 import Barbies.Internal.ConstraintsB(ConstraintsB(..))
 import Barbies.Internal.FunctorB(FunctorB(..))
+import Barbies.Internal.DistributiveB(DistributiveB(..))
 import Barbies.Internal.TraversableB(TraversableB(..))
 
 import Data.Data (Data(..))
@@ -58,6 +59,7 @@ instance Monoid (Unit f) where
   mappend = (<>)
 
 instance FunctorB Unit
+instance DistributiveB Unit
 instance TraversableB Unit
 instance ApplicativeB Unit
 instance ConstraintsB Unit

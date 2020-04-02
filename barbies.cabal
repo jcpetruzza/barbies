@@ -43,6 +43,7 @@ library
       Barbies.Generics.Applicative
       Barbies.Generics.Bare
       Barbies.Generics.Constraints
+      Barbies.Generics.Distributive
       Barbies.Generics.Functor
       Barbies.Generics.Traversable
 
@@ -54,6 +55,8 @@ library
       Barbies.Internal.ConstraintsT
       Barbies.Internal.Containers
       Barbies.Internal.Dicts
+
+      Barbies.Internal.DistributiveB
 
       Barbies.Internal.FunctorB
       Barbies.Internal.FunctorT
@@ -79,6 +82,7 @@ library
 
   build-depends:
       base >=4.11 && <5,
+      distributive,
       transformers
 
   ghc-options: -Wall
