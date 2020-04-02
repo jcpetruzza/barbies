@@ -40,6 +40,7 @@ data Record1W t f
 
 instance FunctorB (Record1W Bare)
 instance FunctorB (Record1W Covered)
+instance DistributiveB (Record1W Covered)
 instance TraversableB (Record1W Covered)
 instance ApplicativeB (Record1W Covered)
 instance ConstraintsB (Record1W Bare)
@@ -63,6 +64,7 @@ data Record1WS t f
 
 instance FunctorB (Record1WS Bare)
 instance FunctorB (Record1WS Covered)
+instance DistributiveB (Record1WS Covered)
 instance TraversableB (Record1WS Covered)
 instance ApplicativeB (Record1WS Covered)
 instance ConstraintsB (Record1WS Bare)
@@ -89,6 +91,7 @@ data Record3W t f
 
 instance FunctorB (Record3W Bare)
 instance FunctorB (Record3W Covered)
+instance DistributiveB (Record3W Covered)
 instance TraversableB (Record3W Bare)
 instance TraversableB (Record3W Covered)
 instance ApplicativeB (Record3W Covered)
@@ -117,6 +120,7 @@ data Record3WS t f
 
 instance FunctorB (Record3WS Bare)
 instance FunctorB (Record3WS Covered)
+instance DistributiveB (Record3WS Covered)
 instance TraversableB (Record3WS Covered)
 instance ApplicativeB (Record3WS Covered)
 instance ConstraintsB (Record3WS Bare)
@@ -179,6 +183,7 @@ data CompositeRecordW t f
 
 instance FunctorB (CompositeRecordW Bare)
 instance FunctorB (CompositeRecordW Covered)
+instance DistributiveB (CompositeRecordW Covered)
 instance TraversableB (CompositeRecordW Covered)
 instance ApplicativeB (CompositeRecordW Covered)
 instance ConstraintsB (CompositeRecordW Bare)
@@ -228,6 +233,7 @@ data InfRecW t f
 
 instance FunctorB (InfRecW Bare)
 instance FunctorB (InfRecW Covered)
+instance DistributiveB (InfRecW Covered)
 instance TraversableB (InfRecW Covered)
 instance ApplicativeB (InfRecW Covered)
 instance ConstraintsB (InfRecW Bare)
@@ -333,6 +339,7 @@ data ParXW a t f
 
 instance FunctorB (ParXW a Bare)
 instance FunctorB (ParXW a Covered)
+instance DistributiveB (ParXW a Covered)
 instance TraversableB (ParXW a Covered)
 instance ApplicativeB (ParXW a Covered)
 instance ConstraintsB (ParXW a Covered)

@@ -124,6 +124,7 @@ test-suite barbies-test
       Spec.Applicative
       Spec.Bare
       Spec.Constraints
+      Spec.Distributive
       Spec.Functor
       Spec.Traversable
       Spec.Wrapper
@@ -136,6 +137,7 @@ test-suite barbies-test
   build-depends:
       barbies
     , base >=4.7 && <5
+    , distributive
     , QuickCheck
     , tasty
     , tasty-hunit
