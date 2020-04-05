@@ -10,6 +10,7 @@ module Data.Functor.Barbie
 
     -- * Distributive
   , Distr.DistributiveB(bdistribute)
+  , Distr.bdistribute'
   , Distr.bshape
 
     -- * Traversable
