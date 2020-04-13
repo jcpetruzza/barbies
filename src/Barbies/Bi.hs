@@ -161,6 +161,9 @@ instance FunctorT b => FunctorB (Flip b f) where
     = Flip (tmap h bfx)
   {-# INLINE bmap #-}
 
+instance DistributiveT b => DistributiveB (Flip b f) where
+  bdistribute = Flip . tdistribute . fmap runFlip
+  {-# INLINE bdistribute #-}
 
 instance TraversableT b => TraversableB (Flip b f) where
   btraverse h (Flip bfx)
@@ -185,6 +188,10 @@ instance (forall f. FunctorB (b f)) => FunctorT (Flip b) where
   tmap h (Flip bxf)
     = Flip (bmap h bxf)
   {-# INLINE tmap #-}
+
+instance (forall f. DistributiveB (b f)) => DistributiveT (Flip b) where
+  tdistribute = Flip . bdistribute . fmap runFlip
+  {-# INLINE tdistribute #-}
 
 instance (forall f. TraversableB (b f)) => TraversableT (Flip b) where
   ttraverse h (Flip bxf)
