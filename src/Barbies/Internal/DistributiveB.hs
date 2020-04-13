@@ -5,6 +5,7 @@ module Barbies.Internal.DistributiveB
   ( DistributiveB(..)
   , bshape
   , bdistribute'
+  , bcollect
   , gbdistributeDefault
   , CanDeriveDistributiveB
   )
@@ -64,6 +65,9 @@ bshape = bdistribute' id
 -- | A version of `bdistribute` with @g@ specialized to `Identity`.
 bdistribute' :: (DistributiveB b, Functor f) => f (b Identity) -> b f
 bdistribute' = bmap (fmap runIdentity . getCompose) . bdistribute
+
+bcollect :: (DistributiveB b, Functor f) => (a -> b g) -> f a -> b (Compose f g)
+bcollect f = bdistribute . fmap f
 
 type CanDeriveDistributiveB b f g
   = ( GenericP 0 (b g)
