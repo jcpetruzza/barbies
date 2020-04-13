@@ -88,6 +88,11 @@ main
             , Distributive.laws @(Record3WS Covered)
 
             , Distributive.laws @(CompositeRecordW Covered)
+
+            , Distributive.laws @(Flip Bi.Record0 ())
+            , Distributive.laws @(Flip Bi.Record1 ())
+            , Distributive.laws @(Flip Bi.Record1S ())
+            , Distributive.laws @(Flip Bi.Record3S ())
             ]
 
         , testGroup "Traversable Laws"

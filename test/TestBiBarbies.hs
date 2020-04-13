@@ -33,6 +33,7 @@ module TestBiBarbies
 where
 
 import Barbies
+import Data.Distributive
 import qualified TestBarbies
 
 import Data.Typeable
@@ -54,6 +55,7 @@ data Record0 (f :: kl -> *) (x :: kr)
     )
 
 instance FunctorT Record0
+instance DistributiveT Record0
 instance ApplicativeT Record0
 instance TraversableT Record0
 instance ConstraintsT Record0
@@ -67,6 +69,7 @@ data Record1 f (x :: kr)
 
 
 instance FunctorT Record1
+instance DistributiveT Record1
 instance ApplicativeT Record1
 instance TraversableT Record1
 instance ConstraintsT Record1
@@ -84,6 +87,7 @@ data Record1S f (x :: kr)
 
 
 instance FunctorT Record1S
+instance DistributiveT Record1S
 instance ApplicativeT Record1S
 instance TraversableT Record1S
 instance ConstraintsT Record1S
@@ -126,6 +130,7 @@ data Record3S f x
 
 
 instance FunctorT Record3S
+instance DistributiveT Record3S
 instance ApplicativeT Record3S
 instance TraversableT Record3S
 instance ConstraintsT Record3S
@@ -287,6 +292,7 @@ data ParB b (f :: k -> *) (x :: kx)
   deriving (Generic, Typeable)
 
 instance FunctorT b => FunctorT (ParB b)
+instance DistributiveT b => DistributiveT (ParB b)
 instance ApplicativeT b => ApplicativeT (ParB b)
 instance TraversableT b => TraversableT (ParB b)
 instance ConstraintsT b => ConstraintsT (ParB b)
@@ -296,6 +302,7 @@ data ParBH h b (f :: k -> *) (x :: kx)
   deriving (Generic, Typeable)
 
 instance (Functor h, FunctorT b) => FunctorT (ParBH h b)
+instance (Distributive h, DistributiveT b) => DistributiveT (ParBH h b)
 instance (Applicative h, ApplicativeT b) => ApplicativeT (ParBH h b)
 instance (Traversable h, TraversableT b) => TraversableT (ParBH h b)
 
@@ -337,28 +344,29 @@ instance ConstraintsT HKB
 -- Actual bi-barbies
 -----------------------------------------------------
 
-type Record3' = TestBarbies.Record3
+type Record1' = TestBarbies.Record1
 
 data NestedB f g
   = NestedB
       { nb_1 :: g Int
       , nb_2 :: f (g Bool)
-      , nb_3 :: f (Record3' g)
-      , nb_4 :: Record3' g
+      , nb_3 :: f (Record1' g)
+      , nb_4 :: Record1' g
       }
   deriving (Generic, Typeable)
 
 instance FunctorT NestedB
 instance TraversableT NestedB
 instance Functor f => FunctorB (NestedB f)
+instance Distributive f => DistributiveB (NestedB f)
 instance Applicative f => ApplicativeB (NestedB f)
 instance Traversable f => TraversableB (NestedB f)
 
 
-deriving instance (Show (f (g Bool)), AllBF Show g Record3', Show (f (Record3' g))) => Show (NestedB f g)
-deriving instance (Eq (f (g Bool)), AllBF Eq g Record3', Eq (f (Record3' g))) => Eq (NestedB f g)
+deriving instance (Show (f (g Bool)), AllBF Show g Record1', Show (f (Record1' g))) => Show (NestedB f g)
+deriving instance (Eq (f (g Bool)), AllBF Eq g Record1', Eq (f (Record1' g))) => Eq (NestedB f g)
 
 
-instance (Arbitrary (f (g Bool)), AllBF Arbitrary g Record3', Arbitrary (f (Record3' g))) => Arbitrary (NestedB f g) where
+instance (Arbitrary (f (g Bool)), AllBF Arbitrary g Record1', Arbitrary (f (Record1' g))) => Arbitrary (NestedB f g) where
   arbitrary
     = NestedB <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
