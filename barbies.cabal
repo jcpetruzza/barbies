@@ -57,6 +57,7 @@ library
       Barbies.Internal.Dicts
 
       Barbies.Internal.DistributiveB
+      Barbies.Internal.DistributiveT
 
       Barbies.Internal.FunctorB
       Barbies.Internal.FunctorT

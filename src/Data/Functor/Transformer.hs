@@ -9,6 +9,9 @@ module Data.Functor.Transformer
     -- * Functor
     Func.FunctorT(tmap)
 
+    -- * Distributive
+  , Dist.DistributiveT(tdistribute)
+
     -- * Traversable
   , Trav.TraversableT(ttraverse)
     -- ** Utility functions
@@ -45,6 +48,7 @@ where
 
 import qualified Barbies.Internal.ApplicativeT as Appl
 import qualified Barbies.Internal.ConstraintsT as Cons
+import qualified Barbies.Internal.DistributiveT as Dist
 import qualified Barbies.Internal.FunctorT as Func
 import qualified Barbies.Internal.MonadT as Mon
 import qualified Barbies.Internal.TraversableT as Trav
