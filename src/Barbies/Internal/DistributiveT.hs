@@ -59,6 +59,19 @@ tcotraverse :: (DistributiveT b, Functor f) => (forall a . f (g a) -> f a) -> f 
 tcotraverse h = tmap (h . getCompose) . tdistribute
 
 -- | @'CanDeriveDistributiveT' T f g x@ is in practice a predicate about @T@ only.
+--   Intuitively, it says the the following holds  for any arbitrary @f@:
+--
+--     * There is an instance of @'Generic' (B f x)@.
+--
+--     * @(B f x)@ has only one constructor, and doesn't contain "naked" fields
+--       (that is, not covered by `f`). In particular, @x@ needs to occur under @f@.
+--
+--     * @B f x@ can contain fields of type @b f y@ as long as there exists a
+--       @'DistributiveT' b@ instance. In particular, recursive usages of @B f x@
+--       are allowed.
+--
+--     * @B f x@ can also contain usages of @b f y@ under a @'Distributive' h@.
+--       For example, one could use @a -> (B f x)@ as a field of @B f x@.
 type CanDeriveDistributiveT (t :: (Type -> Type) -> i -> Type) f g x
   = ( GenericP 1 (t g x)
     , GenericP 1 (t (Compose f g) x)

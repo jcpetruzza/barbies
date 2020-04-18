@@ -70,6 +70,24 @@ bdistribute' = bmap (fmap runIdentity . getCompose) . bdistribute
 bcotraverse :: (DistributiveB b, Functor f) => (forall a . f (g a) -> f a) -> f (b g) -> b f
 bcotraverse h = bmap (h . getCompose) . bdistribute
 
+-- | Recompose a decomposed function.
+brecompose :: FunctorB b => b ((->) a) -> a -> b Identity
+brecompose bfs = \a -> bmap (Identity . ($ a)) bfs
+
+-- | @'CanDeriveDistributiveB' B f g@ is in practice a predicate about @B@ only.
+--   Intuitively, it says the the following holds  for any arbitrary @f@:
+--
+--     * There is an instance of @'Generic' (B f)@.
+--
+--     * @(B f)@ has only one constructor, and doesn't contain "naked" fields
+--       (that is, not covered by `f`).
+--
+--     * @B f@ can contain fields of type @b f@ as long as there exists a
+--       @'DistributiveB' b@ instance. In particular, recursive usages of @B f@
+--       are allowed.
+--
+--     * @B f@ can also contain usages of @b f@ under a @'Distributive' h@.
+--       For example, one could use @a -> (B f)@ as a field of @B f@.
 type CanDeriveDistributiveB b f g
   = ( GenericP 0 (b g)
     , GenericP 0 (b (Compose f g))
