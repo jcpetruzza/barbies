@@ -20,7 +20,8 @@ module Data.Functor.Barbie
   , Distr.DistributiveB(bdistribute)
   , Distr.bdistribute'
   , Distr.bcotraverse
-  , Distr.bshape
+  , Distr.bdecompose
+  , Distr.brecompose
 
     -- * Applicative
   , Appl.ApplicativeB(bpure, bprod)

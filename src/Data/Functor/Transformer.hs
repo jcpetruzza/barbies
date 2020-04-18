@@ -19,9 +19,10 @@ module Data.Functor.Transformer
 
     -- * Distributive
   , Dist.DistributiveT(tdistribute)
-  , Dist.tshape
   , Dist.tdistribute'
   , Dist.tcotraverse
+  , Dist.tdecompose
+  , Dist.trecompose
 
     -- * Applicative
   , Appl.ApplicativeT(tpure, tprod)

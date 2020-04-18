@@ -3,9 +3,10 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.DistributiveB
   ( DistributiveB(..)
-  , bshape
   , bdistribute'
   , bcotraverse
+  , bdecompose
+  , brecompose
   , gbdistributeDefault
   , CanDeriveDistributiveB
   )
@@ -24,26 +25,39 @@ import Data.Distributive
 import Data.Kind              (Type)
 
 -- | A 'FunctorB' where the effects can be distributed to the fields:
--- `bdistribute` turns an effectful way of making a Barbie-type
--- into a pure Barbie-type with effectful ways of computing the
--- values of its fields.
+--  `bdistribute` turns an effectful way of building a Barbie-type
+--  into a pure Barbie-type with effectful ways of computing the
+--  values of its fields.
 --
--- From 'bdistribute', we can define a pure skeleton where very field
--- is a getter of that field:
---
--- @
--- 'bshape' :: ('DistributiveB' b) => b ((->) (b 'Identity'))
--- 'bshape' = 'bdistribute'' 'id'
--- @
---
---  It should satisfy the following law
+--  This class is the categorical dual of `Barbies.Internal.TraversableB.TraversableB`,
+--  with `bdistribute` the dual of `Barbies.Internal.TraversableB.bsequence`
+--  and `bcotraverse` the dual of `Barbies.Internal.TraversableB.btraverse`. As such,
+--  instances need to satisfy these laws:
 --
 -- @
--- 'bmap' ('Identity' . ('$' b)) 'bshape' = b
+-- 'bdistribute' . h = 'bmap' ('Compose' . h . 'getCompose') . 'bdistribute'    -- naturality
+-- 'bdistribute' . 'Data.Functor.Identity' = 'bmap' ('Compose' . 'Data.Functor.Identity')                 -- identity
+-- 'bdistribute' . 'Compose' = 'bmap' ('Compose' . 'Compose' . 'fmap' 'getCompose' . 'getCompose') . 'bdistribute' . 'fmap' 'bdistribute' -- composition
 -- @
 --
---  It is to 'FunctorB' in the same way as 'Distributive'
---  relates to 'Functor'.
+-- By specializing @f@ to @((->) a)@ and @g@ to 'Identity', we can define a function that
+-- decomposes a function on distributive barbies into a collection of simpler functions:
+--
+-- @
+-- 'bdecompose' :: 'DistributiveB' b => (a -> b 'Identity') -> b ((->) a)
+-- 'bdecompose' = 'bmap' ('fmap' 'runIdentity' . 'getCompose') . 'bdistribute'
+-- @
+--
+-- Lawful instances of the class can then be characterized as those that satisfy:
+--
+-- @
+-- 'brecompose' . 'bdecompose' = 'id'
+-- 'bdecompose' . 'brecompose' = 'id'
+-- @
+--
+-- This means intuitively that instances need to have a fixed shape (i.e. no sum-types can be involved).
+-- Typically, this means record types, as long as they don't contain fields where the functor argument is not applied.
+--
 --
 -- There is a default implementation of 'bdistribute' based on
 -- 'Generic'.  Intuitively, it works on product types where the shape
@@ -51,7 +65,6 @@ import Data.Kind              (Type)
 -- the argument @f@.
 class (FunctorB b) => DistributiveB (b :: (k -> Type) -> Type) where
   bdistribute :: Functor f => f (b g) -> b (Compose f g)
-  -- bdistribute x = bmap (\f -> Compose $ fmap f . bsequence' <$> x) bshape
 
   default bdistribute
     :: forall f g
@@ -59,8 +72,6 @@ class (FunctorB b) => DistributiveB (b :: (k -> Type) -> Type) where
     => Functor f => f (b g) -> b (Compose f g)
   bdistribute = gbdistributeDefault
 
-bshape :: DistributiveB b => b ((->) (b Identity))
-bshape = bdistribute' id
 
 -- | A version of `bdistribute` with @g@ specialized to `Identity`.
 bdistribute' :: (DistributiveB b, Functor f) => f (b Identity) -> b f
@@ -69,6 +80,11 @@ bdistribute' = bmap (fmap runIdentity . getCompose) . bdistribute
 -- | Dual of `Barbies.Internal.TraversableB.btraverse`
 bcotraverse :: (DistributiveB b, Functor f) => (forall a . f (g a) -> f a) -> f (b g) -> b f
 bcotraverse h = bmap (h . getCompose) . bdistribute
+
+-- | Decompose a function returning a distributive barbie, into
+--   a collection of simpler functions.
+bdecompose :: DistributiveB b => (a -> b Identity) -> b ((->) a)
+bdecompose = bdistribute'
 
 -- | Recompose a decomposed function.
 brecompose :: FunctorB b => b ((->) a) -> a -> b Identity
