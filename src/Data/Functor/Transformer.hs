@@ -21,7 +21,7 @@ module Data.Functor.Transformer
   , Dist.DistributiveT(tdistribute)
   , Dist.tshape
   , Dist.tdistribute'
-  , Dist.tcollect
+  , Dist.tcotraverse
 
     -- * Applicative
   , Appl.ApplicativeT(tpure, tprod)
