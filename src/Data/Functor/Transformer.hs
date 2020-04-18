@@ -9,9 +9,6 @@ module Data.Functor.Transformer
     -- * Functor
     Func.FunctorT(tmap)
 
-    -- * Distributive
-  , Dist.DistributiveT(tdistribute)
-
     -- * Traversable
   , Trav.TraversableT(ttraverse)
     -- ** Utility functions
@@ -19,6 +16,12 @@ module Data.Functor.Transformer
   , Trav.tfoldMap
   , Trav.tsequence
   , Trav.tsequence'
+
+    -- * Distributive
+  , Dist.DistributiveT(tdistribute)
+  , Dist.tshape
+  , Dist.tdistribute'
+  , Dist.tcollect
 
     -- * Applicative
   , Appl.ApplicativeT(tpure, tprod)
