@@ -5,15 +5,17 @@ module Barbies.Internal
   , Internal.CanDeriveFunctorB
   , Internal.CanDeriveFunctorT
 
-
-
     -- * Traversable
   , Internal.gbtraverseDefault
   , Generics.GTraversable(..)
   , Internal.CanDeriveTraversableB
   , Internal.CanDeriveTraversableT
 
-
+    -- * Distributive
+  , Internal.gbdistributeDefault
+  , Generics.GDistributive(..)
+  , Internal.CanDeriveDistributiveB
+  , Internal.CanDeriveDistributiveT
 
     -- * Applicative
   , Internal.gbpureDefault
@@ -21,7 +23,6 @@ module Barbies.Internal
   , Generics.GApplicative(..)
   , Internal.CanDeriveApplicativeB
   , Internal.CanDeriveApplicativeT
-
 
 
     -- * Constraints
@@ -54,6 +55,7 @@ where
 import qualified Barbies.Generics.Applicative as Generics
 import qualified Barbies.Generics.Bare as Generics
 import qualified Barbies.Generics.Constraints as Generics
+import qualified Barbies.Generics.Distributive as Generics
 import qualified Barbies.Generics.Functor as Generics
 import qualified Barbies.Generics.Traversable as Generics
 
@@ -62,6 +64,8 @@ import qualified Barbies.Internal.ApplicativeT as Internal
 import qualified Barbies.Internal.BareB as Internal
 import qualified Barbies.Internal.ConstraintsB as Internal
 import qualified Barbies.Internal.ConstraintsT as Internal
+import qualified Barbies.Internal.DistributiveB as Internal
+import qualified Barbies.Internal.DistributiveT as Internal
 import qualified Barbies.Internal.FunctorB as Internal
 import qualified Barbies.Internal.FunctorT as Internal
 import qualified Barbies.Internal.TraversableB as Internal
