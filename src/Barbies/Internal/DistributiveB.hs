@@ -5,7 +5,7 @@ module Barbies.Internal.DistributiveB
   ( DistributiveB(..)
   , bshape
   , bdistribute'
-  , bcollect
+  , bcotraverse
   , gbdistributeDefault
   , CanDeriveDistributiveB
   )
@@ -66,8 +66,9 @@ bshape = bdistribute' id
 bdistribute' :: (DistributiveB b, Functor f) => f (b Identity) -> b f
 bdistribute' = bmap (fmap runIdentity . getCompose) . bdistribute
 
-bcollect :: (DistributiveB b, Functor f) => (a -> b g) -> f a -> b (Compose f g)
-bcollect f = bdistribute . fmap f
+-- | Dual of `Barbies.Internal.TraversableB.btraverse`
+bcotraverse :: (DistributiveB b, Functor f) => (forall a . f (g a) -> f a) -> f (b g) -> b f
+bcotraverse h = bmap (h . getCompose) . bdistribute
 
 type CanDeriveDistributiveB b f g
   = ( GenericP 0 (b g)

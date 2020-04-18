@@ -6,7 +6,7 @@ module Barbies.Internal.DistributiveT
   ( DistributiveT(..)
   , tshape
   , tdistribute'
-  , tcollect
+  , tcotraverse
   , gtdistributeDefault
   , CanDeriveDistributiveT
   )
@@ -54,9 +54,9 @@ tshape = tdistribute' id
 tdistribute' :: (DistributiveT b, Functor f) => f (b Identity x) -> b f x
 tdistribute' = tmap (fmap runIdentity . getCompose) . tdistribute
 
-tcollect :: (DistributiveT b, Functor f) => (a -> b g x) -> f a -> b (Compose f g) x
-tcollect f = tdistribute . fmap f
-
+-- | Dual of `Barbies.Internal.TraversableT.ttraverse`
+tcotraverse :: (DistributiveT b, Functor f) => (forall a . f (g a) -> f a) -> f (b g x) -> b f x
+tcotraverse h = tmap (h . getCompose) . tdistribute
 
 -- | @'CanDeriveDistributiveT' T f g x@ is in practice a predicate about @T@ only.
 type CanDeriveDistributiveT (t :: (Type -> Type) -> i -> Type) f g x
