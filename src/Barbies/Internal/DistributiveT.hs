@@ -4,9 +4,10 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.DistributiveT
   ( DistributiveT(..)
-  , tshape
   , tdistribute'
   , tcotraverse
+  , tdecompose
+  , trecompose
   , gtdistributeDefault
   , CanDeriveDistributiveT
   )
@@ -37,6 +38,45 @@ import Data.Proxy             (Proxy (..))
 import Data.Distributive
 import Data.Kind              (Type)
 
+-- | A 'FunctorT' where the effects can be distributed to the fields:
+--  `tdistribute` turns an effectful way of building a transformer-type
+--  into a pure transformer-type with effectful ways of computing the
+--  values of its fields.
+--
+--  This class is the categorical dual of `Barbies.Internal.TraversableT.TraversableT`,
+--  with `tdistribute` the dual of `Barbies.Internal.TraversableT.tsequence`
+--  and `tcotraverse` the dual of `Barbies.Internal.TraversableT.ttraverse`. As such,
+--  instances need to satisfy these laws:
+--
+-- @
+-- 'tdistribute' . h = 'tmap' ('Compose' . h . 'getCompose') . 'tdistribute'    -- naturality
+-- 'tdistribute' . 'Data.Functor.Identity' = 'tmap' ('Compose' . 'Data.Functor.Identity')                 -- identity
+-- 'tdistribute' . 'Compose' = 'fmap' ('Compose' . 'Compose' . 'fmap' 'getCompose' . 'getCompose') . 'tdistribute' . 'fmap' 'distribute' -- composition
+-- @
+--
+-- By specializing @f@ to @((->) a)@ and @g@ to 'Identity', we can define a function that
+-- decomposes a function on distributive transformers into a collection of simpler functions:
+--
+-- @
+-- 'tdecompose' :: 'DistributiveT' b => (a -> b 'Identity') -> b ((->) a)
+-- 'tdecompose' = 'tmap' ('fmap' 'runIdentity' . 'getCompose') . 'tdistribute'
+-- @
+--
+-- Lawful instances of the class can then be characterized as those that satisfy:
+--
+-- @
+-- 'trecompose' . 'tdecompose' = 'id'
+-- 'tdecompose' . 'trecompose' = 'id'
+-- @
+--
+-- This means intuitively that instances need to have a fixed shape (i.e. no sum-types can be involved).
+-- Typically, this means record types, as long as they don't contain fields where the functor argument is not applied.
+--
+--
+-- There is a default implementation of 'tdistribute' based on
+-- 'Generic'.  Intuitively, it works on product types where the shape
+-- of a pure value is uniquely defined and every field is covered by
+-- the argument @f@.
 class FunctorT t => DistributiveT (t :: (Type -> Type) -> i -> Type) where
   tdistribute :: Functor f => f (t g x) -> t (Compose f g) x
 
@@ -47,16 +87,22 @@ class FunctorT t => DistributiveT (t :: (Type -> Type) -> i -> Type) where
     -> t (Compose f g) x
   tdistribute = gtdistributeDefault
 
-tshape :: DistributiveT b => b ((->) (b Identity x)) x
-tshape = tdistribute' id
-
 -- | A version of `tdistribute` with @g@ specialized to `Identity`.
-tdistribute' :: (DistributiveT b, Functor f) => f (b Identity x) -> b f x
+tdistribute' :: (DistributiveT t, Functor f) => f (t Identity x) -> t f x
 tdistribute' = tmap (fmap runIdentity . getCompose) . tdistribute
 
 -- | Dual of `Barbies.Internal.TraversableT.ttraverse`
-tcotraverse :: (DistributiveT b, Functor f) => (forall a . f (g a) -> f a) -> f (b g x) -> b f x
+tcotraverse :: (DistributiveT t, Functor f) => (forall a . f (g a) -> f a) -> f (t g x) -> t f x
 tcotraverse h = tmap (h . getCompose) . tdistribute
+
+-- | Decompose a function returning a distributive transformer, into
+--   a collection of simpler functions.
+tdecompose :: DistributiveT t => (a -> t Identity x) -> t ((->) a) x
+tdecompose = tdistribute'
+
+-- | Recompose a decomposed function.
+trecompose :: FunctorT t => t ((->) a) x -> a -> t Identity x
+trecompose bfs = \a -> tmap (Identity . ($ a)) bfs
 
 -- | @'CanDeriveDistributiveT' T f g x@ is in practice a predicate about @T@ only.
 --   Intuitively, it says the the following holds  for any arbitrary @f@:
