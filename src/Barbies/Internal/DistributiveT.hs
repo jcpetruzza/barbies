@@ -4,6 +4,9 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.DistributiveT
   ( DistributiveT(..)
+  , tshape
+  , tdistribute'
+  , tcollect
   , gtdistributeDefault
   , CanDeriveDistributiveT
   )
@@ -27,6 +30,7 @@ import Control.Monad.Trans.Writer.Lazy as Lazy (WriterT(..))
 import Control.Monad.Trans.Writer.Strict as Strict (WriterT(..))
 
 import Data.Functor.Compose   (Compose (..))
+import Data.Functor.Identity  (Identity (..))
 import Data.Functor.Reverse   (Reverse (..))
 import Data.Generics.GenericN
 import Data.Proxy             (Proxy (..))
@@ -42,6 +46,17 @@ class FunctorT t => DistributiveT (t :: (Type -> Type) -> i -> Type) where
     => f (t g x)
     -> t (Compose f g) x
   tdistribute = gtdistributeDefault
+
+tshape :: DistributiveT b => b ((->) (b Identity x)) x
+tshape = tdistribute' id
+
+-- | A version of `tdistribute` with @g@ specialized to `Identity`.
+tdistribute' :: (DistributiveT b, Functor f) => f (b Identity x) -> b f x
+tdistribute' = tmap (fmap runIdentity . getCompose) . tdistribute
+
+tcollect :: (DistributiveT b, Functor f) => (a -> b g x) -> f a -> b (Compose f g) x
+tcollect f = tdistribute . fmap f
+
 
 -- | @'CanDeriveDistributiveT' T f g x@ is in practice a predicate about @T@ only.
 type CanDeriveDistributiveT (t :: (Type -> Type) -> i -> Type) f g x

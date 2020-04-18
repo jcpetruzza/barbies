@@ -8,12 +8,6 @@ module Data.Functor.Barbie
   ( -- * Functor
     Func.FunctorB(bmap)
 
-    -- * Distributive
-  , Distr.DistributiveB(bdistribute)
-  , Distr.bdistribute'
-  , Distr.bcollect
-  , Distr.bshape
-
     -- * Traversable
   , Trav.TraversableB(btraverse)
     -- ** Utility functions
@@ -21,6 +15,12 @@ module Data.Functor.Barbie
   , Trav.bfoldMap
   , Trav.bsequence
   , Trav.bsequence'
+
+    -- * Distributive
+  , Distr.DistributiveB(bdistribute)
+  , Distr.bdistribute'
+  , Distr.bcollect
+  , Distr.bshape
 
     -- * Applicative
   , Appl.ApplicativeB(bpure, bprod)
