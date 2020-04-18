@@ -27,9 +27,7 @@ import Control.Monad.Trans.Writer.Lazy as Lazy (WriterT(..))
 import Control.Monad.Trans.Writer.Strict as Strict (WriterT(..))
 
 import Data.Functor.Compose   (Compose (..))
-import Data.Functor.Product   (Product (..))
 import Data.Functor.Reverse   (Reverse (..))
-import Data.Functor.Sum       (Sum (..))
 import Data.Generics.GenericN
 import Data.Proxy             (Proxy (..))
 import Data.Distributive
