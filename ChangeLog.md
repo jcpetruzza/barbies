@@ -1,5 +1,9 @@
 # Changelog for barbies
 
+## ?
+  - Add `Barbies.Bare.Thin` marker type to support having _field-specific_
+    newtype wrappers that get applied only to the covered barbie.
+
 ## 2.0.0.0
   - Builds with ghc 8.8, but drops support for ghc 8.0 and 8.2
   - Fix failure to derive `TraversableB` and `ConstraintsB` when using a type
