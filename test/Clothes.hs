@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, DeriveFunctor #-}
 module Clothes
 
 where
@@ -16,7 +16,7 @@ import Test.Tasty.QuickCheck
 data UnitF a = UnitF deriving(Eq, Show, Typeable)
 
 data F a = F [a]
-  deriving(Eq, Show, Typeable)
+  deriving(Eq, Show, Typeable, Functor)
 
 instance Eq1 F where
   liftEq eq (F as) (F bs) = liftEq eq as bs
@@ -26,7 +26,7 @@ instance Show1 F where
     = showsUnaryWith (liftShowsPrec sp sl) "F" d as
 
 data G a = NoG | G1 a | Gn [a]
-  deriving(Eq, Show, Typeable)
+  deriving(Eq, Show, Typeable, Functor)
 
 instance Eq1 G where
   liftEq _  NoG     NoG     = True
@@ -43,7 +43,7 @@ instance Show1 G where
     Gn as -> showsUnaryWith (liftShowsPrec sp sl) "Gn" d as
 
 data H a = NoH1 | NoH2 | H1 [a] | H2 [a] | H3 [a]
-  deriving(Eq, Show, Typeable)
+  deriving(Eq, Show, Typeable, Functor)
 
 instance Show1 H where
   liftShowsPrec sp sl d = \case
