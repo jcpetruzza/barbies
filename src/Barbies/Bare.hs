@@ -44,13 +44,10 @@ module Barbies.Bare
   , bstripFrom
   , bcoverWith
 
-  , Thin
-
   ) where
 
 import Barbies.Internal.BareB
   ( Wear, Bare, Covered
   , BareB(..)
   , bstripFrom, bcoverWith
-  , Thin
   )

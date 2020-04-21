@@ -8,7 +8,7 @@ where
 
 import Data.Functor.Identity (Identity(..))
 
-import Data.Coerce (Coercible, coerce)
+import Data.Coerce (coerce)
 import Data.Generics.GenericN
 import Data.Proxy (Proxy(..))
 import GHC.TypeLits (Nat)
@@ -67,7 +67,7 @@ instance (GBare n l l', GBare n r r') => GBare n (l :+: r) (l' :+: r') where
 
 type P = Param
 
-instance Coercible a b => GBare n (Rec (P n Identity a) (Identity a)) (Rec b b) where
+instance GBare n (Rec (P n Identity a) (Identity a)) (Rec a a) where
   gstrip _ = coerce
   {-# INLINE gstrip #-}
 

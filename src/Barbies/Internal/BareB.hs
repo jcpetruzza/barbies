@@ -5,7 +5,6 @@ module Barbies.Internal.BareB
   ( Wear, Bare, Covered
   , BareB(..)
   , bstripFrom, bcoverWith
-  , Thin
 
   , gbstripDefault
   , gbcoverDefault
@@ -17,7 +16,7 @@ where
 
 import Barbies.Generics.Bare(GBare(..))
 import Barbies.Internal.FunctorB (FunctorB(..))
-import Barbies.Internal.Wear(Bare, Covered, Wear, Thin)
+import Barbies.Internal.Wear(Bare, Covered, Wear)
 import Data.Functor.Identity (Identity(..))
 
 import Data.Generics.GenericN
