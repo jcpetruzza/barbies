@@ -1,5 +1,8 @@
 # Changelog for barbies
 
+## 2.0.1.0
+  - Add the `DistributiveB` class (Gergő Érdi).
+
 ## 2.0.0.0
   - Builds with ghc 8.8, but drops support for ghc 8.0 and 8.2
   - Fix failure to derive `TraversableB` and `ConstraintsB` when using a type
