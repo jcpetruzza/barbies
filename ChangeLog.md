@@ -1,5 +1,9 @@
 # Changelog for barbies
 
+## ?
+  - Add `Barbies.Bare.WearTwo` type family to support having _field-specific_
+    newtype wrappers that get applied only to the covered barbie.
+
 ## 2.0.1.0
   - Add the `DistributiveB` class (Gergő Érdi).
 
