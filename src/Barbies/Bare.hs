@@ -17,7 +17,7 @@
 --   'Wear' 'Covered' f a = f a
 --
 -- data SignUpForm t f
---   = SignUpForm'
+--   = SignUpForm
 --       { username  :: 'Wear' t f 'String',
 --       , password  :: 'Wear' t f 'String'
 --       , mailingOk :: 'Wear' t f 'Bool'
@@ -27,8 +27,8 @@
 --  ...,
 --  instance 'BareB' SignUpForm
 --
--- type SignUpRaw  = SignUpForm 'Maybe'
--- type SignUpData = SignUpForm 'Bare'
+-- type SignUpRaw  = SignUpForm 'Covered' 'Maybe'
+-- type SignUpData = SignUpForm 'Bare' 'Identity'
 --
 -- formData = SignUpForm "jbond" "shaken007" False :: SignUpData
 -- @
