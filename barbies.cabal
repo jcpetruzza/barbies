@@ -1,5 +1,5 @@
 name:           barbies
-version:        2.0.1.0
+version:        2.0.2.0
 synopsis:       Classes for working with types that can change clothes.
 description:    Types that are parametric on a functor are like Barbies that have an outfit for each role. This package provides the basic abstractions to work with them comfortably.
 category:       Data-structures
