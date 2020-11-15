@@ -19,12 +19,19 @@ module Barbies.Internal.ConstraintsT
   , CanDeriveConstraintsT
   , gtaddDictsDefault
   , GAllRepT
+
+  , TagSelf1, TagSelf1'
   )
 
 where
 
 import Barbies.Internal.ApplicativeT(ApplicativeT (..))
-import Barbies.Generics.Constraints(GConstraints(..), GAll, TagSelf, Self, Other, X, Y)
+import Barbies.Generics.Constraints
+  ( GConstraints(..)
+  , GAll
+  , Self, Other, SelfOrOther
+  , X, Y
+  )
 import Barbies.Internal.Dicts(ClassF, Dict (..), requiringDict)
 import Barbies.Internal.FunctorT(FunctorT (..))
 import Barbies.Internal.TraversableT(TraversableT (..))
@@ -220,16 +227,16 @@ tmempty
 --       @'ConstraintsT' t@ instance. In particular, recursive usages of @T f x@
 --       are allowed.
 type CanDeriveConstraintsT c t f x
-  = ( GenericP 1 (t f x)
-    , GenericP 1 (t (Dict c `Product` f) x)
+  = ( GenericN (t f x)
+    , GenericN (t (Dict c `Product` f) x)
     , AllT c t ~ GAll 1 c (GAllRepT t)
-    , GConstraints 1 c f (GAllRepT t) (RepP 1 (t f x)) (RepP 1 (t (Dict c `Product` f) x))
+    , GConstraints 1 c f (GAllRepT t) (RepN (t f x)) (RepN (t (Dict c `Product` f) x))
     )
 
 -- | The representation used for the generic computation of the @'AllT' c t@
---   constraints. Here 'X' and 'Y' are arbitrary constants since the actual
---   argument to @t@ is irrelevant.
-type GAllRepT t = TagSelf 1 t (RepN (t X Y))
+--   constraints. .
+type GAllRepT t = TagSelf1 t
+
 
 -- ===============================================================
 --  Generic derivations
@@ -244,7 +251,8 @@ gtaddDictsDefault
   => t f x
   -> t (Dict c `Product` f) x
 gtaddDictsDefault
-  = toP (Proxy @1) . gaddDicts @1 @c @f @(GAllRepT t) . fromP (Proxy @1)
+  = toN . gaddDicts @1 @c @f @(GAllRepT t) . fromN
+
 {-# INLINE gtaddDictsDefault #-}
 
 
@@ -254,30 +262,73 @@ gtaddDictsDefault
 
 type P = Param
 
+-- Break recursive case
+type instance GAll 1 c (Self (t' (P 1 X) Y) (t X Y)) = ()
+
 instance
   ( ConstraintsT t
   , AllT c t
-  ) => -- t' is t, maybe with 'Param' annotations
-       GConstraints 1 c f (Rec (Self t' (P 1 X) (P 0 Y)) (t X Y))
-                          (Rec (t (P 1 f) y) (t f y))
-                          (Rec (t (P 1 (Dict c `Product` f)) y)
-                               (t      (Dict c `Product` f)  y))
+  ) => -- t' is t, maybe with some Param occurrences
+       GConstraints 1 c f (Self (t' (P 1 X) Y) (t X Y))
+                          (Rec (t' (P 1 f) (P 0 y)) (t f y))
+                          (Rec (t' (P 1 (Dict c `Product` f)) (P 0 y))
+                               (t       (Dict c `Product` f)       y))
   where
   gaddDicts
     = Rec . K1 . taddDicts . unK1 . unRec
   {-# INLINE gaddDicts #-}
 
 
-type instance GAll 1 c (Rec (Other t (P 1 X) (P 0 Y)) (t' X Y)) = AllT c t'
+type instance GAll 1 c (Other (t' (P 1 X) Y) (t X Y)) = AllT c t
 
 instance
   ( ConstraintsT t
   , AllT c t
-  ) => GConstraints 1 c f (Rec (Other t' (P 1 X) (P 0 Y)) (t X Y))
-                          (Rec (t (P 1 f) y) (t f y))
-                          (Rec (t (P 1 (Dict c `Product` f)) y)
-                               (t      (Dict c `Product` f)  y))
+  ) => -- t' is t maybe with some Param occurrences
+       GConstraints 1 c f (Other (t' (P 1 X) Y) (t X Y))
+                          (Rec (t' (P 1 f) (P 0 y)) (t f y))
+                          (Rec (t' (P 1 (Dict c `Product` f)) (P 0 y))
+                               (t       (Dict c `Product` f)       y))
   where
   gaddDicts
     = Rec . K1 . taddDicts . unK1 . unRec
   {-# INLINE gaddDicts #-}
+
+-- | We use the type-families to generically compute @'Barbies.AllT' c b@.
+--   Intuitively, if @t' f' x'@ occurs inside @t f x@, then we should just add
+--   @'Barbies.AllT' t' c@ to @'Barbies.AllT' t c@. The problem is that if @t@
+--   is a recursive type, and @t'@ is @t@, then ghc will choke and blow the
+--   stack (instead of computing a fixpoint).
+--
+--   So, we would like to behave differently when @t = t'@ and add @()@ instead
+--   of @'Barbies.AllT' t c@ to break the recursion. Our trick will be to use a
+--   type family to inspect @'Rep' (t X Y)@, for arbitrary @X@ and @Y@ and
+--   distinguish recursive usages from non-recursive ones, tagging them with
+--   different types, so we can distinguish them in the instances.
+type TagSelf1 b
+  = TagSelf1' (Indexed b 2) (Zip (Rep (Indexed (b X) 1 Y)) (Rep (b X Y)))
+
+type family TagSelf1' (b :: kf -> kg -> *) (repbf :: * -> *) :: * -> * where
+  TagSelf1' b (M1 mt m s)
+    = M1 mt m (TagSelf1' b s)
+
+  TagSelf1' b (l :+: r)
+    = TagSelf1' b l :+: TagSelf1' b r
+
+  TagSelf1' b (l :*: r)
+    = TagSelf1' b l :*: TagSelf1' b r
+
+  TagSelf1' (b :: kf -> kg -> *)
+            (Rec ((b'  :: kf -> kg -> *) fl fr)
+                 ((b'' :: kf -> kg -> *) gl gr)
+            )
+    = (SelfOrOther b b') (b' fl gr) (b'' gl gr)
+
+  TagSelf1' b (Rec x y)
+    = Rec x y
+
+  TagSelf1' b U1
+    = U1
+
+  TagSelf1' b V1
+    = V1

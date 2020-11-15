@@ -100,25 +100,23 @@ instance
 
 type P0 = Param 0
 
-instance GProductBC c (Rec (P0 X a_or_pma) (X a))
-                      (Rec (P0 (Dict c) a_or_pma) (Dict c a)) where
+instance c a => GProductBC c (Rec (P0 X a_or_pma) (X a))
+                             (Rec (P0 (Dict c) a_or_pma) (Dict c a)) where
   gbdicts = Rec (K1 Dict)
   {-# INLINE gbdicts #-}
 
 instance
   ( ProductBC b
   , AllB c b
-  ) => GProductBC c (Rec (Self b' (P0 X)) (b X))
-                    (Rec      (b' (P0 (Dict c)))
-                              (b     (Dict c))) where
+  ) => GProductBC c (Self (b' (P0 X)) (b X))
+                    (Rec (b' (P0 (Dict c))) (b (Dict c))) where
   gbdicts = Rec $ K1 $ bdicts @_ @b
 
 instance
   ( ProductBC b
   , AllB c b
-  ) => GProductBC c (Rec (Other b' (P0 X)) (b X))
-                    (Rec       (b' (P0 (Dict c)))
-                               (b      (Dict c))) where
+  ) => GProductBC c (Other (b' (P0 X)) (b X))
+                    (Rec (b' (P0 (Dict c))) (b (Dict c))) where
   gbdicts = Rec $ K1 $ bdicts @_ @b
 
 

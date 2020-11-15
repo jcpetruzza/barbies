@@ -19,11 +19,20 @@ module Barbies.Internal.ConstraintsB
   , CanDeriveConstraintsB
   , gbaddDictsDefault
   , GAllRepB
+
+  , TagSelf0, TagSelf0'
   )
 
 where
 
-import Barbies.Generics.Constraints(GConstraints(..), GAll, TagSelf, Self, Other, X)
+import Barbies.Generics.Constraints
+  ( GConstraints(..)
+  , GAll
+  , Self
+  , Other
+  , SelfOrOther
+  , X
+  )
 import Barbies.Internal.ApplicativeB(ApplicativeB(..))
 import Barbies.Internal.Dicts(ClassF, Dict (..), requiringDict)
 import Barbies.Internal.FunctorB(FunctorB (..))
@@ -229,16 +238,15 @@ bmempty
 --       @'ConstraintsB' b@ instance. In particular, recursive usages of @B f@
 --       are allowed.
 type CanDeriveConstraintsB c b f
-  = ( GenericP 0 (b f)
-    , GenericP 0 (b (Dict c `Product` f))
+  = ( GenericN (b f)
+    , GenericN (b (Dict c `Product` f))
     , AllB c b ~ GAll 0 c (GAllRepB b)
-    , GConstraints 0 c f (GAllRepB b) (RepP 0 (b f)) (RepP 0 (b (Dict c `Product` f)))
+    , GConstraints 0 c f (GAllRepB b) (RepN (b f)) (RepN (b (Dict c `Product` f)))
     )
 
 -- | The representation used for the generic computation of the @'AllB' c b@
---   constraints. Here 'X' is an arbitrary constant since the actual
---   argument to @b@ is irrelevant.
-type GAllRepB b = TagSelf 0 b (RepN (b X))
+--   constraints.
+type GAllRepB b = TagSelf0 b
 
 
 -- ===============================================================
@@ -254,7 +262,7 @@ gbaddDictsDefault
   => b f
   -> b (Dict c `Product` f)
 gbaddDictsDefault
-  = toP (Proxy @0) . gaddDicts @0 @c @f @(GAllRepB b) . fromP (Proxy @0)
+  = toN . gaddDicts @0 @c @f @(GAllRepB b) . fromN
 {-# INLINE gbaddDictsDefault #-}
 
 
@@ -264,34 +272,39 @@ gbaddDictsDefault
 
 type P = Param
 
+-- Break recursive case
+type instance GAll 0 c (Self (b' (P 0 X)) (b X)) = ()
 
 instance
   ( ConstraintsB b
   , AllB c b
-  ) => -- b' is b, maybe with 'Param' annotations
-       GConstraints 0 c f (Rec (Self b' (P 0 X)) (b X))
-                          (Rec (b (P 0 f)) (b f))
-                          (Rec (b (P 0 (Dict c `Product` f)))
-                               (b      (Dict c `Product` f)))
+  ) => -- b' is b with maybe some Param occurrences
+       GConstraints 0 c f (Self (b' (P 0 X)) (b X))
+                          (Rec (b' (P 0 f)) (b f))
+                          (Rec (b' (P 0 (Dict c `Product` f)))
+                               (b       (Dict c `Product` f)))
   where
   gaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec
   {-# INLINE gaddDicts #-}
 
 
-type instance GAll 0 c (Rec (Other b (P 0 X)) (b' X)) = AllB c b'
+type instance GAll 0 c (Other (b' (P 0 X)) (b X)) = AllB c b
+
 
 instance
   ( ConstraintsB b
   , AllB c b
-  ) => GConstraints 0 c f (Rec (Other b' (P 0 X)) (b X))
-                          (Rec (b (P 0 f)) (b f))
-                          (Rec (b (P 0 (Dict c `Product` f)))
-                               (b      (Dict c `Product` f)))
+  ) => -- b' is b with maybe some Param occurrences
+       GConstraints 0 c f (Other (b' (P 0 X)) (b X))
+                          (Rec (b' (P 0 f)) (b f))
+                          (Rec (b' (P 0 (Dict c `Product` f)))
+                               (b       (Dict c `Product` f)))
   where
   gaddDicts
     = Rec . K1 . baddDicts . unK1 . unRec
   {-# INLINE gaddDicts #-}
+
 
 -- --------------------------------
 -- Instances for base types
@@ -328,3 +341,46 @@ instance (Functor f, ConstraintsB b) => ConstraintsB (f `Compose` b) where
   baddDicts (Compose x)
     = Compose (baddDicts <$> x)
   {-# INLINE baddDicts #-}
+
+-- ============================================================================
+-- ## Identifying recursive usages of the barbie-type ##
+-- ============================================================================
+
+-- | We use the type-families to generically compute @'Barbies.AllB' c b@.
+--   Intuitively, if @b' f'@ occurs inside @b f@, then we should just add
+--   @'Barbies.AllB' b' c@ to @'Barbies.AllB' b c@. The problem is that if @b@
+--   is a recursive type, and @b'@ is @b@, then ghc will choke and blow the stack
+--   (instead of computing a fixpoint).
+--
+--   So, we would like to behave differently when @b = b'@ and add @()@ instead
+--   of @'Barbies.AllB' b c@ to break the recursion. Our trick will be to use a type
+--   family to inspect @'Rep' (b X)@, for an arbitrary @X@,  and distinguish
+--   recursive usages from non-recursive ones, tagging them with different types,
+--   so we can distinguish them in the instances.
+type TagSelf0 b
+  = TagSelf0' (Indexed b 1) (RepN (b X))
+
+type family TagSelf0' (b :: kf -> *) (repbf :: * -> *) :: * -> * where
+  TagSelf0' b (M1 mt m s)
+    = M1 mt m (TagSelf0' b s)
+
+  TagSelf0' b (l :+: r)
+    = TagSelf0' b l :+: TagSelf0' b r
+
+  TagSelf0' b (l :*: r)
+    = TagSelf0' b l :*: TagSelf0' b r
+
+  TagSelf0' (b :: kf -> *)
+            (Rec ((b'  :: kf -> *) f)
+                 ((b'' :: kf -> *) g)
+            )
+    = (SelfOrOther b b') (b' f) (b'' g)
+
+  TagSelf0' b (Rec x y)
+    = Rec x y
+
+  TagSelf0' b U1
+    = U1
+
+  TagSelf0' b V1
+    = V1

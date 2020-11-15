@@ -70,6 +70,10 @@ main
             , Functor.laws @(Flip Bi.NestedF ())
             , Functor.laws @(Flip Bi.Nested2F ())
             , Functor.laws @(Flip Bi.NestedB Maybe)
+
+
+            , Functor.laws @(Bi.MixedBT Maybe)
+            , Functor.laws @(Flip Bi.MixedBT Maybe)
             ]
 
         , testGroup "Distributive Laws"
@@ -127,7 +131,6 @@ main
 
             , Traversable.laws @(ParF Maybe)
 
-
             , Traversable.laws @(Flip Bi.Record0 ())
             , Traversable.laws @(Flip Bi.Record1 ())
             , Traversable.laws @(Flip Bi.Record3 ())
@@ -140,6 +143,9 @@ main
             , Traversable.laws @(Flip Bi.NestedF ())
             , Traversable.laws @(Flip Bi.Nested2F ())
             , Traversable.laws @(Flip Bi.NestedB Maybe)
+
+            , Traversable.laws @(Bi.MixedBT Maybe)
+            , Traversable.laws @(Flip Bi.MixedBT Maybe)
             ]
 
         , testGroup "Applicative laws"
@@ -174,6 +180,8 @@ main
             , Applicative.laws @(Flip Bi.NestedF ())
             , Applicative.laws @(Flip Bi.Nested2F ())
             , Applicative.laws @(Flip (Bi.ParX (Maybe ())) ())
+
+            , Applicative.laws @(Bi.MixedBT [])
             ]
 
         , testGroup "addDict projection"
@@ -200,6 +208,8 @@ main
 
             , Constraints.lawAddDictPrj @CompositeRecord
             , Constraints.lawAddDictPrj @(CompositeRecordW Covered)
+
+            , Constraints.lawAddDictPrj @(Bi.MixedBT Maybe)
             ]
 
         , testGroup "Bare laws"

@@ -28,6 +28,7 @@ module TestBiBarbies
   , HKB(..)
 
   , NestedB(..)
+  , MixedBT(..)
   )
 
 where
@@ -370,3 +371,25 @@ deriving instance (Eq (f (g Bool)), AllBF Eq g Record1', Eq (f (Record1' g))) =>
 instance (Arbitrary (f (g Bool)), AllBF Arbitrary g Record1', Arbitrary (f (Record1' g))) => Arbitrary (NestedB f g) where
   arbitrary
     = NestedB <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
+data MixedBT f g
+  = MixedBT
+    { mx_1 :: f Int
+    , mx_2 :: g Bool
+    }
+  deriving (Generic, Typeable)
+
+instance FunctorT MixedBT
+instance TraversableT MixedBT
+instance ConstraintsT MixedBT
+
+instance FunctorB (MixedBT f)
+instance (Monoid (f Int)) => ApplicativeB (MixedBT f)
+instance TraversableB (MixedBT f)
+instance ConstraintsB (MixedBT f)
+
+deriving instance (AllBF Show g (MixedBT f), AllTF Show f MixedBT) => Show (MixedBT f g)
+deriving instance (AllBF Eq g (MixedBT f), AllTF Eq f MixedBT) => Eq (MixedBT f g)
+
+instance (AllBF Arbitrary g (MixedBT f), AllTF Arbitrary f MixedBT) => Arbitrary (MixedBT f g) where
+  arbitrary = MixedBT <$> arbitrary <*> arbitrary

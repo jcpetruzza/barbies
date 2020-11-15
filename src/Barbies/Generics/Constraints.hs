@@ -4,7 +4,7 @@
 module Barbies.Generics.Constraints
   ( GAll
   , X, Y
-  , TagSelf, TagSelf', Self, Other
+  , Self, Other, SelfOrOther
   , GConstraints(..)
   )
 
@@ -14,7 +14,7 @@ import Barbies.Internal.Dicts(Dict (..))
 
 import Data.Functor.Product (Product (..))
 import Data.Kind            (Constraint, Type)
-import GHC.TypeLits         (Nat, type (+))
+import GHC.TypeLits         (Nat)
 
 import Data.Generics.GenericN
 
@@ -25,8 +25,6 @@ type family GAll (n :: Nat) (c :: k -> Constraint) (repbf :: Type -> Type) :: Co
 
 data X a
 data family Y :: k
-
-
 
 -- ----------------------------------
 -- Trivial cases
@@ -96,34 +94,39 @@ instance
 
 type P = Param
 
-
-type instance GAll n c (Rec (P n X _) (X a)) = c a
+type instance GAll n c (Rec l r) = GAllRec n c l r
+type family GAllRec
+  (n :: Nat)
+  (c :: k -> Constraint)
+  (l :: Type)
+  (r :: Type) :: Constraint
+  where
+    GAllRec n c (P n X _) (X a) = c a
+    GAllRec _ _ _ _ = ()
 
 -- {{ Functor application -----------------------------------------------------
 instance
+  -- a' is a, maybe with Param applications
   GConstraints n c f (Rec (P n X a') (X a))
-                     (Rec (P n f a) (f a))
-                     (Rec (P n (Dict c `Product` f) a)
+                     (Rec (P n f a') (f a))
+                     (Rec (P n (Dict c `Product` f) a')
                               ((Dict c `Product` f) a))
   where
   gaddDicts
     = Rec . K1 . Pair Dict . unK1 . unRec
   {-# INLINE gaddDicts #-}
+
 -- }} Functor application -----------------------------------------------------
 
 -- {{ Not a functor application -----------------------------------------------
 
--- Break all recursive cases
--- b' is b, maybe with 'Param' annotations
-type instance GAll 0 c (Rec (Self b' (P 0 X)) (b X)) = ()
-type instance GAll 1 c (Rec (Self b' (P 1 X) (P 0 Y)) (b X Y)) = ()
-
-type instance GAll n c (Rec a a) = ()
-
 instance
-  GConstraints n c f (Rec a' a)
-                     (Rec a a)
-                     (Rec a a)
+  -- b is a, but with X or Y instead of Param ...
+  -- a' is a, maybe with occurrences of Param
+  -- b' is b, maybe with occurences of Param
+  GConstraints n c f (Rec a' a) -- a' may contain Y or Param m (m > n)
+                     (Rec b' b) -- a'' may only contain Param m (m > n)
+                     (Rec b' b)
   where
   gaddDicts = id
   {-# INLINE gaddDicts #-}
@@ -135,49 +138,9 @@ instance
 --
 -- ============================================================================
 
-data family Self  (b :: k -> k') :: k -> k'
-data family Other (b :: k -> k') :: k -> k'
+data Self  (p :: Type) (a :: Type) (x :: Type)
+data Other (p :: Type) (a :: Type) (x :: Type)
 
--- | We use the type-families to generically compute @'Barbies.AllB' c b@. Intuitively, if
---   @b' f@ occurs inside @b f@, then we should just add @'Barbies.AllB' b' c@ to
---   @'Barbies.AllB' b c@. The problem is that if @b@ is a recursive type, and @b'@ is @b@,
---   then ghc will choke and blow the stack (instead of computing a fixpoint).
---
---   So, we would like to behave differently when @b = b'@ and add @()@ instead
---   of @'Barbies.AllB' b f@ to break the recursion. Our trick will be to use a type
---   family to inspect @'RepN' (b f)@ and distinguish recursive usages from
---   non-recursive ones, tagging them with different types, so we can distinguish
---   them in the instances.
-type TagSelf n b repbf
-  = TagSelf' n b (Indexed b (n + 1)) repbf
-
-type family TagSelf' (n :: Nat) (b :: kb) (b' :: kb) (repbf :: * -> *) :: * -> * where
-  TagSelf' n b b' (M1 mt m s)
-    = M1 mt m (TagSelf' n b b' s)
-
-  TagSelf' n b b' (l :+: r)
-    = TagSelf' n b b' l :+: TagSelf' n b b' r
-
-  TagSelf' n b b' (l :*: r)
-    = TagSelf' n b b' l :*: TagSelf' n b b' r
-
-  TagSelf' 0 b  b' (Rec (b' f) (b g))
-    = Rec (Self b' f) (b g)
-
-  TagSelf' 0 (b :: k -> *) b' (Rec ((b'' :: k -> *) f) ((b''' :: k -> *) g))
-    = Rec (Other b'' f) (b''' g)
-
-  TagSelf' 1 b  b' (Rec (b' fl fr) (b gl gr))
-    = Rec (Self b' fl fr) (b gl gr)
-
-  TagSelf' 1 (b :: kl -> kr ->  *) b' (Rec ((b'' :: kl -> kr -> *) fl fr) ((b''' :: kl -> kr -> *) gl gr))
-    = Rec (Other b'' fl fr) (b''' gl gr)
-
-  TagSelf' n b b' (Rec p a)
-    = Rec p a
-
-  TagSelf' n b b' U1
-    = U1
-
-  TagSelf' n b b' V1
-    = V1
+type family SelfOrOther (b :: k) (b' :: k) :: Type -> Type -> Type -> Type where
+  SelfOrOther b b = Self
+  SelfOrOther b b' = Other

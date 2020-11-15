@@ -31,20 +31,19 @@ module Barbies.Internal
   , Internal.CanDeriveConstraintsB
   , Internal.CanDeriveConstraintsT
 
-
   , Generics.GAll
   , Internal.GAllRepB
   , Internal.GAllRepT
   , Generics.X, Generics.Y
-  , Generics.TagSelf, Generics.TagSelf', Generics.Self, Generics.Other
+  , Generics.Self, Generics.Other, Generics.SelfOrOther
+  , Internal.TagSelf0, Internal.TagSelf0'
+  , Internal.TagSelf1, Internal.TagSelf1'
 
     -- * Bare values
   , Internal.gbcoverDefault
   , Internal.gbstripDefault
   , Generics.GBare(..)
   , Internal.CanDeriveBareB
-
-
 
     -- * Generic derivation support
   , module Data.Generics.GenericN
