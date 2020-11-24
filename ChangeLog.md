@@ -1,5 +1,11 @@
 # Changelog for barbies
 
+## 2.0.3.0
+  - Add Barbies.Bi.bttraverse_
+  - Add Barbies.Bi.btfoldMap
+  - Fix failure to derive Constraints{B,T} for proper
+    bi-barbies.
+
 ## 2.0.2.0
   - Add `Barbies.Bare.WearTwo` type family to support having _field-specific_
     newtype wrappers that get applied only to the covered barbie (Lennart
