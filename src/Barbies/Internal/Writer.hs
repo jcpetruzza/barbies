@@ -53,4 +53,4 @@ execWr
 
 tell :: Monoid w => w -> Wr w ()
 tell w
-  = St (\s -> ((), s `mappend` w))
+  = St (\s -> ((), seq s s `mappend` w))
