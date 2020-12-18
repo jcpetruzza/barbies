@@ -20,6 +20,8 @@ module Barbies.Bi
     --   and a 'TraversableB'.
   , bttraverse
   , bttraverse1
+  , bttraverse_
+  , btfoldMap
 
    -- * Applicative
    -- | If @t@ is an 'ApplicativeT', the type of 'tpure' shows that its
@@ -37,12 +39,15 @@ module Barbies.Bi
 
 
 import Barbies.Internal.Trivial (Unit(..))
+import Barbies.Internal.Writer (execWr, tell)
 import Data.Functor.Barbie
 import Data.Functor.Transformer
 
 import Control.Applicative (Alternative(..))
 import Control.Monad ((>=>))
 import Data.Monoid (Alt(..))
+import Data.Functor (void)
+import Data.Functor.Const (Const(..))
 import Data.Functor.Product (Product(..))
 
 -- {{ Functor -----------------------------------------------------------------
@@ -103,6 +108,36 @@ bttraverse1
 bttraverse1 h
   = bttraverse h h
 {-# INLINE bttraverse1 #-}
+
+-- | Map each element to an action, evaluate these actions from left to right
+--   and ignore the results.
+bttraverse_
+  :: ( TraversableB (b f)
+     , TraversableT b
+     , Monad e
+     )
+  => (forall a. f a -> e c)
+  -> (forall a. g a -> e d)
+  -> b f g
+  -> e ()
+bttraverse_ hf hg
+  = void . bttraverse (neuter . hf) (neuter . hg)
+  where
+    neuter
+      = fmap (const $ Const ())
+
+-- | Map each element to a monoid, and combine the results.
+btfoldMap
+  :: ( TraversableB (b f)
+     , TraversableT b
+     , Monoid m
+     )
+  => (forall a. f a -> m)
+  -> (forall a. g a -> m)
+  -> b f g -> m
+btfoldMap hf hg
+  = execWr . bttraverse_ (tell . hf) (tell . hg)
+
 -- }} Traversable -------------------------------------------------------------
 
 

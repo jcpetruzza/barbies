@@ -32,6 +32,19 @@ instance Applicative (St s) where
         in (f x, s'')
   {-# INLINE (<*>) #-}
 
+instance Monad (St s) where
+  return = pure
+  {-# INLINE return #-}
+
+  St action >>= f
+    = St $ \s ->
+        let
+          (a, s') = action s
+          St go  = f a
+        in
+          go s'
+  {-# INLINE (>>=) #-}
+
 type Wr = St
 
 execWr :: Monoid w => Wr w a -> w
