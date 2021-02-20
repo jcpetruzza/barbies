@@ -73,7 +73,7 @@ import Data.Generics.GenericN
 class FunctorT t => ApplicativeT (t :: (k -> Type) -> (k' -> Type)) where
   tpure
     :: (forall a . f a)
-    -> (forall x . t f x)
+    -> t f x
 
   tprod
     :: t f x

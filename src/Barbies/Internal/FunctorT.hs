@@ -45,7 +45,7 @@ import Data.Kind              (Type)
 -- There is a default 'tmap' implementation for 'Generic' types, so
 -- instances can derived automatically.
 class FunctorT (t :: (k -> Type) -> k' -> Type) where
-  tmap :: (forall a . f a -> g a) -> (forall x. t f x -> t g x)
+  tmap :: (forall a . f a -> g a) -> t f x -> t g x
 
   default tmap
     :: forall f g x

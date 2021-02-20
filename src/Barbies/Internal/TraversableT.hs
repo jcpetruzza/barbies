@@ -53,7 +53,7 @@ class FunctorT t => TraversableT (t :: (k -> Type) -> k' -> Type) where
   ttraverse
     :: Applicative e
     => (forall a . f a -> e (g a))
-    -> (forall x . t f x -> e (t g x))
+    -> t f x -> e (t g x)
 
   default ttraverse
     :: ( Applicative e, CanDeriveTraversableT t f g x)
