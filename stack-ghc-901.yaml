@@ -1,0 +1,4 @@
+resolver: nightly-2021-04-06
+compiler: ghc-9.0.1
+packages:
+- .
