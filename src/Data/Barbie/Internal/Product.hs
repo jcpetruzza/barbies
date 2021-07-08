@@ -74,7 +74,7 @@ gbuniqDefault x
   = toN $ gbuniq (Proxy @f) (Proxy @(RepN (b f))) (Proxy @(RepN (b (f `Product` f)))) x
 {-# INLINE gbuniqDefault #-}
 
-class GProductB (f :: k -> *) (g :: k -> *) repbf repbg repbfg where
+class GProductB (f :: k -> Type) (g :: k -> Type) repbf repbg repbfg where
   gbprod :: Proxy f -> Proxy g -> repbf x -> repbg x -> repbfg x
 
   gbuniq :: (f ~ g, repbf ~ repbg) => Proxy f -> Proxy repbf -> Proxy repbfg -> (forall a . f a) -> repbf x

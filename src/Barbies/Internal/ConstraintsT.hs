@@ -38,7 +38,7 @@ import Barbies.Internal.TraversableT(TraversableT (..))
 
 import Data.Functor.Const(Const(..))
 import Data.Functor.Product(Product(..))
-import Data.Kind(Constraint)
+import Data.Kind(Constraint, Type)
 import Data.Proxy(Proxy(..))
 
 import Data.Generics.GenericN
@@ -75,7 +75,7 @@ import Data.Generics.GenericN
 -- derive instance 'Generic' (T f a)
 -- instance 'ConstraintsT' T
 -- @
-class FunctorT t => ConstraintsT (t :: (kl -> *) -> (kr -> *)) where
+class FunctorT t => ConstraintsT (t :: (kl -> Type) -> (kr -> Type)) where
   -- | @'AllT' c t@ should contain a constraint @c a@ for each
   --   @a@ occurring under an @f@ in @t f@.
   --
@@ -308,7 +308,7 @@ instance
 type TagSelf1 b
   = TagSelf1' (Indexed b 2) (Zip (Rep (Indexed (b X) 1 Y)) (Rep (b X Y)))
 
-type family TagSelf1' (b :: kf -> kg -> *) (repbf :: * -> *) :: * -> * where
+type family TagSelf1' (b :: kf -> kg -> Type) (repbf :: Type -> Type) :: Type -> Type where
   TagSelf1' b (M1 mt m s)
     = M1 mt m (TagSelf1' b s)
 
@@ -318,9 +318,9 @@ type family TagSelf1' (b :: kf -> kg -> *) (repbf :: * -> *) :: * -> * where
   TagSelf1' b (l :*: r)
     = TagSelf1' b l :*: TagSelf1' b r
 
-  TagSelf1' (b :: kf -> kg -> *)
-            (Rec ((b'  :: kf -> kg -> *) fl fr)
-                 ((b'' :: kf -> kg -> *) gl gr)
+  TagSelf1' (b :: kf -> kg -> Type)
+            (Rec ((b'  :: kf -> kg -> Type) fl fr)
+                 ((b'' :: kf -> kg -> Type) gl gr)
             )
     = (SelfOrOther b b') (b' fl gr) (b'' gl gr)
 

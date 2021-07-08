@@ -42,7 +42,7 @@ import Data.Functor.Compose (Compose (..))
 import Data.Functor.Const   (Const (..))
 import Data.Functor.Product (Product (..))
 import Data.Functor.Sum     (Sum (..))
-import Data.Kind            (Constraint)
+import Data.Kind            (Constraint, Type)
 import Data.Proxy           (Proxy (..))
 
 import Data.Generics.GenericN
@@ -79,7 +79,7 @@ import Data.Generics.GenericN
 -- derive instance 'Generic' (T f)
 -- instance 'ConstraintsB' T
 -- @
-class FunctorB b => ConstraintsB (b :: (k -> *) -> *) where
+class FunctorB b => ConstraintsB (b :: (k -> Type) -> Type) where
   -- | @'AllB' c b@ should contain a constraint @c a@ for each
   --   @a@ occurring under an @f@ in @b f@. E.g.:
   --
@@ -360,7 +360,7 @@ instance (Functor f, ConstraintsB b) => ConstraintsB (f `Compose` b) where
 type TagSelf0 b
   = TagSelf0' (Indexed b 1) (RepN (b X))
 
-type family TagSelf0' (b :: kf -> *) (repbf :: * -> *) :: * -> * where
+type family TagSelf0' (b :: kf -> Type) (repbf :: Type -> Type) :: Type -> Type where
   TagSelf0' b (M1 mt m s)
     = M1 mt m (TagSelf0' b s)
 
@@ -370,9 +370,9 @@ type family TagSelf0' (b :: kf -> *) (repbf :: * -> *) :: * -> * where
   TagSelf0' b (l :*: r)
     = TagSelf0' b l :*: TagSelf0' b r
 
-  TagSelf0' (b :: kf -> *)
-            (Rec ((b'  :: kf -> *) f)
-                 ((b'' :: kf -> *) g)
+  TagSelf0' (b :: kf -> Type)
+            (Rec ((b'  :: kf -> Type) f)
+                 ((b'' :: kf -> Type) g)
             )
     = (SelfOrOther b b') (b' f) (b'' g)
 

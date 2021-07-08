@@ -37,6 +37,7 @@ import Barbies
 import Data.Distributive
 import qualified TestBarbies
 
+import Data.Kind(Type)
 import Data.Typeable
 import GHC.Generics
 import Test.Tasty.QuickCheck
@@ -48,7 +49,7 @@ instance Arbitrary (b r l) => Arbitrary (Barbies.Flip b l r) where
 -- Product Barbies
 ----------------------------------------------------
 
-data Record0 (f :: kl -> *) (x :: kr)
+data Record0 (f :: kl -> Type) (x :: kr)
   = Record0
   deriving
     ( Generic, Typeable
@@ -146,7 +147,7 @@ instance AllTF Arbitrary f Record3S => Arbitrary (Record3S f x) where
 -- Bad products
 -----------------------------------------------------
 
-data Ignore1 (f :: * -> *) (x :: kx)
+data Ignore1 (f :: Type -> Type) (x :: kx)
   = Ignore1 { ign1_f1 :: Int }
   deriving (Generic, Typeable, Eq, Show)
 
@@ -288,7 +289,7 @@ instance Arbitrary (f Int) => Arbitrary (Nested2F f x) where
 -- Parametric barbies
 -----------------------------------------------------
 
-data ParB b (f :: k -> *) (x :: kx)
+data ParB b (f :: k -> Type) (x :: kx)
   = ParB (b f x)
   deriving (Generic, Typeable)
 
@@ -298,7 +299,7 @@ instance ApplicativeT b => ApplicativeT (ParB b)
 instance TraversableT b => TraversableT (ParB b)
 instance ConstraintsT b => ConstraintsT (ParB b)
 
-data ParBH h b (f :: k -> *) (x :: kx)
+data ParBH h b (f :: k -> Type) (x :: kx)
   = ParBH (h (b f x))
   deriving (Generic, Typeable)
 

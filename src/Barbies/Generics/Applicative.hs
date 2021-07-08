@@ -8,12 +8,13 @@ where
 
 
 import Data.Functor.Product(Product(..))
+import Data.Kind(Type)
 import Data.Proxy(Proxy (..))
 
 import Data.Generics.GenericN
 
 
-class GApplicative n (f :: k -> *) (g :: k -> *) repbf repbg repbfg where
+class GApplicative n (f :: k -> Type) (g :: k -> Type) repbf repbg repbfg where
   gprod
     :: Proxy n
     -> Proxy f

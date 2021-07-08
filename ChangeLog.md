@@ -5,6 +5,7 @@
   - Add Barbies.Bi.btfoldMap
   - Fix failure to derive Constraints{B,T} for proper
     bi-barbies.
+  - Builds with ghc 9 (Fumiaki Kinoshita)
 
 ## 2.0.2.0
   - Add `Barbies.Bare.WearTwo` type family to support having _field-specific_

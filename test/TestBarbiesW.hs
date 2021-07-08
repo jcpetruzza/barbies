@@ -25,6 +25,7 @@ where
 import Data.Functor.Barbie
 import Barbies.Bare
 
+import Data.Kind(Type)
 import Data.Typeable
 import GHC.Generics
 import Test.Tasty.QuickCheck
@@ -303,7 +304,7 @@ instance Arbitrary (f Int) => Arbitrary (Nested2FW Covered f) where
 -- Parametric barbies
 -----------------------------------------------------
 
-data ParBW b t (f :: * -> *)
+data ParBW b t (f :: Type -> Type)
   = ParBW (b t f)
   deriving (Generic, Typeable)
 
@@ -324,7 +325,7 @@ instance ConstraintsB (b t) => ConstraintsB (ParBW b t) where
   baddDicts (ParBW btf) = ParBW (baddDicts btf)
 
 
-data ParBHW h b t (f :: * -> *)
+data ParBHW h b t (f :: Type -> Type)
   = ParBHW (h (b t f))
   deriving (Generic, Typeable)
 
