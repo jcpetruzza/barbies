@@ -1,5 +1,8 @@
 # Changelog for barbies
 
+## 2.0.3.1
+  - Compatibility changes for GHC 9.2 (Dan Dart)
+
 ## 2.0.3.0
   - Add Barbies.Bi.bttraverse_
   - Add Barbies.Bi.btfoldMap
