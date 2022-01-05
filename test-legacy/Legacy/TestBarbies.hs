@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass       #-}
+{-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Legacy.TestBarbies
