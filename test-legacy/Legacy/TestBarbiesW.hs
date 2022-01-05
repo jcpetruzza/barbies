@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -O0 #-}
 {-# LANGUAGE DeriveAnyClass       #-}
+{-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE UndecidableInstances #-}
