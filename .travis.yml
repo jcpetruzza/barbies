@@ -19,6 +19,8 @@ matrix:
     - env: STACK_YAML=stack-ghc-865.yaml
     - env: STACK_YAML=stack-ghc-883.yaml
     - env: STACK_YAML=stack-ghc-8104.yaml
+    - env: STACK_YAML=stack-ghc-901.yaml
+    - env: STACK_YAML=stack-ghc-924.yaml
 
 script:
   - stack --no-terminal --install-ghc --skip-ghc-check test
