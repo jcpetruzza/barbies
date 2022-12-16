@@ -2,6 +2,7 @@
 
 ## 2.0.3.1
   - Compatibility changes for GHC 9.2 (Dan Dart)
+  - Add FunctorT and DistributiveT instances for AccumT
 
 ## 2.0.3.0
   - Add Barbies.Bi.bttraverse_

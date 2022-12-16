@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -19,6 +20,9 @@ import Barbies.Internal.FunctorT (FunctorT (..))
 
 import Control.Applicative.Backwards(Backwards (..))
 
+#if MIN_VERSION_transformers(0,5,3)
+import Control.Monad.Trans.Accum(AccumT(..), runAccumT)
+#endif
 import Control.Monad.Trans.Except(ExceptT(..), runExceptT)
 import Control.Monad.Trans.Identity(IdentityT(..))
 import Control.Monad.Trans.Maybe(MaybeT(..))
@@ -168,6 +172,12 @@ instance Distributive f => DistributiveT (Compose f) where
 -- -- --------------------------------
 -- -- Instances for transformers types
 -- -- --------------------------------
+
+#if MIN_VERSION_transformers(0,5,3)
+instance DistributiveT (AccumT w) where
+  tdistribute fh = AccumT $ \w -> Compose $ fmap (\h -> runAccumT h w) fh
+  {-# INLINE tdistribute #-}
+#endif
 
 instance DistributiveT Backwards where
   tdistribute = Backwards . Compose . fmap forwards

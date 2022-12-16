@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -15,6 +16,9 @@ import Barbies.Generics.Functor (GFunctor(..))
 import Control.Applicative.Backwards(Backwards (..))
 import Control.Applicative.Lift(Lift, mapLift )
 
+#if MIN_VERSION_transformers(0,5,3)
+import Control.Monad.Trans.Accum(AccumT, mapAccumT)
+#endif
 import Control.Monad.Trans.Except(ExceptT, mapExceptT)
 import Control.Monad.Trans.Identity(IdentityT, mapIdentityT)
 import Control.Monad.Trans.Maybe(MaybeT, mapMaybeT)
@@ -141,6 +145,12 @@ instance FunctorT (Sum f) where
 -- --------------------------------
 -- Instances for transformers types
 -- --------------------------------
+
+#if MIN_VERSION_transformers(0,5,3)
+instance FunctorT (AccumT w) where
+  tmap h = mapAccumT h
+  {-# INLINE tmap #-}
+#endif
 
 instance FunctorT Backwards where
   tmap h (Backwards fa)
