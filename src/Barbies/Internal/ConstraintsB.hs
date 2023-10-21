@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeFamilies         #-}
 {-# LANGUAGE PolyKinds            #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE UndecidableSuperClasses #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.ConstraintsB
   ( ConstraintsB(..)
@@ -16,6 +17,8 @@ module Barbies.Internal.ConstraintsB
   , bzipWith3C
   , bzipWith4C
   , bfoldMapC
+
+  , type (&)
 
   , CanDeriveConstraintsB
   , gbaddDictsDefault
@@ -106,6 +109,8 @@ class FunctorB b => ConstraintsB (b :: (k -> Type) -> Type) where
     => b f -> b (Dict c `Product` f)
   baddDicts = gbaddDictsDefault
 
+class (c a, d a) => (c & d) a where
+instance (c a, d a) => (c & d) a where
 
 -- | Like 'bmap' but a constraint is allowed to be required on
 --   each element of @b@
@@ -118,6 +123,11 @@ class FunctorB b => ConstraintsB (b :: (k -> Type) -> Type) where
 -- >   where
 -- >     showField :: forall a. Show a => Identity a -> Const String a
 -- >     showField (Identity a) = Const (show a)
+--
+-- Notice that one can use the '(&)' class as a way to require several
+-- constraiints to hold simultaneously:
+--
+-- > bmap @(Show & Eq & Enum) r
 bmapC :: forall c b f g
       .  (AllB c b, ConstraintsB b)
       => (forall a. c a => f a -> g a)

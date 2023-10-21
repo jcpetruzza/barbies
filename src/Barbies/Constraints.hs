@@ -13,6 +13,9 @@ module Barbies.Constraints
   , AllBF
   , ClassF
   , ClassFG
+
+    -- * Helpers
+  , type (&)
   )
 
 where
