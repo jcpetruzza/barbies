@@ -10,6 +10,9 @@
     - `Data.Functor.Transformer.tforC`
     - `Data.Functor.Transformer.tfor_`
     - `Barbies.Bi.btfor1`
+    -
+## 2.0.5.0
+  - Add helper class Barbies.Constraints.(&) (#46)
 
 ## 2.0.4.0
   - Add FunctorT and DistributiveT instances for AccumT
