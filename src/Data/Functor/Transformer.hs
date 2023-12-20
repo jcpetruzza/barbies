@@ -12,7 +12,9 @@ module Data.Functor.Transformer
     -- * Traversable
   , Trav.TraversableT(ttraverse)
     -- ** Utility functions
+  , Trav.tfor
   , Trav.ttraverse_
+  , Trav.tfor_
   , Trav.tfoldMap
   , Trav.tsequence
   , Trav.tsequence'
@@ -43,6 +45,7 @@ module Data.Functor.Transformer
     -- ** Utility functions
   , Cons.tmapC
   , Cons.ttraverseC
+  , Cons.tforC
 
     -- * Support for generic derivations
   , GenericsN.Rec(..)

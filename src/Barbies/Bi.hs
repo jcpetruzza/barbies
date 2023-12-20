@@ -20,6 +20,7 @@ module Barbies.Bi
     --   and a 'TraversableB'.
   , bttraverse
   , bttraverse1
+  , btfor1
   , bttraverse_
   , btfoldMap
 
@@ -108,6 +109,17 @@ bttraverse1
 bttraverse1 h
   = bttraverse h h
 {-# INLINE bttraverse1 #-}
+
+-- | 'bttraverse1' with the arguments flipped.
+btfor1
+  :: ( TraversableB (b f)
+     , TraversableT b
+     , Monad t
+     )
+  => b f f
+  -> (forall a . f a -> t (g a))
+  -> t (b g g)
+btfor1 b f = bttraverse1 f b
 
 -- | Map each element to an action, evaluate these actions from left to right
 --   and ignore the results.

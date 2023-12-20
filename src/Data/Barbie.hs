@@ -8,7 +8,9 @@ module Data.Barbie
     -- * Traversable
   , TraversableB(btraverse)
     -- ** Utility functions
+  , bfor
   , btraverse_
+  , bfor_
   , bfoldMap
   , bsequence, bsequence'
 
@@ -29,6 +31,7 @@ module Data.Barbie
     -- ** Utility functions
   , bmapC
   , btraverseC
+  , bforC
 
     -- * Products and constaints
   , ProductBC(bdicts)
@@ -55,7 +58,7 @@ module Data.Barbie
 
 where
 
-import Barbies.Internal.ConstraintsB (AllBF, ConstraintsB (..), bmapC, btraverseC, bmempty)
+import Barbies.Internal.ConstraintsB (AllBF, ConstraintsB (..), bforC, bmapC, btraverseC, bmempty)
 
 import Barbies.Internal.FunctorB(FunctorB(..))
 import Barbies.Internal.Wrappers(Barbie(..))
@@ -66,8 +69,9 @@ import Data.Barbie.Internal.ProductC(ProductBC(..), CanDeriveProductBC,  GProduc
 
 import Barbies.Internal.TraversableB
   ( TraversableB(..)
+  , bfor
   , bsequence, bsequence'
-  , bfoldMap, btraverse_
+  , bfoldMap, btraverse_, bfor_
   )
 import qualified Barbies.Internal.Trivial as Trivial
 

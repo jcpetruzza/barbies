@@ -7,6 +7,7 @@ module Barbies.Internal.ConstraintsT
   ( ConstraintsT(..)
   , tmapC
   , ttraverseC
+  , tforC
   , AllTF
   , tdicts
   , tpureC
@@ -121,6 +122,16 @@ ttraverseC
   -> e (t g x)
 ttraverseC f t
   = ttraverse (\(Pair (Dict :: Dict c a) x) -> f x) (taddDicts t)
+
+-- | Like 'ttraverseC' but with the arguments flipped.
+tforC
+  :: forall c t f g e x
+  .  (TraversableT t, ConstraintsT t, AllT c t, Applicative e)
+  => t f x
+  -> (forall a. c a => f a -> e (g a))
+  -> e (t g x)
+tforC t f
+  = ttraverseC @c f t
 
 -- | Like 'Data.Functor.Transformer.tfoldMap' but with a constraint on the function.
 tfoldMapC
