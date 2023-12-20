@@ -4,7 +4,9 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.TraversableT
   ( TraversableT(..)
+  , tfor
   , ttraverse_
+  , tfor_
   , tsequence
   , tsequence'
   , tfoldMap
@@ -60,6 +62,17 @@ class FunctorT t => TraversableT (t :: (k -> Type) -> k' -> Type) where
     => (forall a . f a -> e (g a)) -> t f x -> e (t g x)
   ttraverse = ttraverseDefault
 
+-- | 'ttraverse' with the arguments flipped. Useful when the traversing function is a large lambda:
+--
+-- @
+-- tfor someTransformer $ \fa -> ...
+-- @
+tfor
+  :: (TraversableT t, Applicative e)
+  => t f x
+  -> (forall a . f a -> e (g a))
+  -> e (t g x)
+tfor t f = ttraverse f t
 
 
 -- | Map each element to an action, evaluate these actions from left to right,
@@ -70,6 +83,14 @@ ttraverse_
   -> t f x -> e ()
 ttraverse_ f
   = void . ttraverse (fmap (const $ Const ()) . f)
+
+-- | 'ttraverse_' with the arguments flipped.
+tfor_
+  :: (TraversableT t, Applicative e)
+  => t f x
+  -> (forall a . f a -> e c)
+  -> e ()
+tfor_ t f = ttraverse_ f t
 
 
 -- | Evaluate each action in the structure from left to right,

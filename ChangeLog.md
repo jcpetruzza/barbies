@@ -1,5 +1,16 @@
 # Changelog for barbies
 
+## Unreleased (minor)
+  - Add flipped-argument versions of `traverse` functions. By analogy
+    to `Data.Traversable.for` in `base` these are similarly-named:
+    - `Data.Barbie.bfor`
+    - `Data.Barbie.bfor_`
+    - `Data.Barbie.bforC`
+    - `Data.Functor.Transformer.tfor`
+    - `Data.Functor.Transformer.tforC`
+    - `Data.Functor.Transformer.tfor_`
+    - `Barbies.Bi.btfor1`
+
 ## 2.0.4.0
   - Add FunctorT and DistributiveT instances for AccumT
 

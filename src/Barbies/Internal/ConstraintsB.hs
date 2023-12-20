@@ -7,6 +7,7 @@ module Barbies.Internal.ConstraintsB
   ( ConstraintsB(..)
   , bmapC
   , btraverseC
+  , bforC
   , AllBF
   , bdicts
   , bpureC
@@ -137,6 +138,19 @@ btraverseC
   -> e (b g)
 btraverseC f b
   = btraverse (\(Pair (Dict :: Dict c a) x) -> f x) (baddDicts b)
+
+-- | 'btraverseC' with the arguments flipped. Useful when the traversing function is a large lambda:
+--
+-- @
+-- bforC someBarbie $ \fa -> ...
+-- @
+bforC
+  :: forall c b f g e
+  .  (TraversableB b, ConstraintsB b, AllB c b, Applicative e)
+  => b f
+  -> (forall a. c a => f a -> e (g a))
+  -> e (b g)
+bforC b f = btraverseC @c f b
 
 bfoldMapC
   :: forall c b m f

@@ -3,7 +3,9 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Barbies.Internal.TraversableB
   ( TraversableB(..)
+  , bfor
   , btraverse_
+  , bfor_
   , bsequence
   , bsequence'
   , bfoldMap
@@ -50,6 +52,17 @@ class FunctorB b => TraversableB (b :: (k -> Type) -> Type) where
     -> e (b g)
   btraverse = gbtraverseDefault
 
+-- | 'btraverse' with the arguments flipped. Useful when the traversing function is a large lambda:
+--
+-- @
+-- bfor someBarbie $ \fa -> ...
+-- @
+bfor
+  :: (TraversableB b, Applicative e)
+  => b f
+  -> (forall a . f a -> e (g a))
+  -> e (b g)
+bfor b f = btraverse f b
 
 
 -- | Map each element to an action, evaluate these actions from left to right,
@@ -61,6 +74,14 @@ btraverse_
   -> e ()
 btraverse_ f
   = void . btraverse (fmap (const $ Const ()) . f)
+
+-- | 'btraverse_' with the arguments flipped.
+bfor_
+  :: (TraversableB b, Applicative e)
+  => b f
+  -> (forall a. f a -> e c)
+  -> e ()
+bfor_ b f = btraverse_ f b
 
 
 -- | Evaluate each action in the structure from left to right,
