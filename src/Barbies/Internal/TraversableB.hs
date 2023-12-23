@@ -57,6 +57,8 @@ class FunctorB b => TraversableB (b :: (k -> Type) -> Type) where
 -- @
 -- bfor someBarbie $ \fa -> ...
 -- @
+--
+-- @since 2.1.1.0
 bfor
   :: (TraversableB b, Applicative e)
   => b f
@@ -76,6 +78,8 @@ btraverse_ f
   = void . btraverse (fmap (const $ Const ()) . f)
 
 -- | 'btraverse_' with the arguments flipped.
+--
+-- @since 2.1.1.0
 bfor_
   :: (TraversableB b, Applicative e)
   => b f

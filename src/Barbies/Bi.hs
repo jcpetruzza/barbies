@@ -111,6 +111,8 @@ bttraverse1 h
 {-# INLINE bttraverse1 #-}
 
 -- | 'bttraverse1' with the arguments flipped.
+--
+-- @since 2.1.0.0
 btfor1
   :: ( TraversableB (b f)
      , TraversableT b
