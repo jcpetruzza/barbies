@@ -1,8 +1,9 @@
 # Changelog for barbies
 
-## Unreleased (minor)
-  - Add flipped-argument versions of `traverse` functions. By analogy
-    to `Data.Traversable.for` in `base` these are similarly-named:
+## Unreleased (major)
+  - Remove the deprecated interface from 1.x version
+  - Add flipped-argument versions of `traverse` functions )Jack Kelly).
+    By analogy to `Data.Traversable.for` in `base` these are similarly-named:
     - `Data.Barbie.bfor`
     - `Data.Barbie.bfor_`
     - `Data.Barbie.bforC`
@@ -10,7 +11,7 @@
     - `Data.Functor.Transformer.tforC`
     - `Data.Functor.Transformer.tfor_`
     - `Barbies.Bi.btfor1`
-    -
+
 ## 2.0.5.0
   - Add helper class Barbies.Constraints.(&) (#46)
 

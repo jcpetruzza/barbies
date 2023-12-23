@@ -33,12 +33,6 @@ library
       Data.Functor.Barbie
       Data.Functor.Transformer
 
-      -- Deprecated modules
-      Data.Barbie
-      Data.Barbie.Bare
-      Data.Barbie.Constraints
-      Data.Functor.Prod
-
   other-modules:
       Barbies.Generics.Applicative
       Barbies.Generics.Bare
@@ -73,10 +67,6 @@ library
       Barbies.Internal.Writer
 
       Data.Generics.GenericN
-
-      -- To be removed
-      Data.Barbie.Internal.Product
-      Data.Barbie.Internal.ProductC
 
   hs-source-dirs:
       src
@@ -139,50 +129,6 @@ test-suite barbies-test
       barbies
     , base >=4.7 && <5
     , distributive
-    , QuickCheck
-    , tasty
-    , tasty-hunit
-    , tasty-quickcheck
-
-  default-language: Haskell2010
-  default-extensions:
-    DeriveDataTypeable
-    DeriveGeneric
-    KindSignatures
-    LambdaCase
-    Rank2Types
-    ScopedTypeVariables
-    StandaloneDeriving
-    TypeApplications
-    TypeOperators
-
--- This tests that the deprecated Data.Barbie interface
--- can still be used to build code writen against 1.x,
--- with deprecation warnings
-test-suite barbies-test-legacy
-  type: exitcode-stdio-1.0
-
-  main-is: Legacy/Spec.hs
-
-  other-modules:
-      Legacy.TestBarbies
-      Legacy.TestBarbiesW
-      Legacy.Clothes
-      Legacy.Spec.Bare
-      Legacy.Spec.Constraints
-      Legacy.Spec.Functor
-      Legacy.Spec.Traversable
-      Legacy.Spec.Product
-      Legacy.Spec.Wrapper
-
-  hs-source-dirs:
-      test-legacy
-
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall -Wno-deprecations -O0
-
-  build-depends:
-      barbies
-    , base >=4.7 && <5
     , QuickCheck
     , tasty
     , tasty-hunit
