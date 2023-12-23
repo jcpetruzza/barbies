@@ -154,6 +154,8 @@ btraverseC f b
 -- @
 -- bforC someBarbie $ \fa -> ...
 -- @
+--
+-- @since 2.1.1.0
 bforC
   :: forall c b f g e
   .  (TraversableB b, ConstraintsB b, AllB c b, Applicative e)

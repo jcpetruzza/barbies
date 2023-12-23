@@ -67,6 +67,8 @@ class FunctorT t => TraversableT (t :: (k -> Type) -> k' -> Type) where
 -- @
 -- tfor someTransformer $ \fa -> ...
 -- @
+--
+-- @since 2.1.0.0
 tfor
   :: (TraversableT t, Applicative e)
   => t f x
@@ -85,6 +87,8 @@ ttraverse_ f
   = void . ttraverse (fmap (const $ Const ()) . f)
 
 -- | 'ttraverse_' with the arguments flipped.
+--
+-- @since 2.1.0.0
 tfor_
   :: (TraversableT t, Applicative e)
   => t f x

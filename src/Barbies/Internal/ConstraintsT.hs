@@ -124,6 +124,8 @@ ttraverseC f t
   = ttraverse (\(Pair (Dict :: Dict c a) x) -> f x) (taddDicts t)
 
 -- | Like 'ttraverseC' but with the arguments flipped.
+--
+-- @since 2.1.0.0
 tforC
   :: forall c t f g e x
   .  (TraversableT t, ConstraintsT t, AllT c t, Applicative e)
