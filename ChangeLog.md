@@ -2,7 +2,7 @@
 
 ## 2.1.0.0
   - Remove the deprecated interface from 1.x version
-  - Add flipped-argument versions of `traverse` functions )Jack Kelly).
+  - Add flipped-argument versions of `traverse` functions (Jack Kelly).
     By analogy to `Data.Traversable.for` in `base` these are similarly-named:
     - `Data.Barbie.bfor`
     - `Data.Barbie.bfor_`
