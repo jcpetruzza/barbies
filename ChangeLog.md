@@ -1,12 +1,19 @@
 # Changelog for barbies
 
+## 2.1.1.0
+  - Correctly export the following functions, which were not
+    accessible in 2.1.0.0:
+    - `Data.Barbie.bfor`
+    - `Data.Barbie.bfor_`
+    - `Data.Barbie.bforC`
+
 ## 2.1.0.0
   - Remove the deprecated interface from 1.x version
   - Add flipped-argument versions of `traverse` functions (Jack Kelly).
     By analogy to `Data.Traversable.for` in `base` these are similarly-named:
-    - `Data.Barbie.bfor`
-    - `Data.Barbie.bfor_`
-    - `Data.Barbie.bforC`
+    - ~~`Data.Barbie.bfor`~~
+    - ~~`Data.Barbie.bfor_`~~
+    - ~~`Data.Barbie.bforC`~~
     - `Data.Functor.Transformer.tfor`
     - `Data.Functor.Transformer.tforC`
     - `Data.Functor.Transformer.tfor_`
