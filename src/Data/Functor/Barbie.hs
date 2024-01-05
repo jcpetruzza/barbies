@@ -11,7 +11,9 @@ module Data.Functor.Barbie
     -- * Traversable
   , Trav.TraversableB(btraverse)
     -- ** Utility functions
+  , Trav.bfor
   , Trav.btraverse_
+  , Trav.bfor_
   , Trav.bfoldMap
   , Trav.bsequence
   , Trav.bsequence'
@@ -59,6 +61,7 @@ module Data.Functor.Barbie
   , Cons.bmapC
   , Cons.bfoldMapC
   , Cons.btraverseC
+  , Cons.bforC
   , Cons.bpureC
   , Cons.bzipWithC
   , Cons.bzipWith3C
