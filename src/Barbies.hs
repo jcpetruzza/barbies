@@ -165,7 +165,7 @@ module Barbies
      --  barbie-types, transformer-types are functors too.
      --
      -- @
-     -- 'tmap' :: 'FunctorT' t => (forall a. f a -> g a) -> t f x -> b g x
+     -- 'tmap' :: 'FunctorT' t => (forall a. f a -> g a) -> t f x -> t g x
      -- @
      --
      --  Where 'FunctorB' captures functors from indexed-types to types,
