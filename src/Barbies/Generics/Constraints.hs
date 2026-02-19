@@ -1,6 +1,12 @@
-{-# LANGUAGE AllowAmbiguousTypes  #-}
-{-# LANGUAGE TypeFamilies         #-}
-{-# LANGUAGE PolyKinds            #-}
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PolyKinds             #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE UndecidableInstances  #-}
 module Barbies.Generics.Constraints
   ( GAll
   , X, Y
@@ -101,7 +107,11 @@ type family GAllRec
   (l :: Type)
   (r :: Type) :: Constraint
   where
+    -- Method fields: strip function arrows recursively
+    GAllRec n c (a -> d) (a -> e) = GAllRec n c d e
+    -- Standard case: direct functor application
     GAllRec n c (P n X _) (X a) = c a
+    -- Default: no constraint
     GAllRec _ _ _ _ = ()
 
 -- {{ Functor application -----------------------------------------------------
@@ -118,9 +128,56 @@ instance
 
 -- }} Functor application -----------------------------------------------------
 
+
+-- {{ Method records (records-of-functions) -----------------------------------
+
+-- Method base case: function returning f a
+instance
+  {-# OVERLAPPING #-}
+  c z =>
+  GConstraints
+    0
+    c
+    f
+    (Rec (a -> P 0 X z) (a -> X z))
+    (Rec (a -> P 0 f z) (a -> f z))
+    (Rec (a -> P 0 (Product (Dict c) f) z) (a -> Product (Dict c) f z))
+  where
+  gaddDicts (Rec (K1 g)) = Rec (K1 (Pair Dict . g))
+  {-# INLINE gaddDicts #-}
+
+-- Method recursive case: multi-argument functions
+instance
+  ( GConstraints
+      0
+      c
+      (f :: k1 -> Type)
+      (Rec d e :: Type -> Type)
+      (Rec d' e' :: k2 -> Type)
+      (Rec d'' e'' :: k2 -> Type)
+  , GAll 0 c (Rec d e)
+  ) =>
+  GConstraints
+    0
+    c
+    (f :: k1 -> Type)
+    (Rec (a -> d) (a -> e) :: Type -> Type)
+    (Rec (a -> d') (a -> e') :: k2 -> Type)
+    (Rec (a -> d'') (a -> e'') :: k2 -> Type)
+  where
+  gaddDicts (Rec (K1 g)) = Rec . K1 $ \a ->
+    let Rec (K1 ga'') =
+          gaddDicts @0 @c @f @(Rec d e :: Type -> Type) @(Rec d' e' :: k2 -> Type) @(Rec d'' e'' :: k2 -> Type) (Rec (K1 (g a)))
+     in ga''
+  {-# INLINE gaddDicts #-}
+
+-- }} Method records ----------------------------------------------------------
+
+
 -- {{ Not a functor application -----------------------------------------------
 
 instance
+  {-# OVERLAPPABLE #-}
   -- b is a, but with X or Y instead of Param ...
   -- a' is a, maybe with occurrences of Param
   -- b' is b, maybe with occurences of Param

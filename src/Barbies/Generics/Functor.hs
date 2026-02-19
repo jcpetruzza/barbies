@@ -1,5 +1,12 @@
-{-# LANGUAGE PolyKinds    #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PolyKinds             #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE UndecidableInstances  #-}
 module Barbies.Generics.Functor
   ( GFunctor(..)
   )
@@ -7,6 +14,7 @@ module Barbies.Generics.Functor
 where
 
 import Data.Generics.GenericN
+import Data.Kind (Type)
 import Data.Proxy (Proxy (..))
 
 import GHC.TypeLits (Nat)
@@ -84,8 +92,37 @@ instance
 
 -- {{ Not a functor application --------------------------
 instance
+  {-# OVERLAPPABLE #-}
   GFunctor n f g (Rec x x) (Rec x x)
   where
   gmap _ _ = id
   {-# INLINE gmap #-}
 -- }} Not a functor application --------------------------
+
+
+-- {{ Method records (records-of-functions) -----------------------------------
+
+-- Method base case: function returning f a
+instance
+  {-# OVERLAPPING #-}
+  GFunctor 0 (x :: k1 -> Type) (y :: k1 -> Type)
+    (Rec (a -> P 0 x z) (a -> x z) :: k2 -> Type)
+    (Rec (a -> P 0 y z) (a -> y z) :: k2 -> Type)
+  where
+  gmap _ h (Rec (K1 f)) = Rec (K1 (h . f))
+  {-# INLINE gmap #-}
+
+-- Method recursive case: multi-argument functions
+instance
+  GFunctor 0 (x :: k1 -> Type) (y :: k1 -> Type)
+    (Rec b c :: k2 -> Type) (Rec b' c' :: k2 -> Type) =>
+  GFunctor 0 (x :: k1 -> Type) (y :: k1 -> Type)
+    (Rec (a -> b) (a -> c) :: k2 -> Type)
+    (Rec (a -> b') (a -> c') :: k2 -> Type)
+  where
+  gmap p h (Rec (K1 f)) = Rec . K1 $ \a ->
+    let Rec (K1 fa') = gmap @0 @x @y @(Rec b c :: k2 -> Type) @(Rec b' c' :: k2 -> Type) p h (Rec (K1 (f a)))
+     in fa'
+  {-# INLINE gmap #-}
+
+-- }} Method records ----------------------------------------------------------

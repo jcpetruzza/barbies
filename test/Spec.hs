@@ -5,12 +5,14 @@ import qualified Spec.Bare as Bare
 import qualified Spec.Constraints as Constraints
 import qualified Spec.Functor as Functor
 import qualified Spec.Applicative as Applicative
+import qualified Spec.Method as Method
 import qualified Spec.Traversable as Traversable
 import qualified Spec.Distributive as Distributive
 import qualified Spec.Wrapper as Wrapper
 
 import TestBarbies
 import TestBarbiesW
+import TestMethodBarbies ()
 import qualified TestBiBarbies as Bi
 
 import Barbies(Flip)
@@ -295,4 +297,6 @@ main
                   go w x y z = liftA2 (+) (liftA2 (+) w x) (liftA2 (+) y z)
                 bzipWith4C @Num go a b c d @?= Record1S (Just 165)
             ]
+
+        , Method.methodTests
         ]

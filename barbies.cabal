@@ -111,12 +111,14 @@ test-suite barbies-test
       TestBarbies
       TestBarbiesW
       TestBiBarbies
+      TestMethodBarbies
       Clothes
       Spec.Applicative
       Spec.Bare
       Spec.Constraints
       Spec.Distributive
       Spec.Functor
+      Spec.Method
       Spec.Traversable
       Spec.Wrapper
 
