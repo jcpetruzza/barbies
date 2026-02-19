@@ -1,5 +1,12 @@
-{-# LANGUAGE PolyKinds            #-}
-{-# LANGUAGE TypeFamilies         #-}
+{-# LANGUAGE AllowAmbiguousTypes   #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE PolyKinds             #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeApplications      #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE UndecidableInstances  #-}
 module Barbies.Generics.Applicative
   ( GApplicative(..)
   )
@@ -7,6 +14,7 @@ module Barbies.Generics.Applicative
 where
 
 
+import Control.Applicative (liftA2)
 import Data.Functor.Product(Product(..))
 import Data.Kind(Type)
 import Data.Proxy(Proxy (..))
@@ -118,6 +126,7 @@ instance
 
 -- {{ Not a functor application -----------------------------------------------
 instance
+  {-# OVERLAPPABLE #-}
   ( Monoid x
   ) => GApplicative n f g (Rec x x) (Rec x x) (Rec x x)
   where
@@ -129,3 +138,43 @@ instance
     = Rec (K1 (l <> r))
   {-# INLINE gprod #-}
 -- }} Not a functor application -----------------------------------------------
+
+
+-- {{ Method records (records-of-functions) -----------------------------------
+
+-- Method base case: function returning f a
+instance
+  {-# OVERLAPPING #-}
+  GApplicative 0 x y
+    (Rec (a -> P 0 x z) (a -> x z))
+    (Rec (a -> P 0 y z) (a -> y z))
+    (Rec (a -> P 0 (Product x y) z) (a -> Product x y z))
+  where
+  gpure _ _ _ _ x = Rec (K1 (pure x))
+  {-# INLINE gpure #-}
+
+  gprod _ _ _ (Rec (K1 f)) (Rec (K1 g)) = Rec (K1 (liftA2 Pair f g))
+  {-# INLINE gprod #-}
+
+-- Method recursive case: multi-argument functions
+instance
+  GApplicative 0 (x :: k1 -> Type) (y :: k1 -> Type)
+    (Rec b c :: k2 -> Type) (Rec b' c' :: k2 -> Type) (Rec d d' :: k2 -> Type) =>
+  GApplicative 0 (x :: k1 -> Type) (y :: k1 -> Type)
+    (Rec (a -> b) (a -> c) :: k2 -> Type)
+    (Rec (a -> b') (a -> c') :: k2 -> Type)
+    (Rec (a -> d) (a -> d') :: k2 -> Type)
+  where
+  gpure p px _ _ x = Rec . K1 $ \_ ->
+    let Rec (K1 x') = gpure p px (Proxy :: Proxy (Rec b c :: k2 -> Type)) (Proxy :: Proxy (Rec d d' :: k2 -> Type)) x
+     in x'
+  {-# INLINE gpure #-}
+
+  gprod p px py (Rec (K1 f)) (Rec (K1 g)) = Rec . K1 $ \a ->
+    let Rec (K1 z') = gprod @_ @0 @(x :: k1 -> Type) @(y :: k1 -> Type)
+          @(Rec b c :: k2 -> Type) @(Rec b' c' :: k2 -> Type) @(Rec d d' :: k2 -> Type)
+          p px py (Rec (K1 (f a))) (Rec (K1 (g a)))
+     in z'
+  {-# INLINE gprod #-}
+
+-- }} Method records ----------------------------------------------------------
