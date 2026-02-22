@@ -66,6 +66,32 @@ methodTests = testGroup "Method Records"
                 lhs = bmap (g . f) record
                 rhs = (bmap g . bmap f) record
             mr1_method lhs 5 @?= mr1_method rhs 5
+
+        , testCase "bmap id on MethodRecord3" $ do
+            let record = MethodRecord3
+                  { mr3_method1 = \i b -> Identity (if b then i else 0)
+                  , mr3_method2 = \i b c -> Identity (c == 'a' && b)
+                  , mr3_method3 = \i b c d -> Identity (d + fromIntegral i)
+                  }
+                mapped = bmap id record
+            runIdentity (mr3_method1 mapped 5 True) @?= 5
+            runIdentity (mr3_method1 mapped 5 False) @?= 0
+            runIdentity (mr3_method2 mapped 1 True 'a') @?= True
+            runIdentity (mr3_method2 mapped 1 False 'a') @?= False
+            runIdentity (mr3_method3 mapped 10 True 'x' 1.5) @?= 11.5
+
+        , testCase "bmap (natural transformation) on MethodRecord3" $ do
+            let record = MethodRecord3
+                  { mr3_method1 = \i b -> Identity i
+                  , mr3_method2 = \i b c -> Identity b
+                  , mr3_method3 = \i b c d -> Identity d
+                  }
+                listify :: forall a. Identity a -> [] a
+                listify (Identity x) = [x]
+                mapped = bmap listify record
+            mr3_method1 mapped 42 True @?= [42]
+            mr3_method2 mapped 1 False 'z' @?= [False]
+            mr3_method3 mapped 0 True 'a' 3.14 @?= [3.14]
         ]
 
     , testGroup "ApplicativeB"
@@ -112,6 +138,38 @@ methodTests = testGroup "Method Records"
             let r = MethodRecord1 { mr1_method = \n -> Identity n }
                 lhs = bmap (\(Pair _ b) -> b) (bpure Nothing `bprod` r)
             mr1_method lhs 42 @?= mr1_method r 42
+
+        , testCase "bpure on MethodRecord3" $ do
+            let record :: MethodRecord3 Maybe
+                record = bpure Nothing
+            mr3_method1 record 1 True @?= Nothing
+            mr3_method2 record 2 False 'x' @?= Nothing
+            mr3_method3 record 3 True 'y' 1.0 @?= Nothing
+
+        , testCase "bprod on MethodRecord3" $ do
+            let r1 = MethodRecord3
+                  { mr3_method1 = \i b -> Identity i
+                  , mr3_method2 = \i b c -> Identity b
+                  , mr3_method3 = \i b c d -> Identity d
+                  }
+                r2 = MethodRecord3
+                  { mr3_method1 = \i b -> Identity (i * 2)
+                  , mr3_method2 = \i b c -> Identity (not b)
+                  , mr3_method3 = \i b c d -> Identity (d * 2)
+                  }
+                prod = r1 `bprod` r2
+            case mr3_method1 prod 5 True of
+              Pair (Identity a) (Identity b) -> do
+                a @?= 5
+                b @?= 10
+            case mr3_method2 prod 1 True 'z' of
+              Pair (Identity a) (Identity b) -> do
+                a @?= True
+                b @?= False
+            case mr3_method3 prod 1 True 'a' 2.5 of
+              Pair (Identity a) (Identity b) -> do
+                a @?= 2.5
+                b @?= 5.0
         ]
 
     , testGroup "ConstraintsB"
@@ -137,5 +195,19 @@ methodTests = testGroup "Method Records"
                 withDicts = baddDicts record :: MethodRecord1 (Product (Dict Show) Identity)
                 projected = bmap (\(Pair _ b) -> b) withDicts
             runIdentity (mr1_method projected 5) @?= runIdentity (mr1_method record 5)
+
+        , testCase "baddDicts on MethodRecord3" $ do
+            let record = MethodRecord3
+                  { mr3_method1 = \i b -> Identity i
+                  , mr3_method2 = \i b c -> Identity b
+                  , mr3_method3 = \i b c d -> Identity d
+                  }
+                withDicts = baddDicts record :: MethodRecord3 (Product (Dict Show) Identity)
+            case mr3_method1 withDicts 42 True of
+              Pair Dict (Identity v) -> v @?= 42
+            case mr3_method2 withDicts 1 True 'x' of
+              Pair Dict (Identity v) -> v @?= True
+            case mr3_method3 withDicts 1 False 'a' 3.14 of
+              Pair Dict (Identity v) -> v @?= 3.14
         ]
     ]

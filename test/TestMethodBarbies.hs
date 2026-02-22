@@ -6,6 +6,7 @@
 module TestMethodBarbies
   ( MethodRecord1(..)
   , MethodRecord2(..)
+  , MethodRecord3(..)
   , MixedRecord(..)
   )
 
@@ -55,3 +56,17 @@ data MixedRecord (f :: Type -> Type)
 instance FunctorB MixedRecord
 instance ApplicativeB MixedRecord
 instance ConstraintsB MixedRecord
+
+
+-- | A method record with methods of varying arities (2, 3, and 4)
+data MethodRecord3 (f :: Type -> Type)
+  = MethodRecord3
+      { mr3_method1 :: Int -> Bool -> f Int           -- arity 2
+      , mr3_method2 :: Int -> Bool -> Char -> f Bool  -- arity 3
+      , mr3_method3 :: Int -> Bool -> Char -> Double -> f Double  -- arity 4
+      }
+  deriving (Generic, Typeable)
+
+instance FunctorB MethodRecord3
+instance ApplicativeB MethodRecord3
+instance ConstraintsB MethodRecord3
